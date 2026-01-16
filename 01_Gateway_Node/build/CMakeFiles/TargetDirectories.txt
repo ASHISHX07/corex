@@ -1,3 +1,0 @@
-D:/programming/Projects/VENN/01_Gateway_Node/build/CMakeFiles/shm_bridge.dir
-D:/programming/Projects/VENN/01_Gateway_Node/build/CMakeFiles/ALL_BUILD.dir
-D:/programming/Projects/VENN/01_Gateway_Node/build/CMakeFiles/ZERO_CHECK.dir
