@@ -20,7 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({path: path.resolve(__dirname, '../.env')});    // Load .env from the Root Directory
 const accessTokenFilePath = path.resolve(__dirname, '../Data/cache/access_token.txt');
 const authCodeFilePath = path.resolve(__dirname, '../Data/cache/auth_code.txt');
-const bridge = require('./build/Release/shm_bridge.node');
+const bridge = require('./build/shm_bridge.node');
 
 const appId = process.env.FYERS_APP_ID
 let accessToken = ensureAndRead(accessTokenFilePath);

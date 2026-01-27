@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(shm_bridge)
 
+# cmake-js adds "/DELAYLOAD:NODE.EXE" by default on Windows (assuming MSVC).
+# This causes GCC/MinGW to crash. We must remove it.
+if(WIN32 AND (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR MINGW))
+    message(STATUS "Cleaning up MSVC flags for GCC/MinGW...")
+    string(REPLACE "/DELAYLOAD:NODE.EXE" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+    string(REPLACE "/DELAYLOAD:NODE.EXE" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
+endif()
+
 # Enforce C++20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
