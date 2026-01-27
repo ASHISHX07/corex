@@ -33,12 +33,13 @@ if(!accessToken) {
     await getAccessToken(appId);
     accessToken = readFileSync(accessTokenFilePath, 'utf8');
 }
-let validate = await getProfileInfo(appId, accessToken, true)
+let validate = await getProfileInfo(appId, accessToken, true, false)
 if(validate) {
     console.log("\nauthentication done\n")
 }
-
-// await getProfileInfo(appId, access_token); // will be used when needed
+else {
+    
+}
 
 // await stockStream(appId, access_token);
 

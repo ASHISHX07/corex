@@ -11,9 +11,9 @@ dotenv.config({path: path.resolve(__dirname, '../../.env')});    // Load .env fr
 const logDir = path.join(__dirname, '../../Data/logs/account_logs');
 const authCodeFilePath = path.resolve(__dirname, '../../Data/cache/auth_code.txt');
 const accessTokenFilePath = path.resolve(__dirname, '../../Data/cache/access_token.txt');
-const fyers = new fyersModel({"path": ensureAndMkdir(logDir), "enableLogging": true});
 
-async function getProfileInfo(app_id, access_token, checker = false) {
+async function getProfileInfo(app_id, access_token, checker = false, logger = false) {
+    const fyers = new fyersModel({"path": ensureAndMkdir(logDir), "enableLogging": logger});
     fyers.setAppId(app_id);
     fyers.setAccessToken(access_token);
 
