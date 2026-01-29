@@ -3,6 +3,7 @@
 // Boost interprocess headers
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include "./headers/optionChainBufferHeader.h"
 
 using namespace boost::interprocess;
 
@@ -17,10 +18,10 @@ Napi::Value GetSharedBuffer(const Napi::CallbackInfo& info) {
         if(g_shm == nullptr) {
             // Create the Shared Memory Object named "TEST_MEM"
             // "open_or_create" means: if it exists, open it; if not, create it.
-            g_shm = new shared_memory_object(open_or_create, "TEST_MEM", read_write);
+            g_shm = new shared_memory_object(open_or_create, "OPTION_CHAIN_MEM", read_write);
             // Set the size. We use a hardcoded size or sizeof(YourStruct)
             //Let's allocate 1024 bytes to be safe
-            g_shm->truncate(1024);
+            g_shm->truncate(sizeof(TradeData));
         }
 
         // Map the memory into this process so we can touch it

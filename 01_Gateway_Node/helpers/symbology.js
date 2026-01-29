@@ -9,7 +9,7 @@
  * @param {String} optionType type of the option eg. CE, PE
  * @returns {String} The final symbol name for weekly option symbol
  */
-async function weeklyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strike, optionType) {
+function weeklyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strike, optionType) {
     return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${month}${day}${strike}${optionType}`;
 }
 
@@ -23,7 +23,11 @@ async function weeklyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOf
  * @param {String} optionType type of the option eg. CE, PE
  * @returns {String} the final symbol name for monthly option symbol
  */
-async function monthlyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, strike, optionType) {
+function monthlyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, strike, optionType) {
     return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${month}${strike}${optionType}`
 }
 
+export {
+    weeklyOptionSymbolName,
+    monthlyOptionSymbolName,
+}

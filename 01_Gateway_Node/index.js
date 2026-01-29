@@ -8,11 +8,13 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ensureAndRead from "./helpers/ensureAndRead.helper.js";
+import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
 // import optionChainStream from "./streams/api-streams/option-chain.stream.js";
 // import marketStatus from "./market/marketStatus.js";
 import niftyStream from "./streams/sockets/indics/nifty.socket.js";
 // import stockStream from "./streams/stock.stream.js"
 // import exampleSocket from "./streams/sockets/example.js";
+import optionChainStream from "./streams/sockets/optionChain.stream.js";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,8 +40,13 @@ if(validate) {
     console.log("\nauthentication done\n")
 }
 else {
-    
+    console.log("failed to authenticate, please try again");
+    process.exit(0);
 }
+
+let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 3, 25400, "CE");
+console.log(symbol);
+
 
 // await stockStream(appId, access_token);
 
@@ -52,13 +59,12 @@ else {
 console.log("[NODE] Accessing shared memory buffer");
 const rawBuffer = bridge.getSharedBuffer();
 
-const intView = new Int32Array(rawBuffer.buffer, rawBuffer.byteOffset, 3); // first 3 ints
-const floatView = new Float32Array(rawBuffer.buffer, rawBuffer.byteOffset + 12, 4);
-console.log(`Shared memory intialized`);
+const floatView = new Float32Array(rawBuffer.buffer, rawBuffer.byteOffset, 4);
+// console.log(`[NODE] Shared memory intialized`);
 
-console.log("[Node] Starting Nifty Stream with Memory Access...");
+// niftyStream(appId, accessToken, intView, floatView)
+optionChainStream(appId, accessToken, floatView, ["NSE:NIFTY2620325400CE"], false, false)
 
-niftyStream(appId, accessToken, intView, floatView)
 
 // <================================================== Bridge Implementation ==================================================>
 
@@ -76,15 +82,15 @@ niftyStream(appId, accessToken, intView, floatView)
 
 // Test: Read what C++ writes
 
-setInterval(() => {
-    // Read values directly from RAM (written by C++)
-    const ltp = floatView[0]; // Struct 'ltp'
-    const oi = floatView[1];  // Struct 'oi'
+// setInterval(() => {
+//     // Read values directly from RAM (written by C++)
+//     const ltp = floatView[0]; // Struct 'ltp'
+//     const oi = floatView[1];  // Struct 'oi'
     
-    // Print to prove it's alive
-    console.log(`[Node Read] C++ says -> LTP: ${ltp.toFixed(2)} | OI: ${oi.toFixed(2)}`);
+//     // Print to prove it's alive
+//     console.log(`[Node Read] C++ says -> LTP: ${ltp.toFixed(2)} | OI: ${oi.toFixed(2)}`);
 
-    // 5. SEND BACK: Write something to C++
-    // Let's pretend we got a new market price
-    floatView[0] = Math.random() * 1000; // changing LTP randomly
-}, 1000);
+//     // 5. SEND BACK: Write something to C++
+//     // Let's pretend we got a new market price
+//     floatView[0] = Math.random() * 1000; // changing LTP randomly
+// }, 1000);
