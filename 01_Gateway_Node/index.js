@@ -22,7 +22,31 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({path: path.resolve(__dirname, '../.env')});    // Load .env from the Root Directory
 const accessTokenFilePath = path.resolve(__dirname, '../Data/cache/access_token.txt');
 const authCodeFilePath = path.resolve(__dirname, '../Data/cache/auth_code.txt');
+
 const bridge = require('./build/shm_bridge.node');
+
+const controllerBuffer = bridge.getControllerBuffer();
+const controllerBufferView = new Float64Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
+
+console.log(`[NODE] Data Stream Linked. Size: ${optionChainBufferView.length} doubles.`);
+
+const CTRL_IDX = {
+    systemStatus: 0,
+    socketSymbolCount: 1,
+    tbtSocketSymbolCount: 2,
+    apiSymbolCount: 3,
+    marketDepthCount: 4
+}
+
+let symbolArray = [126203254000, "NSE:NIFTY2620325400CE", 126203252501, "NSE:NIFTY2620325250PE"];
+let memNeeded = symbolArray.length * 20 * 8;
+console.log(`[NODE] Allocating ${memNeeded} bytes for ${symbolArray.length / 2} symbols.`);
+controllerBufferView[CTRL_IDX.systemStatus] = 0;
+
+controllerBufferView[CTRL_IDX.socketSymbolCount] = symbolArray.length / 2;
+
+const optionChainBuffer = bridge.getOptionChainBuffer(memNeeded);
+const optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
 
 const appId = process.env.FYERS_APP_ID
 let accessToken = ensureAndRead(accessTokenFilePath);
@@ -33,8 +57,8 @@ if(!accessToken) {
         await getAuthCodeM(appId);
     }
     await getAccessToken(appId);
-    accessToken = readFileSync(accessTokenFilePath, 'utf8');
 }
+accessToken = readFileSync(accessTokenFilePath, 'utf8');
 let validate = await getProfileInfo(appId, accessToken, true, false)
 if(validate) {
     console.log("\nauthentication done\n")
@@ -47,7 +71,6 @@ else {
 let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 3, 25400, "CE");
 console.log(symbol);
 
-
 // await stockStream(appId, access_token);
 
 // await niftyStream(appId, accessToken);
@@ -57,13 +80,9 @@ console.log(symbol);
 // optionChainStream(appId, accessToken, "MCX:CRUDEOILM26JAN5300CE", 1, 4000);
 
 console.log("[NODE] Accessing shared memory buffer");
-const rawBuffer = bridge.getSharedBuffer();
-
-const floatView = new Float32Array(rawBuffer.buffer, rawBuffer.byteOffset, 4);
-// console.log(`[NODE] Shared memory intialized`);
 
 // niftyStream(appId, accessToken, intView, floatView)
-optionChainStream(appId, accessToken, floatView, ["NSE:NIFTY2620325400CE"], false, false)
+optionChainStream(appId, accessToken, optionChainBufferView, symbolArray, false);
 
 
 // <================================================== Bridge Implementation ==================================================>
@@ -94,3 +113,6 @@ optionChainStream(appId, accessToken, floatView, ["NSE:NIFTY2620325400CE"], fals
 //     // Let's pretend we got a new market price
 //     floatView[0] = Math.random() * 1000; // changing LTP randomly
 // }, 1000);
+
+console.log("[NODE] System Fully Loaded. Signaling C++ to Start.");
+controllerView[CTRL_IDX.STATUS] = 1; // READY!

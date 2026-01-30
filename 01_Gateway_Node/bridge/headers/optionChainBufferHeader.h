@@ -2,6 +2,8 @@ struct TradeData {
     double instrument;
     double ltp;
     double volume;
+    double oi;
+    double chngInOi;
     double totBuyQty;
     double totSellQty;
     double avgTradePrice;
@@ -14,4 +16,6 @@ struct TradeData {
     double exchFeedTime;
     double ch;
     double chp;
+    double signal;
+    double action;
 };
