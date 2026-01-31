@@ -13,6 +13,8 @@ struct ControllerData {
     double tbtSocketSymbolCount;
     double apiSymbolCount;
     double marketDepthCount;
+    double signal;
+    double action;
 };
 
 shared_memory_object* g_shm_controller{ nullptr };

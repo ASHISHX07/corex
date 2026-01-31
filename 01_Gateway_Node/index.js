@@ -28,17 +28,17 @@ const bridge = require('./build/shm_bridge.node');
 const controllerBuffer = bridge.getControllerBuffer();
 const controllerBufferView = new Float64Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
-console.log(`[NODE] Data Stream Linked. Size: ${optionChainBufferView.length} doubles.`);
-
 const CTRL_IDX = {
     systemStatus: 0,
     socketSymbolCount: 1,
     tbtSocketSymbolCount: 2,
     apiSymbolCount: 3,
-    marketDepthCount: 4
+    marketDepthCount: 4,
+    signal: 5,
+    action: 6
 }
 
-let symbolArray = [126203254000, "NSE:NIFTY2620325400CE", 126203252501, "NSE:NIFTY2620325250PE"];
+let symbolArray = [126203254000, "NSE:NIFTY2620325400CE", 126203252502, "NSE:NIFTY2620325250PE", 126203253002, "NSE:NIFTY2620325300PE"];
 let memNeeded = symbolArray.length * 20 * 8;
 console.log(`[NODE] Allocating ${memNeeded} bytes for ${symbolArray.length / 2} symbols.`);
 controllerBufferView[CTRL_IDX.systemStatus] = 0;
@@ -115,4 +115,4 @@ optionChainStream(appId, accessToken, optionChainBufferView, symbolArray, false)
 // }, 1000);
 
 console.log("[NODE] System Fully Loaded. Signaling C++ to Start.");
-controllerView[CTRL_IDX.STATUS] = 1; // READY!
+controllerBufferView[CTRL_IDX.systemStatus] = 1; // READY!
