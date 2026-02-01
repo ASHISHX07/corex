@@ -8,13 +8,13 @@
 using namespace boost::interprocess;
 
 struct ControllerData {
-    double systemStatus;
-    double socketSymbolCount;
-    double tbtSocketSymbolCount;
-    double apiSymbolCount;
-    double marketDepthCount;
-    double signal;
-    double action;
+    int systemStatus;
+    int socketSymbolCount;
+    int tbtSocketSymbolCount;
+    int apiSymbolCount;
+    int marketDepthCount;
+    int signal;
+    int action;
 };
 
 shared_memory_object* g_shm_controller{ nullptr };

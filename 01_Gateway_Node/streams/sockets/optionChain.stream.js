@@ -88,7 +88,7 @@ async function optionChainStream(app_id, access_token, floatView, symbols = [], 
                 
                 floatView[b + data.signal]              = 0;
                 floatView[b + data.action]              = 0;
-                console.log(message);
+                // console.log(message);
             }
         }
     });

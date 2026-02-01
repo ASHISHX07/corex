@@ -26,7 +26,7 @@ const authCodeFilePath = path.resolve(__dirname, '../Data/cache/auth_code.txt');
 const bridge = require('./build/shm_bridge.node');
 
 const controllerBuffer = bridge.getControllerBuffer();
-const controllerBufferView = new Float64Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
+const controllerBufferView = new Int32Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
 const CTRL_IDX = {
     systemStatus: 0,
@@ -38,7 +38,7 @@ const CTRL_IDX = {
     action: 6
 }
 
-let symbolArray = [126203254000, "NSE:NIFTY2620325400CE", 126203252502, "NSE:NIFTY2620325250PE", 126203253002, "NSE:NIFTY2620325300PE"];
+let symbolArray = [126203254000, "NSE:NIFTY2620325400CE", 126203252502, "NSE:NIFTY2620325250PE", 126203253002, "NSE:NIFTY50-INDEX"];
 let memNeeded = symbolArray.length * 20 * 8;
 console.log(`[NODE] Allocating ${memNeeded} bytes for ${symbolArray.length / 2} symbols.`);
 controllerBufferView[CTRL_IDX.systemStatus] = 0;
