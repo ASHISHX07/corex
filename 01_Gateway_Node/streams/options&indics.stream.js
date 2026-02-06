@@ -40,9 +40,9 @@ const optionChainData = {
     action: 18
     }
 
-const STRIDE = Object.keys(optionChainData).length
+const optionsData = Object.keys(optionChainData).length
 
-async function optionStream(app_id, access_token, floatView, symbols = [], logger = false) {
+async function optionStream(app_id, access_token, optionVeiew, indicsView, symbols = [], logger = false) {
 
     const symbolMap = new Map();
     const subscriptionList = [];
@@ -50,13 +50,13 @@ async function optionStream(app_id, access_token, floatView, symbols = [], logge
     for (let i = 0; i < symbols.length; i += 2) {
         const token = symbols[i];
         const symbolStr = symbols[i+1];
-        const baseIdx = (i / 2) * STRIDE;
+        const baseIdx = (i / 2) * optionsData;
         
         symbolMap.set(symbolStr, {baseIdx, token});
         subscriptionList.push(symbolStr);
     }
 
-    console.log(`[NODE] Stream Configured. Stride: ${STRIDE}. Symbols: ${subscriptionList.length}`);
+    console.log(`[NODE] Stream Configured. Stride: ${optionsData}. Symbols: ${subscriptionList.length}`);
 
     let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, ensureAndMkdir(logDir), logger);
 
@@ -119,5 +119,5 @@ async function optionStream(app_id, access_token, floatView, symbols = [], logge
 
 export {
     optionStream,
-    STRIDE,
+    optionsData,
 }

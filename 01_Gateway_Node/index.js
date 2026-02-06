@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ensureAndRead from "./helpers/ensureAndRead.helper.js";
 import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
-import { optionStream, STRIDE } from "./streams/options&indics.stream.js";
+import { optionStream, optionsData } from "./streams/options&indics.stream.js";
 const appId = process.env.FYERS_APP_ID;
 
 const require = createRequire(import.meta.url);
@@ -34,12 +34,15 @@ const CTRL_IDX = {
     action: 6
 }
 
-let symbolArray = [126203254000, "NSE:NIFTY2621025800CE"];
-let memNeeded = (symbolArray.length / 2) * STRIDE * 8;
+let symbolArray = [1, "NSE:NIFTY50-INDEX", 2, "NSE:NIFTYBANK-INDEX", 3, "BSE:SENSEX-INDEX", 26203254000, "NSE:NIFTY2621025800CE"];
+let memNeeded = (symbolArray.length / 2) * optionsData * 8;
 console.log(`[NODE] Allocating ${memNeeded} bytes for ${symbolArray.length / 2} symbols.`);
 
 controllerBufferView[CTRL_IDX.systemStatus] = 0;
 controllerBufferView[CTRL_IDX.socketSymbolCount] = symbolArray.length / 2;
+
+const optionChainBuffer = bridge.getOptionChainBuffer(memNeeded);
+const optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
 
 let indicsCount;
 for(let i = 0; i < symbolArray.length; i+=2) {
@@ -47,9 +50,6 @@ for(let i = 0; i < symbolArray.length; i+=2) {
         indicsCount++;
     }
 }
-
-const optionChainBuffer = bridge.getOptionChainBuffer(memNeeded);
-const optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
 
 let accessToken = ensureAndRead(accessTokenFilePath);
 
@@ -70,14 +70,12 @@ else {
     process.exit(0);
 }
 
-let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 3, 2, 26800, "PE");
-symbolArray.push(2621725400);
-symbolArray.push(symbol);
-console.log(symbol);
-
-console.log("[NODE] Accessing shared memory buffer");
+// let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 17, 25700, "PE");
+// symbolArray.push(2621725400);
+// symbolArray.push(symbol);
+// console.log(symbol);
 
 optionStream(appId, accessToken, optionChainBufferView, symbolArray, false);
 
-console.log("[NODE] System Fully Loaded. Signaling C++ to Start.");
+console.log("[NODE] Complete");
 controllerBufferView[CTRL_IDX.systemStatus] = 1; // READY!
