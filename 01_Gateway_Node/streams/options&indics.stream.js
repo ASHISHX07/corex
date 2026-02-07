@@ -1,62 +1,57 @@
 import { fyersDataSocket } from "fyers-api-v3";
+import { readFileSync } from "fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import ensureAndMkdir from "../helpers/ensureAndMkdir.helper.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const bufferLayoutPath = path.resolve(__dirname, '../../Config/shm_layout.json')
+const layout = JSON.parse(readFileSync(bufferLayoutPath, 'utf8'))
 const logDir = path.join(__dirname, '../../../Data/logs/stream_logs/option-chain-logs');
 
-const indicsData = {
-    instrument: 0,
-    ltp: 1,
-    exchFeedTime: 2,
-    high: 3,
-    low: 4,
-    open: 5,
-    prevClosePrice: 6,
-    ch: 7,
-    chp: 8
-}
+const indicsDataMap = {};
+layout.INDICS.forEach((field, index) => {indicsDataMap[field] = index;});
+let indicsDataPoints = layout.INDICS.length;
 
-const optionChainData = {
-    instrument: 0,
-    ltp: 1,
-    volume: 2,
-    oi: 3,
-    chngInOi: 4,
-    totBuyQty: 5,
-    totSellQty: 6,
-    avgTradePrice: 7,
-    high: 8,
-    low: 9,
-    open: 10,
-    prevClose: 11,
-    upperCkt: 12,
-    lowerCkt: 13,
-    exchFeedTime: 14,
-    ch: 15,
-    chp: 16,
-    signal: 17,
-    action: 18
-    }
+const optionChainDataMap = {};
+layout.OPTIONS.forEach((field, index) => {optionChainDataMap[field] = index;});
+let optionsDataPoints = layout.OPTIONS.length;
 
-const optionsData = Object.keys(optionChainData).length
+// let totalDataPoints = indicsDataPoints + optionsDataPoints;
 
-async function optionStream(app_id, access_token, optionVeiew, indicsView, symbols = [], logger = false) {
+async function optionStream(app_id, access_token, indicsView, optionView, symbols = [], logger = false) {
 
     const symbolMap = new Map();
     const subscriptionList = [];
 
+    let indicsCounter = 0;
+    let optionsCounter = 0;
+
     for (let i = 0; i < symbols.length; i += 2) {
         const token = symbols[i];
         const symbolStr = symbols[i+1];
-        const baseIdx = (i / 2) * optionsData;
+
+        let type, baseIdx;
+
+        if (token < 10) {
+            type = 1;
+            baseIdx = indicsCounter * indicsDataPoints;
+            indicsCounter++;
+        } else {
+            type = 2;
+            baseIdx = optionsCounter * optionsDataPoints;
+            optionsCounter++;
+        }
+
+        // const baseIdx = (i / 2) * optionsDataPoints;
         
-        symbolMap.set(symbolStr, {baseIdx, token});
+        symbolMap.set(symbolStr, {type, baseIdx, token});
         subscriptionList.push(symbolStr);
     }
 
-    console.log(`[NODE] Stream Configured. Stride: ${optionsData}. Symbols: ${subscriptionList.length}`);
+    console.log(`[NODE] Stream Configured`);
+    console.log(`       Indices: ${indicsCounter}`);
+    console.log(`       Options: ${optionsCounter}`);
 
     let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, ensureAndMkdir(logDir), logger);
 
@@ -65,41 +60,53 @@ async function optionStream(app_id, access_token, optionVeiew, indicsView, symbo
     socket.on("connect", function(){
         socket.subscribe(subscriptionList);
         socket.mode(socket.FullMode);
-        console.log("[NODE] Subscribed to all given option chain symbols");
+        console.log("[NODE] Subscribed to all symbols");
     })
 
     socket.on("message", function(message){
 
         const updates = Array.isArray(message) ? message : [message];
 
-        for (let i = 0; i < updates.length; i++) {
-            const packet = updates[i];
-
+        for (const packet of updates) {
             const meta = symbolMap.get(packet.symbol);
+            if (!meta) continue;
+            
+            const b = meta.baseIdx;
 
-            if (meta) {
-                const b = meta.baseIdx;
-
-                floatView[b + optionChainData.instrument]          = meta.token;
-                floatView[b + optionChainData.ltp]                 = packet.ltp                || -1;
-                floatView[b + optionChainData.volume]              = packet.vol_traded_today   || -1;
-                floatView[b + optionChainData.oi]                  = packet.oi                 || -1;
-                floatView[b + optionChainData.chngInOi]            = packet.chng_in_oi         || -1;
-                floatView[b + optionChainData.totBuyQty]           = packet.tot_buy_qty        || -1;
-                floatView[b + optionChainData.totSellQty]          = packet.tot_sell_qty       || -1;
-                floatView[b + optionChainData.avgTradePrice]       = packet.avg_trade_price    || -1;
-                floatView[b + optionChainData.high]                = packet.high_price         || -1;
-                floatView[b + optionChainData.low]                 = packet.low_price          || -1;
-                floatView[b + optionChainData.open]                = packet.open_price         || -1;
-                floatView[b + optionChainData.prevClose]           = packet.prev_close_price   || -1;
-                floatView[b + optionChainData.upperCkt]            = packet.upper_ckt          || -1;
-                floatView[b + optionChainData.lowerCkt]            = packet.lower_ckt          || -1;
-                floatView[b + optionChainData.exchFeedTime]        = packet.exch_feed_time     || -1;
-                floatView[b + optionChainData.ch]                  = packet.ch                 || -1;
-                floatView[b + optionChainData.chp]                 = packet.chp                || -1;
+            if (meta.type == 1) {
+                indicsView[b + indicsDataMap.instrument]            = meta.token;
+                indicsView[b + indicsDataMap.ltp]                   = packet.ltp || -1;
+                indicsView[b + indicsDataMap.exchFeedTime]          = packet.exch_feed_time || -1;
+                indicsView[b + indicsDataMap.high]                  = packet.high || -1;
+                indicsView[b + indicsDataMap.low]                   = packet.low_price || -1;
+                indicsView[b + indicsDataMap.open]                  = packet.open_price || -1;
+                indicsView[b + indicsDataMap.prevClose]             = packet.prev_close_price || -1;
+                indicsView[b + indicsDataMap.ch]                    = packet.ch || -1;
+                indicsView[b + indicsDataMap.chp]                   = packet.chp || -1;
+                indicsView[b + indicsDataMap.signal]                = 0;
+                indicsView[b + indicsDataMap.action]                = 0;
+            }
+            else {
+                optionView[b + optionChainDataMap.instrument]       = meta.token;
+                optionView[b + optionChainDataMap.ltp]              = packet.ltp                || -1;
+                optionView[b + optionChainDataMap.volume]           = packet.vol_traded_today   || -1;
+                optionView[b + optionChainDataMap.oi]               = packet.oi                 || -1;
+                optionView[b + optionChainDataMap.chngInOi]         = packet.chng_in_oi         || -1;
+                optionView[b + optionChainDataMap.totBuyQty]        = packet.tot_buy_qty        || -1;
+                optionView[b + optionChainDataMap.totSellQty]       = packet.tot_sell_qty       || -1;
+                optionView[b + optionChainDataMap.avgTradePrice]    = packet.avg_trade_price    || -1;
+                optionView[b + optionChainDataMap.high]             = packet.high_price         || -1;
+                optionView[b + optionChainDataMap.low]              = packet.low_price          || -1;
+                optionView[b + optionChainDataMap.open]             = packet.open_price         || -1;
+                optionView[b + optionChainDataMap.prevClose]        = packet.prev_close_price   || -1;
+                optionView[b + optionChainDataMap.upperCkt]         = packet.upper_ckt          || -1;
+                optionView[b + optionChainDataMap.lowerCkt]         = packet.lower_ckt          || -1;
+                optionView[b + optionChainDataMap.exchFeedTime]     = packet.exch_feed_time     || -1;
+                optionView[b + optionChainDataMap.ch]               = packet.ch                 || -1;
+                optionView[b + optionChainDataMap.chp]              = packet.chp                || -1;
                 
-                floatView[b + optionChainData.signal]              = 0;
-                floatView[b + optionChainData.action]              = 0;
+                optionView[b + optionChainDataMap.signal]           = 0;
+                optionView[b + optionChainDataMap.action]           = 0;
                 console.log(message);
             }
         }
@@ -119,5 +126,6 @@ async function optionStream(app_id, access_token, optionVeiew, indicsView, symbo
 
 export {
     optionStream,
-    optionsData,
+    indicsDataPoints,
+    optionsDataPoints,
 }

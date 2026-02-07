@@ -10,13 +10,18 @@ class VENN_Memory {
 private: 
     shared_memory_object* shm_controller { nullptr };
     mapped_region* region_controller { nullptr };
-    shared_memory_object* shm_data { nullptr };
-    mapped_region* region_data { nullptr };
+    shared_memory_object* shm_indices_data { nullptr };
+    mapped_region* region_indices_data { nullptr };
+    shared_memory_object* shm_options_data { nullptr };
+    mapped_region* region_options_data { nullptr };
 
 public:
     ControllerBufferHeader* ctrl { nullptr };
-    OptionChainBufferHeader* optionChainData { nullptr };
-    int symbolCount { 0 };
+    IndicsBufferHeader* indicesData { nullptr };
+    OptionsBufferHeader* optionChainData { nullptr };
+    
+    int n_indices {0};
+    int n_options {0};
 
     void connectController() {
         std::cout << "[CORE] Looking for VENN_CONTROLLER..." << std::endl;
@@ -36,22 +41,29 @@ public:
 
     void waitForReady() {
         std::cout << "[CORE] Waiting for start" << std::endl;
-        while (ctrl -> systemStatus != 1.0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        while (ctrl -> systemStatus != 1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
-        this -> symbolCount = (int)ctrl -> socketSymbolCount;
-        std::cout << "[CORE] System READY. Tracking " << symbolCount << " symbols." << std::endl;
+        this -> n_indices = ctrl->sIndicesCount;
+        this -> n_options = (int)ctrl -> sOptionsCount;
+        std::cout << "[CORE] Indices: " << n_indices << " | Options: " << n_options << std::endl;
     }
 
     void connectToOptionChainStream() {
         try {
-            shm_data = new shared_memory_object(open_only, "OPTION_CHAIN_MEM", read_write);
-            region_data = new mapped_region(*shm_data, read_write);
-            optionChainData = static_cast<OptionChainBufferHeader*>(region_data->get_address());
-            std::cout << "[CORE] Connected to OPTION_CHAIN_MEM." << std::endl;
-        } catch (const std::exception& e) {
-            std::cerr << "[CORE CRITICAL ERROR] Could not open option chain data stream: " << e.what() << std::endl;
+            shm_indices_data = new shared_memory_object(open_only, "INDICES_DATA_MEM", read_write);
+            region_indices_data = new mapped_region(*shm_indices_data, read_write);
+            indicesData = static_cast<IndicsBufferHeader*>(region_indices_data->get_address());
+
+            shm_options_data = new shared_memory_object(open_only, "OPTIONS_DATA_MEM", read_write);
+            region_options_data = new mapped_region(*shm_options_data, read_write);
+            optionChainData = static_cast<OptionsBufferHeader*>(region_options_data->get_address());
+
+            std::cout << "[CORE] Memory buffers done" << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "[CORE ERROR] Could not open option chain data stream: " << e.what() << std::endl;
             exit(1);
         }
     }

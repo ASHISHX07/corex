@@ -22,7 +22,7 @@ Napi::Value getControllerBuffer(const Napi::CallbackInfo& info) {
     try {
         if(g_shm_controller == nullptr) {
             g_shm_controller = new shared_memory_object(open_or_create, "VENN_CONTROLLER", read_write);
-            g_shm_controller->truncate(sizeof(ControllerBuffer));
+            g_shm_controller->truncate(sizeof(ControllerBufferHeader));
         }
         if(g_region_controller == nullptr) {
             g_region_controller = new mapped_region(*g_shm_controller, read_write);
@@ -57,7 +57,7 @@ Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
 
     try {
         if(g_shm_indics == nullptr) {
-            g_shm_indics = new shared_memory_object(open_or_create, "INDICS_DATA_MEM", read_write);
+            g_shm_indics = new shared_memory_object(open_or_create, "INDICES_DATA_MEM", read_write);
             g_shm_indics->truncate(desiredSize);
         }
 
@@ -96,7 +96,7 @@ Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
 
     try {
         if(g_shm_opt_chn == nullptr) {
-            g_shm_opt_chn = new shared_memory_object(open_or_create, "OPTION_CHAIN_MEM", read_write);
+            g_shm_opt_chn = new shared_memory_object(open_or_create, "OPTIONS_DATA_MEM", read_write);
             g_shm_opt_chn->truncate(desiredSize);
         }
 

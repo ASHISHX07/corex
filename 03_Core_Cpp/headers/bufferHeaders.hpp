@@ -1,9 +1,10 @@
-#ifndef BUFFER_HEADER_H
+#ifndef BUFFFER_HEADER_H
 #define BUFFER_HEADER_H
 
 struct ControllerBufferHeader {
     int systemStatus;
-    int socketSymbolCount;
+    int sIndicesCount;
+    int sOptionsCount;
     int tbtSocketSymbolCount;
     int apiSymbolCount;
     int marketDepthCount;
@@ -11,7 +12,21 @@ struct ControllerBufferHeader {
     int action;
 };
 
-struct OptionChainBufferHeader {
+struct IndicsBufferHeader {
+    double instrument;
+    double ltp;
+    double exchFeedTime;
+    double high;
+    double low;
+    double open;
+    double prevClose;
+    double ch;
+    double chp;
+    double signal;
+    double action;
+};
+
+struct OptionsBufferHeader {
     double instrument;
     double ltp;
     double volume;
@@ -32,7 +47,5 @@ struct OptionChainBufferHeader {
     double signal;
     double action;
 };
-
-constexpr int DATA_STRIDE { sizeof(OptionChainBufferHeader) / sizeof(double) };
 
 #endif // BUFFER_HEADER_H
