@@ -10,7 +10,7 @@ const nodeBufferHeader = path.join(__dirname, '../bridge/headers/optionChainBuff
 const cppBufferHeader = path.join(__dirname, '../../03_Core_Cpp/headers/bufferHeaders.hpp');
 
 export default async function headerGenerator() {
-    let hppContent = `#ifndef BUFFFER_HEADER_H\n#define BUFFER_HEADER_H\n\n`;
+    let hppContent = `#ifndef BUFFER_HEADER_H\n#define BUFFER_HEADER_H\n\n`;
     
     for (const [key, fields] of Object.entries(layout)) {
         const structName = key.charAt(0) + key.slice(1).toLowerCase();

@@ -1,4 +1,4 @@
-#ifndef BUFFFER_HEADER_H
+#ifndef BUFFER_HEADER_H
 #define BUFFER_HEADER_H
 
 struct ControllerBufferHeader {

@@ -1,24 +1,24 @@
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <vector>
 #include <iomanip>
+#include <mutex>
 #include "headers/shmController.hpp"
 
-int main() {
-    std::cout << "[CORE] VENN engine booting" << std::endl;
+std::atomic<bool> running {true};
+std::mutex consoleMutex;
 
-    VENN_Memory mem;
-
-    mem.connectController();
-    mem.waitForReady();
-    mem.connectToOptionChainStream();
-
-    while (true) {
-
+void processIndices(VENN_Memory& mem) {
+    while(running) {
         for (int i {0}; i < mem.n_indices; i++) {
             IndicsBufferHeader& idx = mem.indicesData[i];
+            
             if (idx.instrument == 1) {
-                std::cout << ">> NIFTY" << '\n'
+
+                std::lock_guard<std::mutex> lock(consoleMutex);
+
+                std::cout << ">> \033[1;32m[INDEX UPDATED]\033[0m NIFTY50\n"
                           << ">> LTP                : " << std::fixed << std::setprecision(2) << idx.ltp << '\n'
                           << ">> EXCHANGE FEED TIME : " << std::fixed << std::setprecision(0) << idx.exchFeedTime << '\n'
                           << ">> HIGH               : " << std::fixed << std::setprecision(2) << idx.high << '\n'
@@ -27,14 +27,22 @@ int main() {
                           << ">> OPEN               : " << std::fixed << std::setprecision(2) << idx.open << '\n'
                           << ">> CLOSE              : " << std::fixed << std::setprecision(2) << idx.prevClose << '\n'
                           << ">> CHANGE             : " << std::fixed << std::setprecision(2) << idx.ch << '\n'
-                          << ">> CHANGE IN %        : " << std::fixed << std::setprecision(2) << idx.chp << '\n';
+                          << ">> CHANGE IN %        : " << std::fixed << std::setprecision(2) << idx.chp << '\n'
+                          << "------------------------------------------------------------------" << std::endl;
             }
         }
-
-        for (int i = 0; i < mem.n_options; i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+void processOptions(VENN_Memory& mem) {
+    while(running) {
+        for (int i {0}; i < mem.n_options; i++) {
             OptionsBufferHeader& opt = mem.optionChainData[i];
 
             if ((long long)opt.instrument == 26203254000) {
+
+                std::lock_guard<std::mutex> lock(consoleMutex);
+
                 std::cout << ">> NIFTY" << '\n'
                           << ">> LTP                : " << std::fixed << std::setprecision(2) << opt.ltp << '\n'
                           << ">> Vol                : " << std::fixed << std::setprecision(0) << opt.volume << '\n'
@@ -52,10 +60,38 @@ int main() {
                           << ">> LOWER CKT          : " << std::fixed << std::setprecision(2) << opt.lowerCkt << '\n'
                           << ">> EXCHANGE FEED TIME : " << std::fixed << std::setprecision(0) << opt.exchFeedTime << '\n'
                           << ">> CHANGE             : " << std::fixed << std::setprecision(2) << opt.ch << '\n'
-                          << ">> CHANGE IN %        : " << std::fixed << std::setprecision(2) << opt.chp << '\n';
+                          << ">> CHANGE IN %        : " << std::fixed << std::setprecision(2) << opt.chp << '\n'
+                          << "------------------------------------------------------------------" << std::endl;
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+}
+
+int main() {
+    std::cout << "[CORE] Starting" << std::endl;
+
+    VENN_Memory mem;
+
+    mem.connectController();
+    mem.waitForReady();
+    mem.connectToOptionChainStream();
+
+    std::thread threadIdx(processIndices, std::ref(mem));
+    std::thread threadOpt(processOptions, std::ref(mem));
+
+    while (running) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        if (mem.ctrl->systemStatus == 0) {
+            running = false;
+        }
+    }
+    
+    threadIdx.join();
+    threadOpt.join();
+
+    std::cout << "[CORE] close" << std::endl;
+
     return 0;
 }

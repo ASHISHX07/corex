@@ -32,28 +32,31 @@ let symbolArray = [1, "NSE:NIFTY50-INDEX", 2, "NSE:NIFTYBANK-INDEX", 3, "BSE:SEN
 
 const CTRL_IDX = {
     systemStatus: 0,
-    socketSymbolCount: 1,
-    tbtSocketSymbolCount: 2,
-    apiSymbolCount: 3,
-    marketDepthCount: 4,
-    signal: 5,
-    action: 6
+    sIndicesCount: 1,
+    sOptionsCount: 2,
+    tbtSocketSymbolCount: 3,
+    apiSymbolCount: 4,
+    marketDepthCount: 5,
+    signal: 6,
+    action: 7
 }
 
-controllerBufferView[CTRL_IDX.systemStatus] = 0;
-controllerBufferView[CTRL_IDX.socketSymbolCount] = symbolArray.length / 2;
-
-let indicsCount = 0;
 let optionsCount = 0;
+let indicesCount = 0;
+
 
 for(let i = 0; i < symbolArray.length; i+=2) {
     const symbolStr = symbolArray[i];
-
-    if (symbolStr < 10) { indicsCount++; }
+    
+    if (symbolStr < 10) { indicesCount++; }
     else { optionsCount++ }
 }
+
+controllerBufferView[CTRL_IDX.systemStatus] = 0;
+controllerBufferView[CTRL_IDX.sIndicesCount] = indicesCount;
+controllerBufferView[CTRL_IDX.sOptionsCount] = optionsCount;
 // let memNeeded = (symbolArray.length / 2) * totalDataPoints * 8;
-const indicesMemNeeded = indicsCount * indicsDataPoints * 8;
+const indicesMemNeeded = indicesCount * indicsDataPoints * 8;
 const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
 
 console.log(`[NODE] Allocating:`);

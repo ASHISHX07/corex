@@ -107,8 +107,8 @@ async function optionStream(app_id, access_token, indicsView, optionView, symbol
                 
                 optionView[b + optionChainDataMap.signal]           = 0;
                 optionView[b + optionChainDataMap.action]           = 0;
-                console.log(message);
             }
+            console.log(message);
         }
     });
 
