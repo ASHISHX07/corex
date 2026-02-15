@@ -9,8 +9,9 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ensureAndRead from "./helpers/ensureAndRead.helper.js";
 import headerGenerator from './helpers/headerGenerator.js'
-import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
+// import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
 import { optionStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
+import tbtDataSocket from "./streams/tbtData.stream.js";
 
 const appId = process.env.FYERS_APP_ID;
 
@@ -97,14 +98,14 @@ else {
     process.exit(0);
 }
 
-
+// tbtDataSocket(appId, accessToken, ["NSE:NIFTY2621725450CE"], 4)   BAD
 
 // let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 17, 25700, "PE");
 // symbolArray.push(2621725400);
 // symbolArray.push(symbol);
 // console.log(symbol);
 
-optionStream(appId, accessToken, indicsBufferView, optionChainBufferView, symbolArray, false);
+// optionStream(appId, accessToken, indicsBufferView, optionChainBufferView, symbolArray, false);
 
 console.log("[NODE] Complete");
 controllerBufferView[CTRL_IDX.systemStatus] = 1; // READY!

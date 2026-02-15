@@ -23,7 +23,6 @@ void processIndices(VENN_Memory& mem) {
                           << ">> EXCHANGE FEED TIME : " << std::fixed << std::setprecision(0) << idx.exchFeedTime << '\n'
                           << ">> HIGH               : " << std::fixed << std::setprecision(2) << idx.high << '\n'
                           << ">> LOW                : " << std::fixed << std::setprecision(2) << idx.low << '\n'
-                          << ">> HIGH               : " << std::fixed << std::setprecision(2) << idx.low << '\n'
                           << ">> OPEN               : " << std::fixed << std::setprecision(2) << idx.open << '\n'
                           << ">> CLOSE              : " << std::fixed << std::setprecision(2) << idx.prevClose << '\n'
                           << ">> CHANGE             : " << std::fixed << std::setprecision(2) << idx.ch << '\n'
@@ -91,7 +90,7 @@ int main() {
     threadIdx.join();
     threadOpt.join();
 
-    std::cout << "[CORE] close" << std::endl;
+    std::cout << "[CORE] closed" << std::endl;
 
     return 0;
 }

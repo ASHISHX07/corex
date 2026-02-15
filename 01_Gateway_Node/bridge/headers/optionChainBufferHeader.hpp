@@ -48,4 +48,7 @@ struct OptionsBufferHeader {
     double action;
 };
 
+struct TbtdataBufferHeader {
+};
+
 #endif // BUFFER_HEADER_H

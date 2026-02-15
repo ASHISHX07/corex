@@ -1,5 +1,6 @@
 {
     "CONTROLLER": ["systemStatus", "sIndicesCount", "sOptionsCount", "tbtSocketSymbolCount", "apiSymbolCount", "marketDepthCount", "signal", "action"],
     "INDICS": ["instrument", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "signal", "action"],
-    "OPTIONS": ["instrument", "ltp", "volume", "oi", "chngInOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "exchFeedTime", "ch", "chp", "signal", "action"]
+    "OPTIONS": ["instrument", "ltp", "volume", "oi", "chngInOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "exchFeedTime", "ch", "chp", "signal", "action"],
+    "TBTDATA": []
 }
