@@ -105,7 +105,7 @@ else {
 // symbolArray.push(symbol);
 // console.log(symbol);
 
-// optionStream(appId, accessToken, indicsBufferView, optionChainBufferView, symbolArray, false);
+optionStream(appId, accessToken, indicsBufferView, optionChainBufferView, symbolArray, false);
 
 console.log("[NODE] Complete");
 controllerBufferView[CTRL_IDX.systemStatus] = 1; // READY!
