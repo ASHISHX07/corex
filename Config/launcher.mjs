@@ -9,10 +9,9 @@ const pySrc = path.resolve(__dirname, '../02_Strategies_Python/example.py');
 const nodeGateway = path.resolve(__dirname, '../01_Gateway_Node/index.js');
 
 console.log(`[LAUNCHER] Starting....`);
-console.log(`[LAUNCHER] Starting VENN System...`);
 
-// 1. Start Node.js FIRST (The Creator)
-console.log(`[LAUNCHER] -----> Launching Node Gateway (Creator)...`);
+// 1. Start Node.js FIRST
+console.log(`[LAUNCHER] -----> Launching Node Gateway...`);
 const nodeProcess = spawn('node', [nodeGateway], { stdio: 'inherit' });
 console.log(`[LAUNCHER] -----> Launching Python Layer....`);
 const pyProcess = spawn('python', [pySrc], {stdio: 'inherit'});
@@ -26,9 +25,9 @@ setTimeout(() => {
 
     // Handle Cleanup
     nodeProcess.on('close', (code) => {
-        console.log(`[LAUNCHER] Node exited (${code}). Killing Core...`);
+        console.log(`[LAUNCHER] Node exited (${code}).`);
         cppProcess.kill();
-        // pyProcess.kill();
+        pyProcess.kill();
         process.exit(code);
     });
 

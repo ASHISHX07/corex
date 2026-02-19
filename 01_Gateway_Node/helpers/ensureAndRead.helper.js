@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, } from "node:fs";
 import path from 'path';
 
-export default function ensureAndRead(filePath) {
+export default async function ensureAndRead(filePath) {
     try {
         return readFileSync(filePath, 'utf8').trim();
     }

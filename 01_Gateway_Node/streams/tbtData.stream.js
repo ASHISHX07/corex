@@ -18,7 +18,7 @@ async function tbtDataSocket(appId, accessToken, symbols = [], bufferView, diffO
     });
     
     socket.on("open", () => {
-        socket.subscribe(symbols);
+        socket.subscribe(symbols, '1', 'ohlcv');
         socket.switchChannel([], ['1']);
     });
 
