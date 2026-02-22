@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(venn_core)
+project(main)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -11,9 +11,9 @@ endif()
 file(GLOB SOURCE_FILES "*.cpp" "importers/*.cpp")
 
 # --- EXETUABLE ---
-add_executable(venn_core ${SOURCE_FILES})
+add_executable(main ${SOURCE_FILES})
 
-target_include_directories(venn_core PRIVATE
+target_include_directories(main PRIVATE
     "headers"
     ${BOOST_ROOT}
 )
