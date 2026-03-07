@@ -42,7 +42,7 @@ void processOptions(VENN_Memory& mem) {
 
                 std::lock_guard<std::mutex> lock(consoleMutex);
 
-                std::cout << ">> NIFTY" << '\n'
+                std::cout << ">> NIFTY              :"  << std::fixed << std::setprecision(0) << opt.instrument << '\n'
                           << ">> LTP                : " << std::fixed << std::setprecision(2) << opt.ltp << '\n'
                           << ">> Vol                : " << std::fixed << std::setprecision(0) << opt.volume << '\n'
                           << ">> Oi                 : " << std::fixed << std::setprecision(0) << opt.oi << '\n'

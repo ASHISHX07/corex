@@ -8,7 +8,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ensureAndRead from "./helpers/ensureAndRead.helper.js";
-import headerGenerator from './helpers/headerGenerator.js'
+import headerGenerator from './generators/headerGenerator.js'
 // import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
 import { optionStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
 import tbtDataSocket from "./streams/tbtData.stream.js";
@@ -22,15 +22,22 @@ await headerGenerator();
 
 dotenv.config({path: path.resolve(__dirname, '../.env')});    // Load .env from the Root Directory
 const bufferLayoutPath = path.resolve(__dirname, '../Config/shm_layout.json');
-const controllerLayout = JSON.parse(readFileSync(bufferLayoutPath, 'utf8'));
 const accessTokenFilePath = path.resolve(__dirname, '../Data/cache/access_token.txt');
 const authCodeFilePath = path.resolve(__dirname, '../Data/cache/auth_code.txt');
 
 const bridge = require('./build/shm_bridge.node');
+
+const controllerLayout = JSON.parse(readFileSync(bufferLayoutPath, 'utf8'));
+
+const controllerMap = {};
+controllerLayout.CONTROLLER.forEach((field, index) => {
+    controllerMap[field] = index;
+})
+
 const controllerBuffer = bridge.getControllerBuffer();
 const controllerBufferView = new Int32Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
-let symbolArray = [1, "NSE:NIFTY50-INDEX", 2, "BSE:SENSEX-INDEX", 26203254000, "NSE:NIFTY26FEB25450CE"];
+let symbolArray = [1, "NSE:NIFTY50-INDEX", 2, "BSE:SENSEX-INDEX", 26203254000, "NSE:NIFTY2631024350CE"];
 
 let optionsCount = 0;
 let indicesCount = 0;
@@ -43,9 +50,9 @@ for(let i = 0; i < symbolArray.length; i+=2) {
     else { optionsCount++ }
 }
 
-controllerBufferView[controllerLayout.systemStatus] = 0;
-controllerBufferView[controllerLayout.sIndicesCount] = indicesCount;
-controllerBufferView[controllerLayout.sOptionsCount] = optionsCount;
+controllerBufferView[controllerMap.systemStatus] = 0;
+controllerBufferView[controllerMap.sIndicesCount] = indicesCount;
+controllerBufferView[controllerMap.sOptionsCount] = optionsCount;
 // let memNeeded = (symbolArray.length / 2) * totalDataPoints * 8;
 const indicesMemNeeded = indicesCount * indicsDataPoints * 8;
 const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
@@ -88,14 +95,25 @@ else {
     process.exit(0);
 }
 
-tbtDataSocket(appId, accessToken, ["NSE:NIFTY26FEB25450CE"], 4)  // BAD
+// tbtDataSocket(appId, accessToken, ["NSE:NIFTY26FEB25450CE"], 4)  // BAD
 
 // let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 17, 25700, "PE");
 // symbolArray.push(2621725400);
 // symbolArray.push(symbol);
 // console.log(symbol);
 
-// optionStream(appId, accessToken, indicsBufferView, optionChainBufferView, symbolArray, false);
+const streamConfig = {
+    app_id: appId,
+    access_token: accessToken,
+    indicsView: indicsBufferView,
+    optionView: optionChainBufferView,
+    symbols: symbolArray,
+    litemode: false,
+    logger: true,
+    logWriter: false
+}
+
+optionStream(streamConfig);
 
 console.log("[NODE] Complete");
-controllerBufferView[controllerLayout.systemStatus] = 1; // READY!
+controllerBufferView[controllerMap.systemStatus] = 1; // READY!

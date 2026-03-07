@@ -13,7 +13,7 @@ function weeklyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, 
 
     let formattedMonth;
 
-    if(month > 9 && month <= 12) {
+    if(month > 9 && month < 13) {
         switch (month) {
             case 10:
                 formattedMonth = 'O';
