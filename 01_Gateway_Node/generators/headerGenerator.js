@@ -14,7 +14,7 @@ export default async function headerGenerator() {
     
     for (const [key, fields] of Object.entries(layout)) {
         const structName = key.charAt(0) + key.slice(1).toLowerCase();
-        const type = (key == "CONTROLLER") ? "int" : "double";
+        const type = (key === "CONTROLLER") ? "int" : "double";
     
         hppContent += `struct ${structName}BufferHeader {\n`;
         fields.forEach(field => {
