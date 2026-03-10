@@ -16,7 +16,4 @@ async function getDateTime() {
     });
 }
 
-const time = await getDateTime();
-const now = time.toDateString();
-
 export default getDateTime;

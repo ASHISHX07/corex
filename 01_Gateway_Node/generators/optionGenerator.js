@@ -1,6 +1,8 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import { weeklyOptionSymbolName, monthlyOptionSymbolName } from './symbology.js';
+import getDateTime from '../timers/atomicClock.js';
 
 /**
  * returns an array of option chain symbols, or array containing multiple arrays of option chain symbols
@@ -14,9 +16,12 @@ async function getOptionChain({exchange, segment, pointsFromStrike, visibility})
 
     let symbols = [];
 
+    const now = await getDateTime();
+    const date = now.toLocaleDateString();
     
-
 }
+
+getOptionChain({exchange: 1, segment: 1, pointsFromStrike: 1, visibility: 1});
 
 export {
     getOptionChain,
