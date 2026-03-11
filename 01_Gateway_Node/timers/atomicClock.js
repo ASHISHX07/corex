@@ -12,6 +12,7 @@ async function getDateTime() {
                 return reject(err);
             }
             resolve(date);
+            
         });
     });
 }

@@ -1,8 +1,25 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
 import { weeklyOptionSymbolName, monthlyOptionSymbolName } from './symbology.js';
+import dateFilter from '../helpers/expiryFilters.js';
 import getDateTime from '../timers/atomicClock.js';
+import { readFileSync } from 'fs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const holidayPath = path.resolve(__dirname, "../../Data/cache/holidays.json");
+const holidays = JSON.parse(readFileSync(holidayPath, 'utf8'));
+const expiryPath = path.resolve(__dirname, "../../Data/cache/expiry's.json");
+const expiryDates = JSON.parse(readFileSync(expiryPath, 'utf8'));
+
+const now = await getDateTime();
+// let date = now.toLocaleDateString().replaceAll('/', '');
+
+const lYear = false;
+const weekDay = [1, 2, 3, 4, 5, 6, 7];
+const month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+let symbols = [];
 
 /**
  * returns an array of option chain symbols, or array containing multiple arrays of option chain symbols
@@ -14,11 +31,10 @@ import getDateTime from '../timers/atomicClock.js';
 
 async function getOptionChain({exchange, segment, pointsFromStrike, visibility}) {
 
-    let symbols = [];
-
-    const now = await getDateTime();
-    const date = now.toLocaleDateString();
+    let year = now.getFullYear();
     
+    
+
 }
 
 getOptionChain({exchange: 1, segment: 1, pointsFromStrike: 1, visibility: 1});
