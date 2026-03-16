@@ -7,19 +7,13 @@ import { readFileSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const holidayPath = path.resolve(__dirname, "../../Data/cache/holidays.json");
-const holidays = JSON.parse(readFileSync(holidayPath, 'utf8'));
 const expiryPath = path.resolve(__dirname, "../../Data/cache/expiry's.json");
 const expiryDates = JSON.parse(readFileSync(expiryPath, 'utf8'));
 
-const now = await getDateTime();
-// let date = now.toLocaleDateString().replaceAll('/', '');
-
-const lYear = false;
-const weekDay = [1, 2, 3, 4, 5, 6, 7];
-const month = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-
-let symbols = [];
+const niftyGap = 50;
+const bankniftyGap = 100;
+const sensexGap = 100;
+const bankexGap = 100;
 
 /**
  * returns an array of option chain symbols, or array containing multiple arrays of option chain symbols
@@ -29,11 +23,15 @@ let symbols = [];
  * @param {Number} visibility the range you want of farthest option expiry eg. to get next 4 expiry's use 4
 */
 
-async function getOptionChain({exchange, segment, pointsFromStrike, visibility}) {
+async function getOptionChain({exchange, segment, pointsFromStrike, isMonthly}) {
 
-    let year = now.getFullYear();
+    let symbolArr = [];
     
-    
+    for (let i = 1; i <= pointsFromStrike; ++i) {
+
+        
+
+    }
 
 }
 

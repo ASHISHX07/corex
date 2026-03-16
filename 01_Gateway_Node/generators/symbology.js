@@ -9,50 +9,24 @@
  * @param {String} optionType type of the option eg. CE, PE
  * @returns {String} The final symbol name for weekly option symbol
  */
-function weeklyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strike, optionType) {
+function optionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strike, optionType, isMonthly) {
 
-    let formattedMonth;
+    let monthPart;
 
-    if(month > 9 && month < 13) {
-        switch (month) {
-            case 10:
-                formattedMonth = 'O';
-                break;
-            case 11:
-                formattedMonth = 'N';
-                break;
-            case 12:
-                formattedMonth = 'D';
-                break;
-        }
-    }
+    if (isMonthly) {
+        const monthMap = ['', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        monthPart = monthMap[month];
+    } 
     else {
-        formattedMonth = month
+        const weeklyMonthMap = { 10: 'O', 11: 'N', 12: 'D' };
+        monthPart = weeklyMonthMap[month] || month;
     }
 
-    let formattedDay = String(day).padStart(2, '0');
+    const dayPart = isMonthly ? '' : String(day).padStart(2, '0');
     
     return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${formattedMonth}${formattedDay}${strike}${optionType}`;
 }
 
-/**
- * returns the symbol name for NSE BSE monthly option symbol
- * @param {String} exchange exhange eg. NSE, BSE
- * @param {String} underlyingSymbol underlying symbol name eg. NIFTY50, BANKNIFTY, SENSEX, BANKEX
- * @param {Number} lastTwoDigitOfYear last two digits of year or four if decade eg. 19, 2020, 21, 22, 23
- * @param {Number} month month in Number eg. 1 to 12
- * @param {Number} strike strike price you're looking for eg. 22000, 21450, 55000, 57800 (strike difference can differ between underlying symbol)
- * @param {String} optionType type of the option eg. CE, PE
- * @returns {String} the final symbol name for monthly option symbol
- */
-function monthlyOptionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, strike, optionType) {
-
-    const monthMap = ['', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-
-    return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${monthMap[month]}${strike}${optionType}`;
-}
-
 export {
-    weeklyOptionSymbolName,
-    monthlyOptionSymbolName,
+    optionSymbolName
 }
