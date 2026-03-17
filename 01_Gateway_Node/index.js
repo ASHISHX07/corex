@@ -12,6 +12,7 @@ import headerGenerator from './generators/headerGenerator.js'
 // import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
 import { optionStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
 import tbtDataSocket from "./streams/tbtData.stream.js";
+import getOptionChain from "./generators/optionGenerator.js";
 
 const appId = process.env.FYERS_APP_ID;
 
@@ -37,7 +38,7 @@ controllerLayout.CONTROLLER.forEach((field, index) => {
 const controllerBuffer = bridge.getControllerBuffer();
 const controllerBufferView = new Int32Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
-let symbolArray = [1, "NSE:NIFTY50-INDEX", 2, "BSE:SENSEX-INDEX", 26203254000, "NSE:NIFTY2631024350CE"];
+let symbolArray = await getOptionChain();
 
 let optionsCount = 0;
 let indicesCount = 0;
@@ -95,6 +96,9 @@ else {
     process.exit(0);
 }
 
+console.log(symbolArray);
+
+
 // tbtDataSocket(appId, accessToken, ["NSE:NIFTY26FEB25450CE"], 4)  // BAD
 
 // let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 17, 25700, "PE");
@@ -113,7 +117,7 @@ const streamConfig = {
     logWriter: false
 }
 
-optionStream(streamConfig);
+// optionStream(streamConfig);
 
 console.log("[NODE] Complete");
 controllerBufferView[controllerMap.systemStatus] = 1; // READY!

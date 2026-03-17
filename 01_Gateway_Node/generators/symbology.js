@@ -9,7 +9,7 @@
  * @param {String} optionType type of the option eg. CE, PE
  * @returns {String} The final symbol name for weekly option symbol
  */
-function optionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strike, optionType, isMonthly) {
+function optionSymbolName({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
 
     let monthPart;
 
@@ -24,9 +24,7 @@ function optionSymbolName(exchange, underlyingSymbol, lastTwoDigitOfYear, month,
 
     const dayPart = isMonthly ? '' : String(day).padStart(2, '0');
     
-    return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${formattedMonth}${formattedDay}${strike}${optionType}`;
+    return `${exchange}:${underlyingSymbol}${lastTwoDigitOfYear}${monthPart}${dayPart}${strikePrice}${optionType}`;
 }
 
-export {
-    optionSymbolName
-}
+export default optionSymbolName;
