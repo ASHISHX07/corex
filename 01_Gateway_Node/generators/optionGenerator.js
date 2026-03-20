@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import optionSymbolName from './symbology.js';
+import { optionSymbolName, optionInstrument} from './symbology.js';
 import dateFilter from '../helpers/expiryFilters.js';
 import getDateTime from '../timers/atomicClock.js';
 import { readFileSync } from 'fs';
@@ -21,19 +21,11 @@ const optionManager = {
     lastTwoDigitOfYear: 26,
     month: 3,
     day: 24,
-    strikePrice: 23600,
+    strikePrice: 21300,
     optionType: "CE",
     isMonthly: false,
     distance: 1
 }
-
-/**
- * returns an array of option chain symbols, or array containing multiple arrays of option chain symbols
- * @param {String} exchange exchange eg. NSE, BSE, MCX
- * @param {String} segment segment eg. NIFTY, BANKNIFTY, SENSEX, CRUDEOIL
- * @param {Number} pointsFromStrike distance from the strike eg. to get 2 ITM and OTM, use 2, this includes both CE and PE
- * @param {Number} visibility the range you want of farthest option expiry eg. to get next 4 expiry's use 4
-*/
 
 async function getOptionChain() {
 
@@ -42,22 +34,26 @@ async function getOptionChain() {
     for (let i = 1; i <= optionManager.distance; ++i) {
 
         let CESymbol = optionSymbolName(optionManager);
-        symbolArr.push(CESymbol);
+        let CEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
+
+        symbolArr.push(CEInstrument, CESymbol);
         optionManager.optionType = "PE";
         
         let PESymbol = optionSymbolName(optionManager);
-        symbolArr.push(PESymbol);
+        let PEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
+        
+        symbolArr.push(PEInstrument, PESymbol);
         optionManager.optionType = "CE";
 
     }
+
+    console.log(symbolArr);
+    
 
     return symbolArr;
 
 }
 
-let arr = await getOptionChain();
-
-console.log(arr);
-
+await getOptionChain();
 
 export default getOptionChain;

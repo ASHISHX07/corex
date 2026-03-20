@@ -38,7 +38,9 @@ controllerLayout.CONTROLLER.forEach((field, index) => {
 const controllerBuffer = bridge.getControllerBuffer();
 const controllerBufferView = new Int32Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
-let symbolArray = await getOptionChain();
+// let symbolArray = await getOptionChain();
+
+let symbolArray = [1126324213001, 'NSE:NIFTY2632421300CE', 1126324213002, 'NSE:NIFTY2632421300PE'];
 
 let optionsCount = 0;
 let indicesCount = 0;
