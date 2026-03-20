@@ -24,14 +24,24 @@ const optionManager = {
     strikePrice: 21300,
     optionType: "CE",
     isMonthly: false,
-    distance: 1
+    visibility: 1
 }
 
-async function getOptionChain() {
+async function getOptionChainSymbols() {
+
+    let isNifty = optionManager.underlyingSymbol === "NIFTY"
+    let start;
+    let visibility = optionManager.visibility * 2;
+
+    for(let i = 1; i <= visibility; ++i) {
+        if (isNifty) {
+            
+        }
+    }
 
     let symbolArr = [];
     
-    for (let i = 1; i <= optionManager.distance; ++i) {
+    for (let i = 1; i <= visibility; ++i) {
 
         let CESymbol = optionSymbolName(optionManager);
         let CEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
@@ -49,11 +59,10 @@ async function getOptionChain() {
 
     console.log(symbolArr);
     
-
     return symbolArr;
 
 }
 
-await getOptionChain();
+await getOptionChainSymbols();
 
-export default getOptionChain;
+export default getOptionChainSymbols;

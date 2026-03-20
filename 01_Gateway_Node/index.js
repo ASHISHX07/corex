@@ -10,9 +10,9 @@ import { fileURLToPath } from 'url';
 import ensureAndRead from "./helpers/ensureAndRead.helper.js";
 import headerGenerator from './generators/headerGenerator.js'
 // import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
-import { optionStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
+import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
 import tbtDataSocket from "./streams/tbtData.stream.js";
-import getOptionChain from "./generators/optionGenerator.js";
+import getOptionChainSymbols from "./generators/optionGenerator.js";
 
 const appId = process.env.FYERS_APP_ID;
 
@@ -38,9 +38,7 @@ controllerLayout.CONTROLLER.forEach((field, index) => {
 const controllerBuffer = bridge.getControllerBuffer();
 const controllerBufferView = new Int32Array(controllerBuffer.buffer, controllerBuffer.byteOffset);
 
-// let symbolArray = await getOptionChain();
-
-let symbolArray = [1126324213001, 'NSE:NIFTY2632421300CE', 1126324213002, 'NSE:NIFTY2632421300PE'];
+let symbolArray = await getOptionChainSymbols();
 
 let optionsCount = 0;
 let indicesCount = 0;
@@ -53,22 +51,29 @@ for(let i = 0; i < symbolArray.length; i+=2) {
     else { optionsCount++ }
 }
 
+let indicsBufferView = null; // Default to null
+
+if (indicesCount > 0) {
+    const indicesMemNeeded = indicesCount * indicsDataPoints * 8;
+    console.log(`[NODE] Allocating ${indicesMemNeeded} bytes for Indices`);
+    const indicsBuffer = bridge.getIndicsDataBuffer(indicesMemNeeded);
+    indicsBufferView = new Float64Array(indicsBuffer.buffer, indicsBuffer.byteOffset);
+} else {
+    console.log("[NODE] No Indices found. Skipping allocation.");
+}
+
+// Options usually have data, but we can guard them too
+let optionChainBufferView = null;
+if (optionsCount > 0) {
+    const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
+    console.log(`[NODE] Allocating ${optionsMemNeeded} bytes for Options`);
+    const optionChainBuffer = bridge.getOptionChainBuffer(optionsMemNeeded);
+    optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
+}
+
 controllerBufferView[controllerMap.systemStatus] = 0;
 controllerBufferView[controllerMap.sIndicesCount] = indicesCount;
 controllerBufferView[controllerMap.sOptionsCount] = optionsCount;
-// let memNeeded = (symbolArray.length / 2) * totalDataPoints * 8;
-const indicesMemNeeded = indicesCount * indicsDataPoints * 8;
-const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
-
-console.log(`[NODE] Allocating:`);
-console.log(`       Indices: ${indicesMemNeeded} bytes`);
-console.log(`       Options: ${optionsMemNeeded} bytes`);
-
-const indicsBuffer = bridge.getIndicsDataBuffer(indicesMemNeeded);
-const indicsBufferView = new Float64Array(indicsBuffer.buffer, indicsBuffer.byteOffset);
-
-const optionChainBuffer = bridge.getOptionChainBuffer(optionsMemNeeded);
-const optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
 
 let accessToken = await ensureAndRead(accessTokenFilePath);
 
@@ -98,8 +103,6 @@ else {
     process.exit(0);
 }
 
-console.log(symbolArray);
-
 
 // tbtDataSocket(appId, accessToken, ["NSE:NIFTY26FEB25450CE"], 4)  // BAD
 
@@ -119,7 +122,7 @@ const streamConfig = {
     logWriter: false
 }
 
-// optionStream(streamConfig);
+optionAndIndicsStream(streamConfig);
 
 console.log("[NODE] Complete");
 controllerBufferView[controllerMap.systemStatus] = 1; // READY!

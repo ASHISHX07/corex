@@ -20,7 +20,7 @@ let optionsDataPoints = layout.OPTIONS.length;
 
 // let totalDataPoints = indicsDataPoints + optionsDataPoints;
 
-async function optionStream({app_id, access_token, indicsView, optionView, symbols = Array, litemode, logger, logWriter}) {
+async function optionAndIndicsStream({app_id, access_token, indicsView, optionView, symbols = Array, litemode, logger, logWriter}) {
 
     const symbolMap = new Map();
     const subscriptionList = [];
@@ -133,7 +133,7 @@ async function optionStream({app_id, access_token, indicsView, optionView, symbo
 }
 
 export {
-    optionStream,
+    optionAndIndicsStream,
     indicsDataPoints,
     optionsDataPoints,
 }
