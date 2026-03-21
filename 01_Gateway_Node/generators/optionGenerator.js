@@ -12,8 +12,6 @@ import { readFileSync } from 'fs';
 
 const niftyGap = 50;
 const bankniftyGap = 100;
-const sensexGap = 100;
-const bankexGap = 100;
 
 const optionManager = {
     exchange: "NSE",
@@ -24,21 +22,16 @@ const optionManager = {
     strikePrice: 21300,
     optionType: "CE",
     isMonthly: false,
-    visibility: 1
+    visibility: 4
 }
 
-async function getOptionChainSymbols() {
+let isNifty = optionManager.underlyingSymbol === "NIFTY"
+let visibility = (optionManager.visibility * 2) + 1;
 
-    let isNifty = optionManager.underlyingSymbol === "NIFTY"
-    let start;
-    let visibility = optionManager.visibility * 2;
+isNifty ? optionManager.strikePrice -= (optionManager.visibility * niftyGap) : optionManager.strikePrice -= (optionManager.visibility * bankniftyGap)
 
-    for(let i = 1; i <= visibility; ++i) {
-        if (isNifty) {
-            
-        }
-    }
-
+async function getOptionChainSymbols() {   
+    
     let symbolArr = [];
     
     for (let i = 1; i <= visibility; ++i) {
@@ -55,14 +48,12 @@ async function getOptionChainSymbols() {
         symbolArr.push(PEInstrument, PESymbol);
         optionManager.optionType = "CE";
 
-    }
+        isNifty ? optionManager.strikePrice += niftyGap : optionManager.strikePrice += bankniftyGap;
 
-    console.log(symbolArr);
+    }
     
     return symbolArr;
 
 }
-
-await getOptionChainSymbols();
 
 export default getOptionChainSymbols;
