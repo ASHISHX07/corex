@@ -4,7 +4,7 @@
 #include <vector>
 #include <iomanip>
 #include <mutex>
-#include "headers/shmController.hpp"
+#include "../headers/shmController.hpp"
 
 std::atomic<bool> running {true};
 std::mutex consoleMutex;

@@ -50,7 +50,7 @@ public:
         std::cout << "[CORE] Indices: " << n_indices << " | Options: " << n_options << std::endl;
     }
 
-    void connectToOptionChainStream() {
+    void connectToOptionStream() {
         try {
             shm_indices_data = new shared_memory_object(open_only, "INDICES_DATA_MEM", read_write);
             region_indices_data = new mapped_region(*shm_indices_data, read_write);
@@ -67,5 +67,4 @@ public:
             exit(1);
         }
     }
-
 };
