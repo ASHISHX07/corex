@@ -68,4 +68,17 @@ public:
         }
     }
 
+    // ~VENN_Memory() {
+
+    //     delete shm_controller;
+    //     delete region_controller;
+
+    //     delete shm_indices_data;
+    //     delete region_indices_data;
+
+    //     delete shm_options_data;
+    //     delete region_options_data;
+
+    // }
+
 };

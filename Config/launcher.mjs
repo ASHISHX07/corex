@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 // executables paths
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const cppExe = path.resolve(__dirname, '../03_Core_Cpp/out/build/gcc-ninja/venn_core.exe');
+const cppExe = path.resolve(__dirname, '../03_Core_Cpp/out/build/gcc-ninja/main.exe');
 const pySrc = path.resolve(__dirname, '../02_Strategies_Python/example.py');
 const nodeGateway = path.resolve(__dirname, '../01_Gateway_Node/index.js');
 
