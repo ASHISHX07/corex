@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const bufferLayoutPath = path.resolve(__dirname, '../../Config/shm_layout.json')
 const layout = JSON.parse(readFileSync(bufferLayoutPath, 'utf8'))
-const logDir = path.join(__dirname, '../../../Data/logs/stream_logs/option-chain-logs');
+const logDir = path.join(__dirname, '../../Data/logs/stream_logs/option-chain-logs');
 
 const indicsDataMap = {};
 layout.INDICS.forEach((field, index) => {indicsDataMap[field] = index;});
@@ -17,8 +17,6 @@ let indicsDataPoints = layout.INDICS.length;
 const optionChainDataMap = {};
 layout.OPTIONS.forEach((field, index) => {optionChainDataMap[field] = index;});
 let optionsDataPoints = layout.OPTIONS.length;
-
-// let totalDataPoints = indicsDataPoints + optionsDataPoints;
 
 async function optionAndIndicsStream({app_id, access_token, indicsView, optionView, symbols = Array, litemode, logger, logWriter}) {
 
@@ -43,20 +41,12 @@ async function optionAndIndicsStream({app_id, access_token, indicsView, optionVi
             baseIdx = optionsCounter * optionsDataPoints;
             optionsCounter++;
         }
-
-        // const baseIdx = (i / 2) * optionsDataPoints;
         
         symbolMap.set(symbolStr, {type, baseIdx, token});
         subscriptionList.push(symbolStr);
     }
 
-    console.log(`[NODE] Stream Configured`);
-    console.log(`       Indices: ${indicsCounter}`);
-    console.log(`       Options: ${optionsCounter}`);
-
-    let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, ensureAndMkdir(logDir), logger);
-
-    // const symbolList = [symbols[1]];
+    let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, ensureAndMkdir(logDir), logWriter);
 
     socket.on("connect", function(){
         socket.subscribe(subscriptionList);
@@ -67,8 +57,6 @@ async function optionAndIndicsStream({app_id, access_token, indicsView, optionVi
         else {
             socket.mode(socket.FullMode);
         }
-
-        console.log("[NODE] Subscribed to all symbols");
     })
 
     socket.on("message", function(message){
