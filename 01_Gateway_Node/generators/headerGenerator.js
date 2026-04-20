@@ -26,5 +26,4 @@ export default async function headerGenerator() {
     hppContent += `#endif // BUFFER_HEADER_H`;
     writeFileSync(nodeBufferHeader, hppContent, 'utf8');
     writeFileSync(cppBufferHeader, hppContent, 'utf8');
-    console.log("[BUILD] C++ Headers updated from JSON layout");
 }

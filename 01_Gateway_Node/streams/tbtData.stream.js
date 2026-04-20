@@ -11,14 +11,18 @@ const logDir = path.join(__dirname, '../../../Data/logs/stream_logs/tbt-data-log
 
 async function tbtDataSocket(appId, accessToken, symbols = [], bufferView, diffOnly = false, logger = false) {
 
-    const socket = new fyersTbtSocket(`${appId}:${accessToken}`, ensureAndMkdir(logDir), logger, diffOnly)
+    const socket = new fyersTbtSocket(`${appId}:${accessToken}`, ensureAndMkdir(logDir), logger, diffOnly);
+
+    if (symbols.length < 1 || symbols.length > 15) {
+        console.error('TBT socket can only subscribe minimum 1 and maximum 15 per channel');
+    }
 
     socket.on("error", (errmsg) => {
-        console.log(`[NODE] TBT SOCKET ERROR: ${errmsg}`)
+        console.log(`[NODE] TBT SOCKET ERROR: ${errmsg}`);
     });
     
     socket.on("open", () => {
-        socket.subscribe(symbols, '1', 'ohlcv');
+        socket.subscribe(symbols, '1', 'depth');
         socket.switchChannel([], ['1']);
     });
 

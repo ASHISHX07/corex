@@ -18,8 +18,8 @@ const optionManager = {
     underlyingSymbol: "NIFTY",
     lastTwoDigitOfYear: 26,
     month: 4,
-    day: 7,
-    strikePrice: 22700,
+    day: 21,
+    strikePrice: 23850,
     optionType: "CE",
     isMonthly: false,
     visibility: 4
@@ -30,7 +30,7 @@ let visibility = (optionManager.visibility * 2) + 1;
 
 isNifty ? optionManager.strikePrice -= (optionManager.visibility * niftyGap) : optionManager.strikePrice -= (optionManager.visibility * bankniftyGap)
 
-async function getOptionChainSymbols() {   
+async function getOptionChainSymbols() {
     
     let symbolArr = [];
     

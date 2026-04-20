@@ -1,17 +1,17 @@
 // bridge imports
-import { createRequire } from "node:module";
-import { getAuthCodeM, getAccessToken } from "./connections/fyers_connect.js";
-import getProfileInfo from "./account/profile_info.js";
-import { readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from 'node:module';
+import { getAuthCodeM, getAccessToken } from './connections/fyers_connect.js';
+import getProfileInfo from './account/profile_info.js';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import ensureAndRead from "./helpers/ensureAndRead.helper.js";
+import ensureAndRead from './helpers/ensureAndRead.helper.js';
 import headerGenerator from './generators/headerGenerator.js'
-// import { weeklyOptionSymbolName, monthlyOptionSymbolName } from "./helpers/symbology.js";
-import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from "./streams/options&indics.stream.js";
-// import tbtDataSocket from "./streams/tbtData.stream.js";
-import getOptionChainSymbols from "./generators/optionGenerator.js";
+import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from './streams/options&indics.stream.js';
+import tbtDataSocket from "./streams/tbtData.stream.js";
+import optionChainStream from './streams/api-streams/option-chain.stream.js'
+import getOptionChainSymbols from './generators/optionGenerator.js';
 
 const appId = process.env.FYERS_APP_ID;
 
@@ -50,8 +50,7 @@ for(let i = 0; i < symbolArray.length; i+=2) {
     else { optionsCount++ }
 }
 
-let indicsBufferView = null; // Default to null
-
+let indicsBufferView = null;
 if (indicesCount > 0) {
     const indicesMemNeeded = indicesCount * indicsDataPoints * 8;
     const indicsBuffer = bridge.getIndicsDataBuffer(indicesMemNeeded);
@@ -60,7 +59,6 @@ if (indicesCount > 0) {
     console.log("[NODE] No Indices");
 }
 
-// Options usually have data, but we can guard them too
 let optionChainBufferView = null;
 if (optionsCount > 0) {
     const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
@@ -99,13 +97,10 @@ else {
     process.exit(0);
 }
 
+// optionChainStream(appId, accessToken, "NSE:NIFTY2642123800CE", 2);
 
-// tbtDataSocket(appId, accessToken, ["NSE:NIFTY26FEB25450CE"], 4)  // BAD
+tbtDataSocket(appId, accessToken, ["NSE:NIFTY2642124350CE"], 4);
 
-// let symbol = weeklyOptionSymbolName("NSE", "NIFTY", 26, 2, 17, 25700, "PE");
-// symbolArray.push(2621725400);
-// symbolArray.push(symbol);
-// console.log(symbol);
 
 const streamConfig = {
     app_id: appId,
@@ -118,7 +113,7 @@ const streamConfig = {
     logWriter: false
 }
 
-optionAndIndicsStream(streamConfig);
+// optionAndIndicsStream(streamConfig);
 
 console.log("[NODE] Complete");
 controllerBufferView[controllerMap.systemStatus] = 1; // READY!

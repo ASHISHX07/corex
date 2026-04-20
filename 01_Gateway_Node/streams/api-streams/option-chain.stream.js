@@ -2,7 +2,6 @@ import { fyersModel } from "fyers-api-v3";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import ensureAndMkdir from "../../helpers/ensureAndMkdir.helper.js";
-import { arrayBuffer } from "stream/consumers";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../../Data/logs/stream_logs/option-chain-logs');
@@ -15,7 +14,7 @@ async function optionChainStream(app_id, access_token, symbol, strikeCount, inte
 
     const poll = async () => {
         try {
-            let optionData = await fyers.getOptionChain({"symbol": symbol, "strikecount": strikeCount, "timestamp": timeStamp});
+            let optionData = await fyers.getOptionChain({"symbol": symbol, "strikecount": strikeCount, "timestamp": timeStamp, "greeks": 1});
             console.log(optionData.data);
         }
         catch (err) {

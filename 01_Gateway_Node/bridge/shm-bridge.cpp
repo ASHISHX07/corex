@@ -16,6 +16,9 @@ mapped_region* g_region_indics{ nullptr };
 shared_memory_object* g_shm_opt_chn{ nullptr };
 mapped_region* g_region_opt_chn{ nullptr };
 
+shared_memory_object* g_shm_tbt_depth{ nullptr };
+mapped_region* g_region_tbt_depth{ nullptr };
+
 Napi::Value getControllerBuffer(const Napi::CallbackInfo& info) {
     Napi::Env env{ info.Env() };
 
@@ -119,12 +122,52 @@ Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
     }
 }
 
+Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
+    Napi::Env env{ info.Env() };
+
+    uint32_t desiredSize {};
+    
+    if (info.Length() > 0 && info[0].IsNumber()) {
+        desiredSize = info[0].As<Napi::Number>().Uint32Value();
+        std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
+    }
+    else {
+        Napi::Error::New(env, "[BRIDGE ERROR] Memory size argument is REQUIRED!").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    try {
+        if(g_shm_tbt_depth == nullptr) {
+            g_shm_tbt_depth = new shared_memory_object(open_or_create, "TBT_DEPTH_MEM", read_write);
+            g_shm_opt_chn->truncate(desiredSize);
+        }
+
+        if(g_region_tbt_depth == nullptr) {
+            g_region_tbt_depth = new mapped_region(*g_shm_tbt_depth, read_write);
+        }
+
+        std::cout << "[BRIDGE] Shared Mem 'OPTION_CHAIN_MEM' opened at: " << g_region_tbt_depth->get_address() << std::endl;
+
+        return Napi::Buffer<uint8_t>::New(env,
+            (uint8_t*)g_region_tbt_depth->get_address(),
+            g_region_tbt_depth->get_size(),
+            [](Napi::Env, uint8_t*) {});
+    }
+
+    catch (const std::exception& e) {
+        // If something breaks (like Boost not finding the path), throw a JS error
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
 // Boilerplate to export the function
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "getControllerBuffer"), Napi::Function::New(env, getControllerBuffer));
     exports.Set(Napi::String::New(env, "getIndicsDataBuffer"), Napi::Function::New(env, getIndicsDataBuffer));
     exports.Set(Napi::String::New(env, "getOptionChainBuffer"), Napi::Function::New(env, getOptionChainBuffer));
+    exports.Set(Napi::String::New(env, "getTbtDepthBuffer"), Napi::Function::New(env, getTbtDepthBuffer));
     return exports;
 }
 
