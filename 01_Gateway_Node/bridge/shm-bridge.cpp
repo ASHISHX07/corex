@@ -31,7 +31,7 @@ Napi::Value getControllerBuffer(const Napi::CallbackInfo& info) {
             g_region_controller = new mapped_region(*g_shm_controller, read_write);
         }
 
-        std::cout << "[BRIDGE] CONTROLLER MEMORY CREATED" << std::endl;
+        // std::cout << "[BRIDGE] CONTROLLER MEMORY CREATED" << std::endl;
 
         return Napi::Buffer<uint8_t>::New(env,
         (uint8_t*)g_region_controller->get_address(),
@@ -68,7 +68,7 @@ Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
             g_region_indics = new mapped_region(*g_shm_indics, read_write);
         }
 
-        std::cout << "[BRIDGE] Shared Mem 'INDICS_DATA_MEM' opened at: " << g_region_indics->get_address() << std::endl;
+        // std::cout << "[BRIDGE] Shared Mem 'INDICS_DATA_MEM' opened at: " << g_region_indics->get_address() << std::endl;
 
         return Napi::Buffer<uint8_t>::New(env,
         (uint8_t*)g_region_indics->get_address(),
@@ -82,7 +82,6 @@ Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
     }
 }
 
-// this function will be called from javascript
 Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
     Napi::Env env{ info.Env() };
 
@@ -90,7 +89,7 @@ Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
 
     if (info.Length() > 0 && info[0].IsNumber()) {
         desiredSize = info[0].As<Napi::Number>().Uint32Value();
-        std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
+        // std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
     }
     else {
         Napi::Error::New(env, "[BRIDGE ERROR] Memory size argument is REQUIRED!").ThrowAsJavaScriptException();
@@ -107,7 +106,7 @@ Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
             g_region_opt_chn = new mapped_region(*g_shm_opt_chn, read_write);
         }
 
-        std::cout << "[BRIDGE] Shared Mem 'OPTION_CHAIN_MEM' opened at: " << g_region_opt_chn->get_address() << std::endl;
+        // std::cout << "[BRIDGE] Shared Mem 'OPTION_CHAIN_MEM' opened at: " << g_region_opt_chn->get_address() << std::endl;
 
         return Napi::Buffer<uint8_t>::New(env,
             (uint8_t*)g_region_opt_chn->get_address(),
@@ -129,7 +128,7 @@ Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
     
     if (info.Length() > 0 && info[0].IsNumber()) {
         desiredSize = info[0].As<Napi::Number>().Uint32Value();
-        std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
+        // std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
     }
     else {
         Napi::Error::New(env, "[BRIDGE ERROR] Memory size argument is REQUIRED!").ThrowAsJavaScriptException();
@@ -146,7 +145,7 @@ Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
             g_region_tbt_depth = new mapped_region(*g_shm_tbt_depth, read_write);
         }
 
-        std::cout << "[BRIDGE] Shared Mem 'OPTION_CHAIN_MEM' opened at: " << g_region_tbt_depth->get_address() << std::endl;
+        // std::cout << "[BRIDGE] Shared Mem 'TBT_DEPTH_MEM' opened at: " << g_region_tbt_depth->get_address() << std::endl;
 
         return Napi::Buffer<uint8_t>::New(env,
             (uint8_t*)g_region_tbt_depth->get_address(),

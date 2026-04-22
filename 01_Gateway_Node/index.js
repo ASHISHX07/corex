@@ -1,4 +1,3 @@
-// bridge imports
 import { createRequire } from 'node:module';
 import { getAuthCodeM, getAccessToken } from './connections/fyers_connect.js';
 import getProfileInfo from './account/profile_info.js';
@@ -64,6 +63,8 @@ if (optionsCount > 0) {
     const optionsMemNeeded = optionsCount * optionsDataPoints * 8;
     const optionChainBuffer = bridge.getOptionChainBuffer(optionsMemNeeded);
     optionChainBufferView = new Float64Array(optionChainBuffer.buffer, optionChainBuffer.byteOffset);
+} else {
+    console.log("[NODE] No Options");
 }
 
 controllerBufferView[controllerMap.systemStatus] = 0;
@@ -84,7 +85,7 @@ else if (accessToken) {
     let validate = await getProfileInfo(appId, accessToken, true, false);
     
     if(validate) {
-        console.log("\nauthentication done\n")
+        console.log("\nauthentication done\n");
     }
     else {
         console.log("failed to authenticate, clearing cache and exiting...");
@@ -99,7 +100,7 @@ else {
 
 // optionChainStream(appId, accessToken, "NSE:NIFTY2642123800CE", 2);
 
-tbtDataSocket(appId, accessToken, ["NSE:NIFTY2642124350CE"], 4);
+tbtDataSocket(appId, accessToken, ["NSE:NIFTY2642824350CE"], 4);
 
 
 const streamConfig = {
