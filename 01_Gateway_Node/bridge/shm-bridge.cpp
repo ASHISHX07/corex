@@ -1,5 +1,7 @@
 #include <napi.h>
 #include <iostream>
+#include <memory>
+#include <utility>
 // Boost interprocess headers
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -7,31 +9,29 @@
 
 using namespace boost::interprocess;
 
-shared_memory_object* g_shm_controller{ nullptr };
-mapped_region* g_region_controller{ nullptr };
+std::unique_ptr<shared_memory_object> g_shm_controller;
+std::unique_ptr<mapped_region> g_region_controller;
 
-shared_memory_object* g_shm_indics{ nullptr };
-mapped_region* g_region_indics{ nullptr };
+std::unique_ptr<shared_memory_object> g_shm_indics;
+std::unique_ptr<mapped_region> g_region_indics;
 
-shared_memory_object* g_shm_opt_chn{ nullptr };
-mapped_region* g_region_opt_chn{ nullptr };
+std::unique_ptr<shared_memory_object> g_shm_opt_chn;
+std::unique_ptr<mapped_region> g_region_opt_chn;
 
-shared_memory_object* g_shm_tbt_depth{ nullptr };
-mapped_region* g_region_tbt_depth{ nullptr };
+std::unique_ptr<shared_memory_object> g_shm_tbt_depth;
+std::unique_ptr<mapped_region> g_region_tbt_depth;
 
 Napi::Value getControllerBuffer(const Napi::CallbackInfo& info) {
     Napi::Env env{ info.Env() };
 
     try {
-        if(g_shm_controller == nullptr) {
-            g_shm_controller = new shared_memory_object(open_or_create, "VENN_CONTROLLER", read_write);
+        if(!g_shm_controller) {
+            g_shm_controller = std::make_unique<shared_memory_object>(open_or_create, "VENN_CONTROLLER", read_write);
             g_shm_controller->truncate(sizeof(ControllerBufferHeader));
         }
-        if(g_region_controller == nullptr) {
-            g_region_controller = new mapped_region(*g_shm_controller, read_write);
+        if(!g_region_controller) {
+            g_region_controller = std::make_unique<mapped_region>(*g_shm_controller, read_write);
         }
-
-        // std::cout << "[BRIDGE] CONTROLLER MEMORY CREATED" << std::endl;
 
         return Napi::Buffer<uint8_t>::New(env,
         (uint8_t*)g_region_controller->get_address(),
@@ -51,7 +51,6 @@ Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
 
     if (info.Length() > 0 && info[0].IsNumber()) {
         desiredSize = info[0].As<Napi::Number>().Uint32Value();
-        std::cout << "[BRIDGE] Node requested memory size: " << desiredSize << "bytes." << std::endl;
     }
     else {
         Napi::Error::New(env, "[BRIDGE ERROR] Memory size argument is REQUIRED!").ThrowAsJavaScriptException();
@@ -59,13 +58,13 @@ Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
     }
 
     try {
-        if(g_shm_indics == nullptr) {
-            g_shm_indics = new shared_memory_object(open_or_create, "INDICES_DATA_MEM", read_write);
+        if(!g_shm_indics) {
+            g_shm_indics = std::make_unique<shared_memory_object>(open_or_create, "INDICES_DATA_MEM", read_write);
             g_shm_indics->truncate(desiredSize);
         }
 
         if(g_region_indics == nullptr) {
-            g_region_indics = new mapped_region(*g_shm_indics, read_write);
+            g_region_indics = std::make_unique<mapped_region>(*g_shm_indics, read_write);
         }
 
         // std::cout << "[BRIDGE] Shared Mem 'INDICS_DATA_MEM' opened at: " << g_region_indics->get_address() << std::endl;
@@ -97,13 +96,13 @@ Napi::Value getOptionChainBuffer(const Napi::CallbackInfo& info) {
     }
 
     try {
-        if(g_shm_opt_chn == nullptr) {
-            g_shm_opt_chn = new shared_memory_object(open_or_create, "OPTIONS_DATA_MEM", read_write);
+        if(!g_shm_opt_chn) {
+            g_shm_opt_chn = std::make_unique<shared_memory_object>(open_or_create, "OPTIONS_DATA_MEM", read_write);
             g_shm_opt_chn->truncate(desiredSize);
         }
 
-        if(g_region_opt_chn == nullptr) {
-            g_region_opt_chn = new mapped_region(*g_shm_opt_chn, read_write);
+        if(!g_region_opt_chn) {
+            g_region_opt_chn =std::make_unique<mapped_region>(*g_shm_opt_chn, read_write);
         }
 
         // std::cout << "[BRIDGE] Shared Mem 'OPTION_CHAIN_MEM' opened at: " << g_region_opt_chn->get_address() << std::endl;
@@ -136,13 +135,13 @@ Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
     }
 
     try {
-        if(g_shm_tbt_depth == nullptr) {
-            g_shm_tbt_depth = new shared_memory_object(open_or_create, "TBT_DEPTH_MEM", read_write);
+        if(!g_shm_tbt_depth) {
+            g_shm_tbt_depth = std::make_unique<shared_memory_object>(open_or_create, "TBT_DEPTH_MEM", read_write);
             g_shm_opt_chn->truncate(desiredSize);
         }
 
-        if(g_region_tbt_depth == nullptr) {
-            g_region_tbt_depth = new mapped_region(*g_shm_tbt_depth, read_write);
+        if(!g_region_tbt_depth) {
+            g_region_tbt_depth = std::make_unique<mapped_region>(*g_shm_tbt_depth, read_write);
         }
 
         // std::cout << "[BRIDGE] Shared Mem 'TBT_DEPTH_MEM' opened at: " << g_region_tbt_depth->get_address() << std::endl;
@@ -161,7 +160,6 @@ Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
 }
 
 // Boilerplate to export the function
-
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "getControllerBuffer"), Napi::Function::New(env, getControllerBuffer));
     exports.Set(Napi::String::New(env, "getIndicsDataBuffer"), Napi::Function::New(env, getIndicsDataBuffer));
