@@ -21,27 +21,16 @@ async function getProfileInfo(app_id, access_token, checker = false, logger = fa
         const response = await fyers.get_profile();
         if(checker) return true;
         console.log(response);
+        return true;
     }
     catch(err) {
-        if(err.code == -8) {
-            writeFileSync(accessTokenFilePath, '', 'utf8');
-            writeFileSync(authCodeFilePath, '', 'utf8');
+        if(err.code == -8 || err.code == 500) {
             console.log("\nInvalid Access Token passed, cleared access token and auth code from cache\n");
-            writeFileSync(authCodeFilePath, '', 'utf8');
-            writeFileSync(accessTokenFilePath, '', 'utf8');
-            console.log("generating new auth code...\n");
-            await getAuthCodeM(app_id);
-            await getAccessToken(app_id);
+            return false;
         }
         else if(err.code == -352) {
             console.error("\nInvalid App ID provided please check you app ID \n");
-            process.exit(0);
-        }
-        else if(err.code == 500) {
-            console.error("\nERROR: likely because of invalid access token or from fyers side issue, clearing up cache please rerun the program\nif this issue persists please check official updates from fyers\n");
-            writeFileSync(accessTokenFilePath, '', 'utf8');
-            writeFileSync(authCodeFilePath, '', 'utf8');
-            process.exit(0);
+            return false;
         }
         else {
             console.error(err);

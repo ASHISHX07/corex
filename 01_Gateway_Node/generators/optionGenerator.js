@@ -18,14 +18,14 @@ const optionManager = {
     underlyingSymbol: "NIFTY",
     lastTwoDigitOfYear: 26,
     month: 4,
-    day: 21,
-    strikePrice: 23850,
+    day: 28,
+    strikePrice: 24150,
     optionType: "CE",
     isMonthly: false,
     visibility: 4
 }
 
-let isNifty = optionManager.underlyingSymbol === "NIFTY"
+let isNifty = optionManager.underlyingSymbol === "NIFTY";
 let visibility = (optionManager.visibility * 2) + 1;
 
 isNifty ? optionManager.strikePrice -= (optionManager.visibility * niftyGap) : optionManager.strikePrice -= (optionManager.visibility * bankniftyGap)

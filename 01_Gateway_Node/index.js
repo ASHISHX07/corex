@@ -73,35 +73,38 @@ controllerBufferView[controllerMap.sOptionsCount] = optionsCount;
 
 let accessToken = await ensureAndRead(accessTokenFilePath);
 
+if(accessToken) {
+
+    let isValid = await getProfileInfo(appId, accessToken, true, false);
+
+    if(!isValid) {
+        console.log("[AUTH] Clearing invalid access token and initiating refresh...");
+        accessToken = "";
+        writeFileSync(accessTokenFilePath, '', 'utf8');
+        writeFileSync(authCodeFilePath, '', 'utf8');
+    }
+    else {
+        console.log("\n[AUTH] Authentication successful\n");
+    }
+}
 if(!accessToken) {
+    console.log("[AUTH] No valid token found. Starting new auth flow...");
     let authCode = await ensureAndRead(authCodeFilePath);
-    if(!authCode) {
+    if (!authCode) {
         await getAuthCodeM(appId);
     }
     await getAccessToken(appId);
     accessToken = await ensureAndRead(accessTokenFilePath);
-}
-else if (accessToken) {
-    let validate = await getProfileInfo(appId, accessToken, true, false);
-    
-    if(validate) {
-        console.log("\nauthentication done\n");
+    if (!accessToken) {
+        console.error("[AUTH ERROR] Failed to acquire access token. Please run again.");
+        process.exit(1);
     }
-    else {
-        console.log("failed to authenticate, clearing cache and exiting...");
-        writeFileSync(accessTokenFilePath, '', 'utf8');
-        process.exit(0);
-    }
-}
-else {
-    console.log("failed to authenticate, please try again");
-    process.exit(0);
+    console.log("\n[AUTH] New token acquired and verified.\n");
 }
 
 // optionChainStream(appId, accessToken, "NSE:NIFTY2642123800CE", 2);
 
 tbtDataSocket(appId, accessToken, ["NSE:NIFTY2642824350CE"], 4);
-
 
 const streamConfig = {
     app_id: appId,
@@ -114,7 +117,7 @@ const streamConfig = {
     logWriter: false
 }
 
-// optionAndIndicsStream(streamConfig);
+optionAndIndicsStream(streamConfig);
 
 console.log("[NODE] Complete");
 controllerBufferView[controllerMap.systemStatus] = 1; // READY!
