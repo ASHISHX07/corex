@@ -84,11 +84,10 @@ if(accessToken) {
         writeFileSync(authCodeFilePath, '', 'utf8');
     }
     else {
-        console.log("\n[AUTH] Authentication successful\n");
+        console.log("\n[AUTH] Done\n");
     }
 }
 if(!accessToken) {
-    console.log("[AUTH] No valid token found. Starting new auth flow...");
     let authCode = await ensureAndRead(authCodeFilePath);
     if (!authCode) {
         await getAuthCodeM(appId);
@@ -99,12 +98,12 @@ if(!accessToken) {
         console.error("[AUTH ERROR] Failed to acquire access token. Please run again.");
         process.exit(1);
     }
-    console.log("\n[AUTH] New token acquired and verified.\n");
+    console.log("\n[AUTH] Done\n");
 }
 
-// optionChainStream(appId, accessToken, "NSE:NIFTY2642123800CE", 2);
+optionChainStream(appId, accessToken, "NSE:NIFTY265523800CE", 2);
 
-tbtDataSocket(appId, accessToken, ["NSE:NIFTY2642824350CE"], 4);
+tbtDataSocket(appId, accessToken, ["NSE:NIFTY265524350CE"], 4);
 
 const streamConfig = {
     app_id: appId,
