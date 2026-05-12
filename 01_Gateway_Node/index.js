@@ -101,9 +101,9 @@ if(!accessToken) {
     console.log("\n[AUTH] Done\n");
 }
 
-optionChainStream(appId, accessToken, "NSE:NIFTY265523800CE", 2);
+// optionChainStream(appId, accessToken, "NSE:NIFTY2650523800CE", 2);
 
-tbtDataSocket(appId, accessToken, ["NSE:NIFTY265524350CE"], 4);
+// tbtDataSocket(appId, accessToken, ["NSE:NIFTY2650524350CE"], 4);
 
 const streamConfig = {
     app_id: appId,
@@ -112,7 +112,7 @@ const streamConfig = {
     optionView: optionChainBufferView,
     symbols: symbolArray,
     litemode: false,
-    logger: true,
+    logger: false,
     logWriter: false
 }
 

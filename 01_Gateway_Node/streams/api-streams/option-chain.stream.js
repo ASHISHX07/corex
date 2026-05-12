@@ -15,7 +15,7 @@ async function optionChainStream(app_id, access_token, symbol, strikeCount, inte
     const poll = async () => {
         try {
             let optionData = await fyers.getOptionChain({"symbol": symbol, "strikecount": strikeCount, "timestamp": timeStamp, "greeks": 1});
-            console.log(optionData.data);
+            console.log(JSON.stringify(optionData.data, '', 2));
         }
         catch (err) {
             console.error("Failed Polling in option-chain.stream.js: ", err);

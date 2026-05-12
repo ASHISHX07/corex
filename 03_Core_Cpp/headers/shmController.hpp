@@ -1,21 +1,30 @@
-#include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/interprocess/mapped_region.hpp>
 #include <iostream>
 #include <thread>
+#include <memory>
 #include "bufferHeaders.hpp"
+// boost headers
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 
 using namespace boost::interprocess;
 
 class VENN_Memory {
 private: 
-    shared_memory_object* shm_controller { nullptr };
-    mapped_region* region_controller { nullptr };
-    shared_memory_object* shm_indices_data { nullptr };
-    mapped_region* region_indices_data { nullptr };
-    shared_memory_object* shm_options_data { nullptr };
-    mapped_region* region_options_data { nullptr };
+
+    std::unique_ptr<shared_memory_object> shm_controller;
+    std::unique_ptr<mapped_region> region_controller;
+
+    std::unique_ptr<shared_memory_object> shm_indices_data;
+    std::unique_ptr<mapped_region> region_indices_data;
+
+    std::unique_ptr<shared_memory_object> shm_options_data;
+    std::unique_ptr<mapped_region> region_options_data;
+
+    std::unique_ptr<shared_memory_object> shm_tbt_data;
+    std::unique_ptr<mapped_region> region_tbt_data;
 
 public:
+
     ControllerBufferHeader* ctrl { nullptr };
     IndicsBufferHeader* indicesData { nullptr };
     OptionsBufferHeader* optionChainData { nullptr };
@@ -27,8 +36,8 @@ public:
         std::cout << "[CORE] Looking for VENN_CONTROLLER..." << std::endl;
         while(true) {
             try {
-                shm_controller = new shared_memory_object(open_only, "VENN_CONTROLLER", read_write);
-                region_controller = new mapped_region(*shm_controller, read_write);
+                shm_controller = std::make_unique<shared_memory_object>(open_only, "VENN_CONTROLLER", read_write); 
+                region_controller = std::make_unique<mapped_region>(*shm_controller, read_write);
                 ctrl = static_cast<ControllerBufferHeader*>(region_controller->get_address());
                 std::cout << "[CORE] Connected to Controller." << std::endl;
                 break;
@@ -52,12 +61,12 @@ public:
 
     void connectToOptionStream() {
         try {
-            shm_indices_data = new shared_memory_object(open_only, "INDICES_DATA_MEM", read_write);
-            region_indices_data = new mapped_region(*shm_indices_data, read_write);
+            shm_indices_data = std::make_unique<shared_memory_object>(open_only, "INDICES_DATA_MEM", read_write);
+            region_indices_data = std::make_unique<mapped_region>(*shm_indices_data, read_write);
             indicesData = static_cast<IndicsBufferHeader*>(region_indices_data->get_address());
 
-            shm_options_data = new shared_memory_object(open_only, "OPTIONS_DATA_MEM", read_write);
-            region_options_data = new mapped_region(*shm_options_data, read_write);
+            shm_options_data = std::make_unique<shared_memory_object>(open_only, "OPTIONS_DATA_MEM", read_write);
+            region_options_data = std::make_unique<mapped_region>(*shm_options_data, read_write);
             optionChainData = static_cast<OptionsBufferHeader*>(region_options_data->get_address());
 
             std::cout << "[CORE] Memory buffers done" << std::endl;
