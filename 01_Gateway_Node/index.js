@@ -6,10 +6,10 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import ensureAndRead from './helpers/ensureAndRead.helper.js';
-import headerGenerator from './generators/headerGenerator.js'
+import headerGenerator from './generators/headerGenerator.js';
 import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from './streams/options&indics.stream.js';
 import tbtDataSocket from "./streams/tbtData.stream.js";
-import optionChainStream from './streams/api-streams/option-chain.stream.js'
+import optionChainStream from './streams/api-streams/option-chain.stream.js';
 import getOptionChainSymbols from './generators/optionGenerator.js';
 
 const appId = process.env.FYERS_APP_ID;
@@ -103,7 +103,7 @@ if(!accessToken) {
 
 // optionChainStream(appId, accessToken, "NSE:NIFTY2650523800CE", 2);
 
-// tbtDataSocket(appId, accessToken, ["NSE:NIFTY2650524350CE"], 4);
+// tbtDataSocket(appId, accessToken, [symbolArray[1]], 4);
 
 const streamConfig = {
     app_id: appId,

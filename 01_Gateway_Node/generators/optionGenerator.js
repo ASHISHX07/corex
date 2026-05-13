@@ -18,8 +18,8 @@ const optionManager = {
     underlyingSymbol: "NIFTY",
     lastTwoDigitOfYear: 26,
     month: 5,
-    day: 5,
-    strikePrice: 24100,
+    day: 19,
+    strikePrice: 23500,
     optionType: "CE",
     isMonthly: false,
     visibility: 4

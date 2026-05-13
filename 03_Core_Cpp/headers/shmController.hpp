@@ -33,7 +33,6 @@ public:
     int n_options {0};
 
     void connectController() {
-        std::cout << "[CORE] Looking for VENN_CONTROLLER..." << std::endl;
         while(true) {
             try {
                 shm_controller = std::make_unique<shared_memory_object>(open_only, "VENN_CONTROLLER", read_write); 
@@ -49,7 +48,6 @@ public:
     }
 
     void waitForReady() {
-        std::cout << "[CORE] Waiting for start" << std::endl;
         while (ctrl -> systemStatus != 1) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
@@ -61,13 +59,17 @@ public:
 
     void connectToOptionStream() {
         try {
-            shm_indices_data = std::make_unique<shared_memory_object>(open_only, "INDICES_DATA_MEM", read_write);
-            region_indices_data = std::make_unique<mapped_region>(*shm_indices_data, read_write);
-            indicesData = static_cast<IndicsBufferHeader*>(region_indices_data->get_address());
-
-            shm_options_data = std::make_unique<shared_memory_object>(open_only, "OPTIONS_DATA_MEM", read_write);
-            region_options_data = std::make_unique<mapped_region>(*shm_options_data, read_write);
-            optionChainData = static_cast<OptionsBufferHeader*>(region_options_data->get_address());
+            if (n_indices > 0) {
+                shm_indices_data = std::make_unique<shared_memory_object>(open_only, "INDICES_DATA_MEM", read_write);
+                region_indices_data = std::make_unique<mapped_region>(*shm_indices_data, read_write);
+                indicesData = static_cast<IndicsBufferHeader*>(region_indices_data->get_address());
+            }
+            
+            if (n_options > 0) {
+                shm_options_data = std::make_unique<shared_memory_object>(open_only, "OPTIONS_DATA_MEM", read_write);
+                region_options_data = std::make_unique<mapped_region>(*shm_options_data, read_write);
+                optionChainData = static_cast<OptionsBufferHeader*>(region_options_data->get_address());
+            }
 
             std::cout << "[CORE] Memory buffers done" << std::endl;
         }
