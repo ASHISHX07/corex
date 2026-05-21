@@ -101,9 +101,9 @@ if(!accessToken) {
     console.log("\n[AUTH] Done\n");
 }
 
-optionChainStream(appId, accessToken, "NSE:NIFTY265523800CE", 2);
+optionChainStream(appId, accessToken, "NSE:NIFTY2650523800CE", 1, true);
 
-tbtDataSocket(appId, accessToken, ["NSE:NIFTY265524350CE"], 4);
+// tbtDataSocket(appId, accessToken, ["NSE:NIFTY265524350CE"], 4);
 
 const streamConfig = {
     app_id: appId,
@@ -116,7 +116,7 @@ const streamConfig = {
     logWriter: false
 }
 
-optionAndIndicsStream(streamConfig);
+// optionAndIndicsStream(streamConfig);
 
 console.log("[NODE] Complete");
 controllerBufferView[controllerMap.systemStatus] = 1; // READY!
