@@ -19,7 +19,7 @@ const optionManager = {
     lastTwoDigitOfYear: 26,
     month: 5,
     day: 19,
-    strikePrice: 23500,
+    strikePrice: 23600,
     optionType: "CE",
     isMonthly: false,
     visibility: 4
@@ -32,7 +32,7 @@ isNifty ? optionManager.strikePrice -= (optionManager.visibility * niftyGap) : o
 
 async function getOptionChainSymbols() {
     
-    let symbolArr = [];
+    let symbolArr = [1, "NSE:NIFTY50-INDEX"];
     
     for (let i = 1; i <= visibility; ++i) {
 
@@ -50,7 +50,7 @@ async function getOptionChainSymbols() {
 
         isNifty ? optionManager.strikePrice += niftyGap : optionManager.strikePrice += bankniftyGap;
     }
-    // console.log(symbolArr);
+    console.log(symbolArr);
     
     return symbolArr;
 }

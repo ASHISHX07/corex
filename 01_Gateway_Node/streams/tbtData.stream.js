@@ -27,7 +27,7 @@ async function tbtDataSocket(appId, accessToken, symbols = [], bufferView, diffO
     });
 
     socket.on("depth", (ticker, data) => {
-        console.log("DEPTH", ticker, data);
+        // console.log("DEPTH", ticker, data);
     });
 
     socket.on("close", () => {

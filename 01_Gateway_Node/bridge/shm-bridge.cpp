@@ -137,7 +137,7 @@ Napi::Value getTbtDepthBuffer(const Napi::CallbackInfo& info) {
     try {
         if(!g_shm_tbt_depth) {
             g_shm_tbt_depth = std::make_unique<shared_memory_object>(open_or_create, "TBT_DEPTH_MEM", read_write);
-            g_shm_opt_chn->truncate(desiredSize);
+            g_shm_tbt_depth->truncate(desiredSize);
         }
 
         if(!g_region_tbt_depth) {
