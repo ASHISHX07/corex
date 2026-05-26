@@ -2,7 +2,7 @@ import { fyersModel } from 'fyers-api-v3';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import ensureAndMkdir from '../helpers/ensureAndMkdir.helper.js';
+import ensureAndMkdir from '../helpers/fs.helper.js';
 import { writeFileSync } from 'fs';
 import { getAuthCodeM, getAccessToken } from '../connections/fyers_connect.js';
 

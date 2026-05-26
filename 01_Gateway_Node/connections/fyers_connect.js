@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { setTimeout } from 'timers/promises';
 import { readFileSync, writeFileSync } from "node:fs";
-import ensureAndMkdir from '../helpers/ensureAndMkdir.helper.js';
+import ensureAndMkdir from '../helpers/fs.helper.js';
 
 // Recreating __dirname (Because it doesn't exist in ESM) note: use CommonJS for backwards compatibility or if you're using fyer's official code guide as of fyers-api-v3 version 1.4.2
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
