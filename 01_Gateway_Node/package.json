@@ -28,9 +28,11 @@
     "axios": "^1.16.1",
     "cmake-js": "^8.0.0",
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "fyers-api-v3": "^1.8.0",
     "node-addon-api": "^8.8.0",
-    "ntp-client": "^0.5.3"
+    "ntp-client": "^0.5.3",
+    "open": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.9.1"

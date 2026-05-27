@@ -1,17 +1,18 @@
-.vscode/
-.vs/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 
+.vscode/
+.vs/
 build/
 out/
 dist/
 node_modules/
+cache/
+runtime/
 
 logs
 .env
-cache
 CmakeUserPresets.json
 *.exe

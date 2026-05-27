@@ -9,10 +9,12 @@ async function getDateTime() {
     return new Promise((resolve, reject) => {
         ntpClient.getNetworkTime("time.google.com", 123, (err, date) => {
             if (err) {
-                return reject(err);
+                console.warn('[CLOCK] NTP failed, falling back to system time: ', err.message);
+                resolve(new Date());
             }
-            resolve(date);
-            
+            else {
+                resolve(date);
+            }
         });
     });
 }
