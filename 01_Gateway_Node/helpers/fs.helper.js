@@ -8,7 +8,7 @@ function safeMkdir(filePath) {
         return resolvedPath;
     }
     else {
-        return folderPath;
+        return resolvedPath;
     }
 }
 

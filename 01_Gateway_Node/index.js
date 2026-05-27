@@ -1,11 +1,7 @@
-import getDateTime from "./timers/atomicClock.js";
+import { ensureAccessToken } from "./connections/fyers_connect.js";
 
-let date = await getDateTime()
-console.log(date.toLocaleTimeString().replace(' ', ''));
-
-
-
-
+const access_token = await ensureAccessToken();
+console.log(access_token)
 
 
 

@@ -2,9 +2,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from 'dotenv';
 import open from "open";
-import { startAuthServer } from "./auth_server";
-import { exchangeForToken } from "./token";
-import { loadCacheToken, saveToken, clearSession } from "./session";
+import { startAuthServer } from "./auth_server.js";
+import { exchangeForToken } from "./token.js";
+import { loadCacheToken, saveToken, clearSession } from "./session.js";
+import getProfileInfo from "../account/profile_info.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -29,4 +30,33 @@ async function runAuthFlow() {
     await open(buildLoginUrl());
 
     const auth_code = await serverPromise;
+    const access_token = await exchangeForToken(APP_ID, APP_SECRET, auth_code);
+    await saveToken(access_token);
+    return access_token;
+}
+
+async function ensureAccessToken() {
+    const cachedToken = await loadCacheToken();
+
+    if (cachedToken) {
+        const isValid = await getProfileInfo(APP_ID, cachedToken, true, true) ;
+
+        if(isValid) {
+            return cachedToken;
+        }
+        console.log('[AUTH] Cached token rejected by Fyers. Re-authenticating...');
+        clearSession();
+    }
+
+    try {
+        return await runAuthFlow();
+    }
+    catch (err) {
+        console.log('[AUTH] Cached token rejected by Fyers. Re-authenticating...');
+        clearSession();
+    }
+}
+
+export {
+    ensureAccessToken
 }
