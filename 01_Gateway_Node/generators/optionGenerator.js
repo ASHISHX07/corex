@@ -1,16 +1,23 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { optionSymbolName, optionInstrument} from './symbology.js';
-import dateFilter from '../helpers/expiryFilters.js';
+import { optionSymbolName, optionInstrument } from './symbology.js';
 import getDateTime from '../timers/atomicClock.js';
-import { readFileSync } from 'fs';
+import { safeRead, safeWrite } from '../helpers/fs.helper.js';
 
-// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname  = path.dirname(fileURLToPath(import.meta.url));
+const configPath = path.resolve(__dirname, '../../Config/option-config.json');
+const statePath  = path.resolve(__dirname, '../../runtime/option-state.json');
 
-// const expiryPath = path.resolve(__dirname, "../../Data/cache/expiry's.json");
-// const expiryDates = JSON.parse(readFileSync(expiryPath, 'utf8'));
+const STRIKE_GAP = {
+    NIFTY: 50,
+    BANKNIFTY: 100,
+    SENSEX: 100,
+    BANKEX: 100
+}
 
-const niftyGap = 50;
+// ----- Config & State ----------------------------------------------
+
+const niftyGap     = 50;
 const bankniftyGap = 100;
 
 const optionManager = {
@@ -30,29 +37,29 @@ let visibility = (optionManager.visibility * 2) + 1;
 
 isNifty ? optionManager.strikePrice -= (optionManager.visibility * niftyGap) : optionManager.strikePrice -= (optionManager.visibility * bankniftyGap)
 
-async function getOptionChainSymbols() {
+// function getOptionChainSymbols() {
     
-    let symbolArr = [];
+//     let symbolArr = [];
     
-    for (let i = 1; i <= visibility; ++i) {
+//     for (let i = 1; i <= visibility; ++i) {
 
-        let CESymbol = optionSymbolName(optionManager);
-        let CEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
+//         let CESymbol = optionSymbolName(optionManager);
+//         let CEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
 
-        symbolArr.push(CEInstrument, CESymbol);
-        optionManager.optionType = "PE";
+//         symbolArr.push(CEInstrument, CESymbol);
+//         optionManager.optionType = "PE";
         
-        let PESymbol = optionSymbolName(optionManager);
-        let PEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
+//         let PESymbol = optionSymbolName(optionManager);
+//         let PEInstrument = optionInstrument(optionManager.exchange, optionManager.underlyingSymbol, optionManager.lastTwoDigitOfYear, optionManager.month, optionManager.day, optionManager.strikePrice, optionManager.optionType, optionManager.isMonthly);
         
-        symbolArr.push(PEInstrument, PESymbol);
-        optionManager.optionType = "CE";
+//         symbolArr.push(PEInstrument, PESymbol);
+//         optionManager.optionType = "CE";
 
-        isNifty ? optionManager.strikePrice += niftyGap : optionManager.strikePrice += bankniftyGap;
-    }
-    // console.log(symbolArr);
+//         isNifty ? optionManager.strikePrice += niftyGap : optionManager.strikePrice += bankniftyGap;
+//     }
+//     // console.log(symbolArr);
     
-    return symbolArr;
-}
+//     return symbolArr;
+// }
 
-export default getOptionChainSymbols;
+// export default getOptionChainSymbols;

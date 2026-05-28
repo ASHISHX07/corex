@@ -2,7 +2,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <iostream>
 #include <thread>
-#include "bufferHeaders.hpp"
+#include "shm-buffer.hpp"
 
 using namespace boost::interprocess;
 

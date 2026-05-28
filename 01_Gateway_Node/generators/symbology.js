@@ -28,7 +28,7 @@ function optionSymbolName({exchange, underlyingSymbol, lastTwoDigitOfYear, month
     
 }
 
-function optionInstrument(exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly) {
+function optionInstrument({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
     
     let exchangeI, underlyingSymbolI;
 
@@ -45,8 +45,7 @@ function optionInstrument(exchange, underlyingSymbol, lastTwoDigitOfYear, month,
                     break;
             
                 default:
-                    console.error("[NODE ERROR] no underlying symbol found, optionGenerator.js");
-                    process.exit(0);
+                throw new Error(`[SYMBOLOGY] Unknown: ${exchange} or ${underlyingSymbol}`);
             }
             break;
 
@@ -72,8 +71,7 @@ function optionInstrument(exchange, underlyingSymbol, lastTwoDigitOfYear, month,
             break;
 
         default:
-            console.error("[NODE ERROR] no exchange found, optionGenerator.js");
-            process.exit(0);
+            throw new Error(`[SYMBOLOGY] Unknown: ${exchange} or ${underlyingSymbol}`);
     }
 
     let returnStr = `${exchangeI}${underlyingSymbolI}${lastTwoDigitOfYear}${month}${isMonthly ? '' : day}${strikePrice}${optionType === "CE" ? 1 : 2}`

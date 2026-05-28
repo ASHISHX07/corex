@@ -1,9 +1,11 @@
+import path from "path";
+import dotenv from 'dotenv';
+import { fileURLToPath } from "url";
 import { ensureAccessToken } from "./connections/fyers_connect.js";
 import getProfileInfo from "./account/profile_info.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import dotenv from 'dotenv';
+import headerGenerator from './generators/headerGenerator.js'
 
+// for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -12,10 +14,12 @@ const APP_SECRET = process.env.FYERS_SECRET_ID;
 const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
 const PORT = process.env.PORT;
 
-const access_token = await ensureAccessToken();
-console.log(access_token)
+// make buffer headers
+await headerGenerator();
 
-console.log(await getProfileInfo(APP_ID, access_token, false, true))
+const access_token = await ensureAccessToken();
+
+
 
 
 
@@ -40,23 +44,12 @@ console.log(await getProfileInfo(APP_ID, access_token, false, true))
 
 
 // import { createRequire } from 'node:module';
-// import { getAuthCodeM, getAccessToken } from './connections/fyers_connect.js';
-// import getProfileInfo from './account/profile_info.js';
-// import { readFileSync, writeFileSync } from 'node:fs';
-// import path from 'path';
-// import dotenv from 'dotenv';
-// import { fileURLToPath } from 'url';
-// import ensureAndRead from './helpers/ensureAndRead.helper.js';
-// import headerGenerator from './generators/headerGenerator.js'
 // import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from './streams/options&indics.stream.js';
 // import tbtDataSocket from "./streams/tbtData.stream.js";
 // import optionChainStream from './streams/api-streams/option-chain.stream.js'
 // import getOptionChainSymbols from './generators/optionGenerator.js';
 
-// const appId = process.env.FYERS_APP_ID;
-
 // const require = createRequire(import.meta.url);
-// const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // await headerGenerator();
 
