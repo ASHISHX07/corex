@@ -21,7 +21,7 @@ function safeRead(filePath, defaultValue = "") {
         if (error.code === 'ENOENT') {
             const folderPath = path.dirname(resolvedPath);
             safeMkdir(folderPath);
-            writeFileSync(folderPath, defaultValue, 'utf8');
+            writeFileSync(resolvedPath, defaultValue, 'utf8');
             return resolvedPath;
         }
         else throw new Error(`Error occured while creating ${filePath}\n${error}`);

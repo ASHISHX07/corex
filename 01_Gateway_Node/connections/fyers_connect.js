@@ -52,8 +52,8 @@ async function ensureAccessToken() {
         return await runAuthFlow();
     }
     catch (err) {
-        console.log('[AUTH] Cached token rejected by Fyers. Re-authenticating...');
         clearSession();
+    throw new Error(`[AUTH] Authentication failed: ${err.message}`);
     }
 }
 

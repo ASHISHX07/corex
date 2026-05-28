@@ -1,9 +1,21 @@
 import { ensureAccessToken } from "./connections/fyers_connect.js";
+import getProfileInfo from "./account/profile_info.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from 'dotenv';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+const APP_ID = process.env.FYERS_APP_ID;
+const APP_SECRET = process.env.FYERS_SECRET_ID;
+const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
+const PORT = process.env.PORT;
 
 const access_token = await ensureAccessToken();
 console.log(access_token)
 
-
+console.log(await getProfileInfo(APP_ID, access_token, false, true))
 
 
 

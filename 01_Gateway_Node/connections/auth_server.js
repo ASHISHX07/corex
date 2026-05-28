@@ -13,7 +13,6 @@ export function startAuthServer(port = 3000) {
         }, 2 * 60 * 1000 );
 
         app.get('/callback', (req, res) => {
-            console.log('[AUTH] Query params received:', req.query)
             const authCode = req.query.auth_code;
             const status = req.query.s;
 
@@ -50,5 +49,3 @@ export function startAuthServer(port = 3000) {
         });
     });
 }
-
-const server = startAuthServer(3000);
