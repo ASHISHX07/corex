@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const layoutPath = path.resolve(__dirname, '../../Config/shm-layout.json');
-const layout = JSON.parse(safeRead(layoutPath, 'utf8'));
+const layout = JSON.parse(safeRead(layoutPath));
 
 const nodeBufferHeader = path.join(__dirname, '../bridge/headers/shm-buffer.hpp');
 const cppBufferHeader = path.join(__dirname, '../../03_Core_Cpp/headers/shm-buffer.hpp');

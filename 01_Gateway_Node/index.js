@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import { ensureAccessToken } from "./connections/fyers_connect.js";
 import getProfileInfo from "./account/profile_info.js";
-import headerGenerator from './generators/headerGenerator.js'
+import headerGenerator from "./generators/headerGenerator.js";
+import { buildOptionSymbols, snapToATM } from "./generators/optionGenerator.js";
+import apiManager from "./helpers/apiPulse.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,10 +16,18 @@ const APP_SECRET = process.env.FYERS_SECRET_ID;
 const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
 const PORT = process.env.PORT;
 
-// make buffer headers
+// make buffer headers first
 await headerGenerator();
 
+// const API = new apiManager();
 const access_token = await ensureAccessToken();
+
+// await getProfileInfo(APP_ID, access_token, false, true);
+// API.dApiCall()
+
+const {atm, map} = buildOptionSymbols(23743);
+
+
 
 
 
@@ -51,12 +61,7 @@ const access_token = await ensureAccessToken();
 
 // const require = createRequire(import.meta.url);
 
-// await headerGenerator();
-
-// dotenv.config({path: path.resolve(__dirname, '../.env')});    // Load .env from the Root Directory
 // const bufferLayoutPath = path.resolve(__dirname, '../Config/shm_layout.json');
-// const accessTokenFilePath = path.resolve(__dirname, '../Data/cache/access_token.txt');
-// const authCodeFilePath = path.resolve(__dirname, '../Data/cache/auth_code.txt');
 
 // const bridge = require('./build/shm_bridge.node');
 
@@ -105,50 +110,9 @@ const access_token = await ensureAccessToken();
 // controllerBufferView[controllerMap.sIndicesCount] = indicesCount;
 // controllerBufferView[controllerMap.sOptionsCount] = optionsCount;
 
-// let accessToken = await ensureAndRead(accessTokenFilePath);
-
-// if(accessToken) {
-
-//     let isValid = await getProfileInfo(appId, accessToken, true, false);
-
-//     if(!isValid) {
-//         console.log("[AUTH] Clearing invalid access token and initiating refresh...");
-//         accessToken = "";
-//         writeFileSync(accessTokenFilePath, '', 'utf8');
-//         writeFileSync(authCodeFilePath, '', 'utf8');
-//     }
-//     else {
-//         console.log("\n[AUTH] Done\n");
-//     }
-// }
-// if(!accessToken) {
-//     let authCode = await ensureAndRead(authCodeFilePath);
-//     if (!authCode) {
-//         await getAuthCodeM(appId);
-//     }
-//     await getAccessToken(appId);
-//     accessToken = await ensureAndRead(accessTokenFilePath);
-//     if (!accessToken) {
-//         console.error("[AUTH ERROR] Failed to acquire access token. Please run again.");
-//         process.exit(1);
-//     }
-//     console.log("\n[AUTH] Done\n");
-// }
-
 // optionChainStream(appId, accessToken, "NSE:NIFTY2650523800CE", 1, true);
 
 // // tbtDataSocket(appId, accessToken, ["NSE:NIFTY265524350CE"], 4);
-
-// const streamConfig = {
-//     app_id: appId,
-//     access_token: accessToken,
-//     indicsView: indicsBufferView,
-//     optionView: optionChainBufferView,
-//     symbols: symbolArray,
-//     litemode: false,
-//     logger: true,
-//     logWriter: false
-// }
 
 // // optionAndIndicsStream(streamConfig);
 

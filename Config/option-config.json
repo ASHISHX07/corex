@@ -1,9 +1,8 @@
 {
-    "_note": "activeExpiry is index into expiries[]. Update on every expiry day. Refresh expiries[] monthly.",
     "exchange": "NSE",
     "underlying": "NIFTY",
     "visibility": 2,
-    "activeExpiry": 0,
+    "activeExpiry": [0],
     "expiries": [
         { "year": 26, "month": 5, "day": 2, "isMonthly": false },
         { "year": 26, "month": 5, "day": 9, "isMonthly": false },

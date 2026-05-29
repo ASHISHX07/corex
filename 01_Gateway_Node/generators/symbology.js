@@ -9,7 +9,7 @@
  * @param {String} optionType type of the option eg. CE, PE
  * @returns {String} The final symbol name for weekly option symbol
  */
-function optionSymbolName({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
+function makeOptionSymbolString({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
 
     let monthPart;
 
@@ -28,7 +28,7 @@ function optionSymbolName({exchange, underlyingSymbol, lastTwoDigitOfYear, month
     
 }
 
-function optionInstrument({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
+function makeOptionInstrument({exchange, underlyingSymbol, lastTwoDigitOfYear, month, day, strikePrice, optionType, isMonthly}) {
     
     let exchangeI, underlyingSymbolI;
 
@@ -81,6 +81,6 @@ function optionInstrument({exchange, underlyingSymbol, lastTwoDigitOfYear, month
 }
 
 export {
-    optionSymbolName,
-    optionInstrument
+    makeOptionSymbolString,
+    makeOptionInstrument
 }
