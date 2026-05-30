@@ -4,10 +4,10 @@
     "visibility": 2,
     "activeExpiry": [0],
     "expiries": [
-        { "year": 26, "month": 5, "day": 2, "isMonthly": false },
-        { "year": 26, "month": 5, "day": 9, "isMonthly": false },
-        { "year": 26, "month": 5, "day": 16, "isMonthly": false },
-        { "year": 26, "month": 5, "day": 23, "isMonthly": false },
-        { "year": 26, "month": 5, "day": 30, "isMonthly": true }
+        { "year": 26, "month": 6, "day": 2, "isMonthly": false },
+        { "year": 26, "month": 6, "day": 9, "isMonthly": false },
+        { "year": 26, "month": 6, "day": 16, "isMonthly": false },
+        { "year": 26, "month": 6, "day": 23, "isMonthly": false },
+        { "year": 26, "month": 6, "day": 30, "isMonthly": true }
     ]
 }

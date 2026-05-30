@@ -5,6 +5,7 @@ import { ensureAccessToken } from "./connections/fyers_connect.js";
 import getProfileInfo from "./account/profile_info.js";
 import headerGenerator from "./generators/headerGenerator.js";
 import { buildOptionSymbols, snapToATM } from "./generators/optionGenerator.js";
+import optionPoll from "./streams/optionApiPolls.stream.js";
 import apiManager from "./helpers/apiPulse.js";
 
 // for absolute path and ENV variables
@@ -19,16 +20,23 @@ const PORT = process.env.PORT;
 // make buffer headers first
 await headerGenerator();
 
-// const API = new apiManager();
+const API = new apiManager();
+
 const access_token = await ensureAccessToken();
 
-// await getProfileInfo(APP_ID, access_token, false, true);
-// API.dApiCall()
-
-const {atm, map} = buildOptionSymbols(23743);
+// await getProfileInfo(APP_ID, access_token, API, false, false);
 
 
+const {atm, map} = buildOptionSymbols(23609);
+console.log([...map.values()]);
 
+
+function logger(data) {
+    console.log(data);
+    console.log(API.getCounts());
+}
+
+await optionPoll(APP_ID, access_token, API, logger, 2000);
 
 
 
