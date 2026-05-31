@@ -21,8 +21,11 @@ function buildLoginUrl() {
         redirect_uri: REDIRECT_URI,
         response_type: 'code',
         state: 'corex'
-    })
-    return `https://api-t1.fyers.in/api/v3/generate-authcode?${params.toString()}`;
+    });
+    const url = `http://api-t1.fyers.in/api/v3/generate-authcode?${params.toString()}`;
+    console.log(url);
+    
+    return url;
 }
 
 async function runAuthFlow() {
@@ -39,7 +42,7 @@ async function ensureAccessToken() {
     const cachedToken = await loadCacheToken();
 
     if (cachedToken) {
-        const isValid = await getProfileInfo(APP_ID, cachedToken, true, true) ;
+        const isValid = await getProfileInfo(APP_ID, cachedToken, true, false);
 
         if(isValid) {
             return cachedToken;

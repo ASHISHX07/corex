@@ -6,7 +6,7 @@ import { safeMkdir } from '../helpers/fs.helper.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.resolve(__dirname, '../../runtime/logs/account');
 
-async function getProfileInfo(app_id, access_token, apiManagerInstance, checker = false, logger = false) {
+async function getProfileInfo(app_id, access_token, checker = false, logger = false) {
     const fyers = new fyersModel({ "path": safeMkdir(logDir), "enableLogging": logger });
     fyers.setAppId(app_id);
     fyers.setAccessToken(access_token);

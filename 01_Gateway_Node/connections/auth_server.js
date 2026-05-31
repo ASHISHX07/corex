@@ -40,7 +40,7 @@ export function startAuthServer(port = 3000) {
         });
 
         server = app.listen(port, '127.0.0.1', () => {
-            console.log(`[AUTH] listening on http://127.0.0.1:${port}/callback`);
+            console.log(`[AUTH] listening on https://127.0.0.1:${port}/callback`);
         });
 
         server.on("error", (err) => {
