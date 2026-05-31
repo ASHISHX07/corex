@@ -2,11 +2,12 @@ import path from "path";
 import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import { ensureAccessToken } from "./connections/fyers_connect.js";
+import apiManager from "./helpers/apiPulse.js";
 import getProfileInfo from "./account/profile_info.js";
 import headerGenerator from "./generators/headerGenerator.js";
 import { buildOptionSymbols, snapToATM } from "./generators/optionGenerator.js";
 import optionPoll from "./streams/optionApiPolls.stream.js";
-import apiManager from "./helpers/apiPulse.js";
+import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,16 +28,21 @@ const access_token = await ensureAccessToken();
 // await getProfileInfo(APP_ID, access_token, API, false, false);
 
 
-const {atm, map} = buildOptionSymbols(23609);
-console.log([...map.values()]);
+const {atm, map} = buildOptionSymbols(23547);
+console.log(map);
 
+function onTick(type, instrument, packet) {
+    console.log(packet);   
+}
+
+await optionAndIndicsStream({app_id: APP_ID, access_token, symbolMap: map, onTick, litemode: false, logger: true});
 
 function logger(data) {
     console.log(data);
     console.log(API.getCounts());
 }
 
-await optionPoll(APP_ID, access_token, API, logger, 2000);
+// await optionPoll(APP_ID, access_token, API, logger, 2000);
 
 
 

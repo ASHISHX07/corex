@@ -34,9 +34,16 @@ function snapToATM(spot, underlyingIndices) {
  * @returns {{ atm: number, map: Map<number,string>, instruments: number[], symbols: string[] }}
  */
 
+const indexAssigns = {
+    'NIFTY': 1,
+    'BANKNIFTY': 2,
+    'SENSEX': 3,
+    "BANKEX": 4
+}
+
 function buildOptionSymbols(spotPrice) {
     const { exchange, underlying, visibility, activeExpiry, expiries } = config;
-    const active = expiries[activeExpiry[0]]
+    const active = expiries[activeExpiry];
 
     const gap = STRIKE_GAP[underlying] ?? 50;
     const atm = snapToATM(spotPrice, underlying);
@@ -45,6 +52,23 @@ function buildOptionSymbols(spotPrice) {
 
     /** @type {Map<number, string>} */
     const map = new Map();
+
+    let uStr;
+    switch (underlying) {
+        case 'NIFTY':
+            uStr = 'NIFTY50';
+            break;
+        
+        case 'BANKNIFTY':
+            uStr = 'NIFTYBANK';
+            break;
+        default:
+            uStr = underlying;
+            break;
+    }
+    const index = `${exchange}:${uStr}-INDEX`;
+
+    map.set(indexAssigns[underlying], index);
 
     for (let i = 0; i < total; i++) {
         const strike = low + i * gap;
@@ -73,7 +97,6 @@ function buildOptionSymbols(spotPrice) {
             });
 
             const symbol = makeOptionSymbolString(params);
-
             map.set(instrument, symbol);
         }
     }

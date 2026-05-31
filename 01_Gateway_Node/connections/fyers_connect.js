@@ -22,10 +22,7 @@ function buildLoginUrl() {
         response_type: 'code',
         state: 'corex'
     });
-    const url = `http://api-t1.fyers.in/api/v3/generate-authcode?${params.toString()}`;
-    console.log(url);
-    
-    return url;
+    return `http://api-t1.fyers.in/api/v3/generate-authcode?${params.toString()}`;
 }
 
 async function runAuthFlow() {
