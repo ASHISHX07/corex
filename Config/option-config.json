@@ -1,8 +1,9 @@
  {
     "exchange": "NSE",
     "underlying": "NIFTY",
+    "spotPrice": 23547,
     "visibility": 2,
-    "activeExpiry": 0,
+    "activeExpiry": 1,
     "expiries": [
         { "year": 26, "month": 6, "day": 2, "isMonthly": false },
         { "year": 26, "month": 6, "day": 9, "isMonthly": false },

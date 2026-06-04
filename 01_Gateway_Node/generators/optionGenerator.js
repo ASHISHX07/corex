@@ -13,8 +13,7 @@ const STRIKE_GAP = { NIFTY: 50, BANKNIFTY: 100, SENSEX: 100, BANKEX: 100 };
 
 // ----- Config & State ----------------------------------------------
 
-function snapToATM(spot, underlyingIndices) {
-    const gap = STRIKE_GAP[underlyingIndices] ?? 50;
+function snapToATM(spot, gap) {
     return Math.round(spot / gap) * gap;
 }
 
@@ -45,8 +44,8 @@ function buildOptionSymbols(spotPrice) {
     const { exchange, underlying, visibility, activeExpiry, expiries } = config;
     const active = expiries[activeExpiry];
 
-    const gap = STRIKE_GAP[underlying] ?? 50;
-    const atm = snapToATM(spotPrice, underlying);
+    const gap = STRIKE_GAP[underlying] ?? 100;
+    const atm = snapToATM(spotPrice, gap);
     const low = atm - visibility * gap;
     const total = visibility * 2 + 1;
 
@@ -85,17 +84,7 @@ function buildOptionSymbols(spotPrice) {
                 isMonthly: active.isMonthly,
             };
 
-            const instrument = makeOptionInstrument({
-                exchange,
-                underlyingSymbol: underlying,
-                lastTwoDigitOfYear: active.year,
-                month: active.month,
-                day: active.day,
-                strikePrice: strike,
-                optionType,
-                isMonthly: active.isMonthly
-            });
-
+            const instrument = makeOptionInstrument(params);
             const symbol = makeOptionSymbolString(params);
             map.set(instrument, symbol);
         }
@@ -105,4 +94,4 @@ function buildOptionSymbols(spotPrice) {
 
 }
 
-export { buildOptionSymbols, snapToATM };
+export { buildOptionSymbols, snapToATM, STRIKE_GAP };

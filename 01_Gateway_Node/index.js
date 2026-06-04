@@ -35,7 +35,19 @@ function onTick(type, instrument, packet) {
     console.log(packet);   
 }
 
-await optionAndIndicsStream({app_id: APP_ID, access_token, symbolMap: map, onTick, litemode: false, logger: true});
+const { reCenter } = optionAndIndicsStream({
+    app_id: APP_ID,
+    access_token,
+    onTick: (type, instrument, packet) => {
+        if (type === 'index') reCenter(packet.ltp);
+        console.log(`[${type}]`, instrument, packet);
+        
+    },
+    litemode: false,
+    logger: false
+});
+
+// await optionAndIndicsStream({app_id: APP_ID, access_token, onTick, litemode: false, logger: true});
 
 function logger(data) {
     console.log(data);
