@@ -9,7 +9,7 @@ const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
 const configPath = path.resolve(__dirname, '../../Config/option-config.json');
 const config = JSON.parse(safeRead(configPath));
 
-async function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger}) {
+function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger}) {
 
     const gap = STRIKE_GAP[config.underlying] ?? 100;
     let currentAtm = snapToATM(config.spotPrice, gap);
@@ -24,12 +24,19 @@ async function optionAndIndicsStream({app_id, access_token, onTick, litemode, lo
         const newAtm = snapToATM(newSpot, gap);
         if(Math.abs(newAtm - currentAtm) < gap) return;
 
+        
         const { map } = buildOptionSymbols(newSpot);
         const oldSyms = [...reverseMap.keys()].filter(s => !s.includes('INDEX'));
         const newSyms = [...map.values()].filter(s => !s.includes('INDEX'));
+        
+        const newSymSet = new Set(newSyms);
+        const oldSymSet = new Set(oldSyms);
 
-        socket.unsubscribe(oldSyms.filter(s => !newSyms.includes(s)));
-        socket.subscribe(newSyms.filter(s => !oldSyms.includes(s)));
+        const toUnsub = oldSyms.filter(s => !newSymSet.has(s));
+        const toSub = newSyms.filter(s => !oldSymSet.has(s));
+
+        socket.unsubscribe(toUnsub);
+        socket.subscribe(toSub);
 
         buildReverseMap(map);
         currentAtm = newAtm;
@@ -39,10 +46,7 @@ async function optionAndIndicsStream({app_id, access_token, onTick, litemode, lo
     const { map } = buildOptionSymbols(currentAtm);
     buildReverseMap(map);
 
-    const instrumentArr = [...reverseMap.values()];
-    let options = instrumentArr.length;
-
-    let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, safeMkdir(logDir), true);
+    let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, safeMkdir(logDir), logger);
 
     socket.on("connect", () => {
         socket.subscribe([...reverseMap.keys()]);
@@ -59,7 +63,6 @@ async function optionAndIndicsStream({app_id, access_token, onTick, litemode, lo
             
             onTick(instrument < 10 ? 'index' : 'option', instrument, packet);
         }
-        
     });
 
     socket.on("error", (error) => {
