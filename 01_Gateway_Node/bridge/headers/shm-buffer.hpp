@@ -31,6 +31,7 @@ struct IndicsBufferHeader {
 
 struct OptionsBufferHeader {
     double instrument;
+    double cp;
     double ltp;
     double volume;
     double oi;

@@ -1,42 +1,32 @@
 import { fyersTbtSocket } from "fyers-api-v3";
-import { readFileSync } from "fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import ensureAndMkdir from "../helpers/ensureAndMkdir.helper.js";
+import { URL } from "url";
+import { safeMkdir } from "../helpers/fs.helper.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const bufferLayoutPath = path.resolve(__dirname, '../../Config/shm_layout.json')
-const layout = JSON.parse(readFileSync(bufferLayoutPath, 'utf8'))
-const logDir = path.join(__dirname, '../../../Data/logs/stream_logs/tbt-data-logs');
+const logDir = path.join(__dirname, '../../runtime/logs/tbt-depth-logs');
 
-async function tbtDataSocket(appId, accessToken, symbols = [], bufferView, diffOnly = false, logger = false) {
+function tbtDataSocket(appId, accessToken, symbols = [], onTbtTick, logger = false) {
 
-    const socket = new fyersTbtSocket(`${appId}:${accessToken}`, ensureAndMkdir(logDir), logger, diffOnly);
+    const socket = new fyersTbtSocket(`${appId}:${accessToken}`, safeMkdir(logDir), logger, false);
 
     if (symbols.length < 1 || symbols.length > 15) {
         console.error('TBT socket can only subscribe minimum 1 and maximum 15 per channel');
     }
 
-    socket.on("error", (errmsg) => {
-        console.log(`[NODE] TBT SOCKET ERROR: ${errmsg}`);
-    });
-    
     socket.on("open", () => {
-        socket.subscribe(symbols, '1', 'depth');
+        socket.subscribe(["NSE:NIFTY2660923400PE"], '1', 'depth');
         socket.switchChannel([], ['1']);
     });
-
+    
     socket.on("depth", (ticker, data) => {
         console.log("DEPTH", ticker, data);
     });
-
-    socket.on("close", () => {
-        console.log("closed");
-    });
-
-    socket.on("servererror", (msg) => {
-        console.log("[NODE] TBT SOCKET SERVER ERROR", msg)
-    });
+    
+    socket.on("error",        (err) => console.error('[NODE] TBT Error:', err));
+    socket.on("servererror",  (msg) => console.error('[NODE] Server error:', msg));
+    socket.on("close",        () => console.log("[NODE] TBT Closed"));
 
     socket.autoreconnect(10);
     socket.connect();

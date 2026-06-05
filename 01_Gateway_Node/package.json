@@ -25,11 +25,11 @@
     "test": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.16.1",
+    "axios": "^1.17.0",
     "cmake-js": "^8.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "fyers-api-v3": "^1.8.0",
+    "fyers-api-v3": "^1.9.0",
     "node-addon-api": "^8.8.0",
     "ntp-client": "^0.5.3",
     "open": "^11.0.0"

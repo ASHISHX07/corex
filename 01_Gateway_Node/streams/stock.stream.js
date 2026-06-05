@@ -1,12 +1,10 @@
 import { fyersModel } from 'fyers-api-v3';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { safeMkdir } from '../helpers/fs.helper.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({path: path.resolve(__dirname, '../../.env')});    // Load .env from the Root Directory
-const logDir = path.join(__dirname, '../../runtime/stock-stream-logs');
+const logDir = path.join(__dirname, '../../runtime/logs/stock-stream-logs');
 
 async function stockStream(app_id, access_token, logger, interval = 1000) {
 
@@ -14,11 +12,13 @@ async function stockStream(app_id, access_token, logger, interval = 1000) {
     fyers.setAppId(app_id);
     fyers.setAccessToken(access_token);
     
+    const symbols = ["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"];
+
     setInterval(() => {
-        fyers.getQuotes(["NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"])
+        fyers.getQuotes(symbols)
         .then(
             (response)=>{
-            console.log(response);
+            response.d.forEach(s => console.log(s.v));
         })
         .catch((err)=>{
             if(err.code == -15) {

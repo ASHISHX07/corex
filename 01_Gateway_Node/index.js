@@ -9,6 +9,7 @@ import { buildOptionSymbols, snapToATM } from "./generators/optionGenerator.js";
 import optionPoll from "./streams/optionApiPolls.stream.js";
 import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 import stockStream from "./streams/stock.stream.js";
+import tbtDataSocket from "./streams/tbtData.stream.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,11 +31,6 @@ const access_token = await ensureAccessToken();
 
 
 const {atm, map} = buildOptionSymbols(23547);
-console.log(map);
-
-function onTick(type, instrument, packet) {
-    console.log(packet);   
-}
 
 const { reCenter } = optionAndIndicsStream({
     app_id: APP_ID,
@@ -54,7 +50,11 @@ function logger(data) {
     console.log(API.getCounts());
 }
 
-await stockStream(APP_ID, access_token, true, 1000);
+tbtDataSocket(APP_ID, access_token, [], [], true);
+
+// await stockStream(APP_ID, access_token, true, 1000);
+
+
 
 // await optionPoll(APP_ID, access_token, API, logger, 2000);
 
