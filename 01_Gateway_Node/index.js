@@ -21,7 +21,7 @@ const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
 const PORT = process.env.PORT;
 
 // make buffer headers first
-await headerGenerator();
+headerGenerator();
 
 const API = new apiManager();
 
@@ -32,16 +32,16 @@ const access_token = await ensureAccessToken();
 
 const {atm, map} = buildOptionSymbols(23547);
 
-const { reCenter } = optionAndIndicsStream({
-    app_id: APP_ID,
-    access_token,
-    onTick: (type, instrument, packet) => {
-        if (type === 'index') reCenter(packet.ltp);
-        console.log(`[${type}]`, instrument, packet);
-    },
-    litemode: false,
-    logger: false
-});
+// const { reCenter } = optionAndIndicsStream({
+//     app_id: APP_ID,
+//     access_token,
+//     onTick: (type, instrument, packet) => {
+//         if (type === 'index') reCenter(packet.ltp);
+//         console.log(`[${type}]`, instrument, packet);
+//     },
+//     litemode: false,
+//     logger: false
+// });
 
 // await optionAndIndicsStream({app_id: APP_ID, access_token, onTick, litemode: false, logger: true});
 
