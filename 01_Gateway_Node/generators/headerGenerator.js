@@ -93,6 +93,14 @@ function headerGenerator() {
             };
         } else {
             hpp += buildFlatStruct(key, section);
+
+            const byteSize = (key === 'CONTROLLER') ? 4 : 8;
+            const flatOffsets = {};
+            let byte = 0;
+            section.forEach(f => { flatOffsets[f] = byte; byte += byteSize; });
+            flatOffsets.__bytesPerSlot = byte;
+
+            allOfsets[key] = flatOffsets;
         }
     }
     hpp += `#endif // BUFFER_HEADERS_H`;

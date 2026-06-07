@@ -21,10 +21,10 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
     }
 
     function reCenter(newSpot) {
+        
         const newAtm = snapToATM(newSpot, gap);
         if(Math.abs(newAtm - currentAtm) < gap) return;
 
-        
         const { map } = buildOptionSymbols(newSpot);
         const oldSyms = [...reverseMap.keys()].filter(s => !s.includes('INDEX'));
         const newSyms = [...map.values()].filter(s => !s.includes('INDEX'));

@@ -57,7 +57,6 @@ function buildOptionSymbols(spotPrice) {
         case 'NIFTY':
             uStr = 'NIFTY50';
             break;
-        
         case 'BANKNIFTY':
             uStr = 'NIFTYBANK';
             break;
