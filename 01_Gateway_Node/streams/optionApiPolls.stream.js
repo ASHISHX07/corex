@@ -1,7 +1,8 @@
 import { fyersModel } from 'fyers-api-v3'
 import { fileURLToPath } from 'url';
-import { safeRead, safeMkdir } from '../helpers/fs.helper.js';
 import path from 'path';
+import { safeRead, safeMkdir } from '../helpers/fs.helper.js';
+import { getExpiryTimeStamp } from '../generators/optionGenerator.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const configPath = path.resolve(__dirname, '../../Config/option-config.json');
@@ -38,7 +39,7 @@ async function optionPoll(appId, accessToken, apiManagerInstance, onData, interv
             const result = await fyers.getOptionChain({
                 symbol: indexSymbol,
                 strikecount: visibility,
-                timestamp: '',
+                timestamp: String(getExpiryTimeStamp() ?? ''),
                 greeks: 1
             });
 

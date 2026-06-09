@@ -8,6 +8,7 @@ import optionPoll from "./streams/optionApiPolls.stream.js";
 import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 import stockStream from "./streams/stock.stream.js";
 import tbtDepthStream from "./streams/tbtData.stream.js";
+import { computeExpiryTimeStamp } from "./generators/optionGenerator.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,7 @@ const PORT = process.env.PORT;
 
 // make buffer headers first
 headerGenerator();
+computeExpiryTimeStamp();
 
 const API = new apiManager();
 
@@ -46,9 +48,9 @@ function logger(data) {
 
 // await stockStream(APP_ID, access_token, true, 1000);
 
-tbtDepthStream(APP_ID, access_token, [], true);
+// tbtDepthStream(APP_ID, access_token, [], true);
 
-// await optionPoll(APP_ID, access_token, API, logger, 2000);
+await optionPoll(APP_ID, access_token, API, logger, 2000);
 
 
 

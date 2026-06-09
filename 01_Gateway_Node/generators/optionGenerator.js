@@ -88,9 +88,21 @@ function buildOptionSymbols(spotPrice) {
             map.set(instrument, symbol);
         }
     }
-
-    return { atm, map }
-
+    return { atm, map };
 }
 
-export { buildOptionSymbols, snapToATM, STRIKE_GAP };
+function computeExpiryTimeStamp() {
+    const timestamps = config.expiries.map(({year, month, day}) => {
+        // month is 1-based, Date.UTC expects 0-based month
+        return Math.floor(Date.UTC(2000 + year, month - 1, day, 10, 0, 0) / 1000);
+    });
+
+    config.expiryTimeStamps = timestamps;
+    safeWrite(configPath, JSON.stringify(config, null, 4));
+}
+
+function getExpiryTimeStamp() {
+    return config.expiryTimeStamps?.[config.activeExpiry] ?? null;
+}
+
+export { buildOptionSymbols, snapToATM, computeExpiryTimeStamp, getExpiryTimeStamp, STRIKE_GAP };

@@ -11,7 +11,7 @@ function tbtDepthStream(appId, accessToken, onTbtTick, logger = false) {
     const socket = new fyersTbtSocket(`${appId}:${accessToken}`, safeMkdir(logDir), logger, false);
 
     socket.on("open", () => {
-        socket.subscribe(["NSE:NIFTY2660923400PE"], '1', 'depth');
+        socket.subscribe(['NSE:NIFTY2661623250CE', 'NSE:NIFTY2661623250PE'], '1', 'depth');
         socket.switchChannel([], ['1']);
     });
     
