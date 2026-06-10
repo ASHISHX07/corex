@@ -42,6 +42,10 @@ const indexAssigns = {
 
 function buildOptionSymbols(spotPrice) {
     const { exchange, underlying, visibility, activeExpiry, expiries } = config;
+
+    if ( activeExpiry >= expiries.length ) {
+        throw new Error(`Invalid expiry selection (in Config/option-config.json)`);
+    }
     const active = expiries[activeExpiry];
 
     const gap = STRIKE_GAP[underlying] ?? 100;
@@ -88,6 +92,8 @@ function buildOptionSymbols(spotPrice) {
             map.set(instrument, symbol);
         }
     }
+    console.log(map);
+    
     return { atm, map };
 }
 

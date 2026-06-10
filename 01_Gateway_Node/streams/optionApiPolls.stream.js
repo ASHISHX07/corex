@@ -6,7 +6,7 @@ import { getExpiryTimeStamp } from '../generators/optionGenerator.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const configPath = path.resolve(__dirname, '../../Config/option-config.json');
-const logPath = path.resolve(__dirname, '../../runtime/logs/option-poll');
+const logPath = path.join(__dirname, '../../runtime/logs/option-poll');
 const config = JSON.parse(safeRead(configPath));
 
 /**
@@ -33,9 +33,9 @@ async function optionPoll(appId, accessToken, apiManagerInstance, onData, interv
 
     const poll = async () => {
         
-        apiManagerInstance.dApiCall();
-
+        
         try {
+            apiManagerInstance.dApiCall();
             const result = await fyers.getOptionChain({
                 symbol: indexSymbol,
                 strikecount: visibility,
@@ -54,7 +54,7 @@ async function optionPoll(appId, accessToken, apiManagerInstance, onData, interv
             console.error('[NODE] optionPoll error: ', err.message());
         }
         finally {
-            setTimeout(poll, interval)
+            setTimeout(poll, interval);
         }
     };
 

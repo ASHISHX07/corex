@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { safeRead, safeMkdir } from "../helpers/fs.helper.js";
 import { buildOptionSymbols, snapToATM, STRIKE_GAP } from "../generators/optionGenerator.js";
+import { setSymbols } from "../helpers/activeSymbols.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
@@ -39,12 +40,14 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
         socket.subscribe(toSub);
 
         buildReverseMap(map);
+        setSymbols(map);
         currentAtm = newAtm;
         console.log(`[ATM SHIFT] -> ${newAtm}`);
     }
 
     const { map } = buildOptionSymbols(currentAtm);
     buildReverseMap(map);
+    setSymbols(map);
 
     let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, safeMkdir(logDir), logger);
 
@@ -60,7 +63,7 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
         for (const packet of updates) {
             const instrument = reverseMap.get(packet.symbol);
             if (instrument === undefined) continue;
-            
+            if (instrument < 10) reCenter(packet.ltp)
             onTick(instrument < 10 ? 'index' : 'option', instrument, packet);
         }
     });
@@ -75,8 +78,6 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
 
     socket.autoreconnect(10);
     socket.connect();
-
-    return { reCenter };
 }
 
 export { optionAndIndicsStream };

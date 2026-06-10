@@ -6,12 +6,12 @@ import { safeMkdir } from "../helpers/fs.helper.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../runtime/logs/tbt-depth-logs');
 
-function tbtDepthStream(appId, accessToken, onTbtTick, logger = false) {
+function tbtDepthStream(appId, accessToken, symbols = [], onTbtTick, logger = false) {
 
     const socket = new fyersTbtSocket(`${appId}:${accessToken}`, safeMkdir(logDir), logger, false);
 
     socket.on("open", () => {
-        socket.subscribe(['NSE:NIFTY2661623250CE', 'NSE:NIFTY2661623250PE'], '1', 'depth');
+        socket.subscribe(symbols, '1', 'depth');
         socket.switchChannel([], ['1']);
     });
     

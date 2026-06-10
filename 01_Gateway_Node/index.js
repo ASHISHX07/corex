@@ -6,9 +6,8 @@ import apiManager from "./helpers/apiPulse.js";
 import headerGenerator from "./generators/headerGenerator.js";
 import optionPoll from "./streams/optionApiPolls.stream.js";
 import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
-import stockStream from "./streams/stock.stream.js";
-import tbtDepthStream from "./streams/tbtData.stream.js";
 import { computeExpiryTimeStamp } from "./generators/optionGenerator.js";
+import expiryGuard from "./timers/expiryGuard.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,35 +19,28 @@ const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
 const PORT = process.env.PORT;
 
 // make buffer headers first
-headerGenerator();
 computeExpiryTimeStamp();
+await expiryGuard();
+headerGenerator();
 
 const API = new apiManager();
 
 const access_token = await ensureAccessToken();
 
-const { reCenter } = optionAndIndicsStream({
+optionAndIndicsStream({
     app_id: APP_ID,
     access_token,
     onTick: (type, instrument, packet) => {
-        if (type === 'index') reCenter(packet.ltp);
         console.log(packet);
     },
     litemode: false,
     logger: false
 });
 
-// await optionAndIndicsStream({app_id: APP_ID, access_token, onTick, litemode: false, logger: true});
-
 function logger(data) {
     console.log(data);
     console.log(API.getCounts());
 }
-
-
-// await stockStream(APP_ID, access_token, true, 1000);
-
-// tbtDepthStream(APP_ID, access_token, [], true);
 
 await optionPoll(APP_ID, access_token, API, logger, 2000);
 
@@ -76,10 +68,6 @@ await optionPoll(APP_ID, access_token, API, logger, 2000);
 
 
 // import { createRequire } from 'node:module';
-// import { optionAndIndicsStream, indicsDataPoints, optionsDataPoints } from './streams/options&indics.stream.js';
-// import tbtDataSocket from "./streams/tbtData.stream.js";
-// import optionChainStream from './streams/api-streams/option-chain.stream.js'
-// import getOptionChainSymbols from './generators/optionGenerator.js';
 
 // const require = createRequire(import.meta.url);
 
