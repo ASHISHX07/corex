@@ -22,11 +22,25 @@
             "month": 6,
             "day": 30,
             "isMonthly": true
+        },
+        {
+            "year": 26,
+            "month": 7,
+            "day": 7,
+            "isMonthly": false
+        },
+        {
+            "year": 26,
+            "month": 7,
+            "day": 14,
+            "isMonthly": false
         }
     ],
     "expiryTimeStamps": [
         1781604000,
         1782208800,
-        1782813600
+        1782813600,
+        1783418400,
+        1784023200
     ]
 }

@@ -6,7 +6,6 @@ import apiManager from "./helpers/apiPulse.js";
 import headerGenerator from "./generators/headerGenerator.js";
 import optionPoll from "./streams/optionApiPolls.stream.js";
 import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
-import { computeExpiryTimeStamp } from "./generators/optionGenerator.js";
 import expiryGuard from "./timers/expiryGuard.js";
 
 // for absolute path and ENV variables
@@ -19,7 +18,6 @@ const REDIRECT_URI = process.env.FYERS_REDIRECT_URL;
 const PORT = process.env.PORT;
 
 // make buffer headers first
-computeExpiryTimeStamp();
 await expiryGuard();
 headerGenerator();
 
@@ -42,7 +40,7 @@ function logger(data) {
     console.log(API.getCounts());
 }
 
-await optionPoll(APP_ID, access_token, API, logger, 2000);
+await optionPoll(APP_ID, access_token, API, logger, 1000);
 
 
 

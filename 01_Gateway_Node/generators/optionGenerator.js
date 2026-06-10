@@ -92,8 +92,6 @@ function buildOptionSymbols(spotPrice) {
             map.set(instrument, symbol);
         }
     }
-    console.log(map);
-    
     return { atm, map };
 }
 
