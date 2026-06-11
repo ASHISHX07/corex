@@ -1,9 +1,9 @@
 {
     "CONTROLLER": [ "systemStatus", "IndicesCount", "OptionsCount", "tbtSocketSymbolCount", "apiSymbolCount", "signal", "action" ],
 
-    "INDICS": [ "instrument", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "signal", "action" ],
+    "INDICS": [ "instrument", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
     
-    "OPTIONS": [ "instrument", "cp", "ltp", "volume", "oi", "chngInOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "exchFeedTime", "ch", "chp", "signal", "action" ],
+    "OPTIONS": [ "instrument", "cp", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
 
     "TBTDEPTHDATA": {
         "slots": 15,

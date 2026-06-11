@@ -5,7 +5,7 @@
 // Boost interprocess headers
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include "./headers/shm-buffer.hpp"
+#include "../headers/shm-buffer.hpp"
 
 using namespace boost::interprocess;
 

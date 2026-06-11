@@ -29,15 +29,21 @@ struct IndicsHeader {
   double chp{};
   double signal{};
   double action{};
+  double iVixLtp{};
+  double iVixCh{};
+  double iVixChp{};
 };
 
 struct OptionsHeader {
   double instrument{};
   double cp{};
   double ltp{};
+  double ch{};
+  double chp{};
   double volume{};
   double oi{};
   double chngInOi{};
+  double prevOi{};
   double totBuyQty{};
   double totSellQty{};
   double avgTradePrice{};
@@ -48,8 +54,10 @@ struct OptionsHeader {
   double upperCkt{};
   double lowerCkt{};
   double exchFeedTime{};
-  double ch{};
-  double chp{};
+  double delta{};
+  double theta{};
+  double gamma{};
+  double vega{};
   double signal{};
   double action{};
 };

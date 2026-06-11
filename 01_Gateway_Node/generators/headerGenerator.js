@@ -81,13 +81,13 @@ function headerGenerator() {
     hpp    += `#include <cstdint>\n`;
     hpp    += `#include <array>\n\n`;
 
-    const allOfsets = {};
+    const allOffsets = {};
     
     for (const [key, section] of Object.entries(layout)) {
         if(isStructured(section)) {
             hpp += buildStructuredStruct(key, section);
 
-            allOfsets[key] = {
+            allOffsets[key] = {
                 slots: section.slots ?? 1,
                 ...computeOffsets(section),
             };
@@ -100,14 +100,14 @@ function headerGenerator() {
             section.forEach(f => { flatOffsets[f] = byte; byte += byteSize; });
             flatOffsets.__bytesPerSlot = byte;
 
-            allOfsets[key] = flatOffsets;
+            allOffsets[key] = flatOffsets;
         }
     }
     hpp += `#endif // BUFFER_HEADERS_H`;
 
     safeWrite(nodeBufferHeader, hpp);
     safeWrite(cppBufferHeader, hpp);
-    safeWrite(offsetPath, JSON.stringify(allOfsets, null, 4));
+    safeWrite(offsetPath, JSON.stringify(allOffsets, null, 4));
 }
 
 export default headerGenerator;
