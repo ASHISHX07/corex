@@ -1,0 +1,17 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default",
+            "inherits": "base",
+            "generator": "Ninja",
+            "environment": {
+                "BOOST_ROOT": "path/to/your/boost",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        }
+    ]
+}
