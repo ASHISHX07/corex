@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "Data import and I/O bound tasks node",
   "keywords": [
-    "venn",
+    "corex",
     "data",
     "trading"
   ],
-  "homepage": "https://github.com/ASHISHX07/VENN#readme",
+  "homepage": "https://github.com/ASHISHX07/corex#readme",
   "bugs": {
-    "url": "https://github.com/ASHISHX07/VENN/issues"
+    "url": "https://github.com/ASHISHX07/corex/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ASHISHX07/VENN.git"
+    "url": "git+https://github.com/ASHISHX07/corex.git"
   },
   "license": "ISC",
   "author": "Ashish Sindhav",
