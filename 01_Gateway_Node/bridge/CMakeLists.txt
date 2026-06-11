@@ -13,15 +13,6 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# OPTIMIZATIONS
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    # -march=native: Uses Ryzen 7 specific instructions
-    # -O3: Max speed
-    # -flto: Link Time Optimization
-    add_compile_options(-march=native -O3 -flto -Wall)
-    add_link_options(-flto -O3)
-endif()
-
 # Definitions & Includes
 add_definitions(-DNAPI_DISABLE_CPP_EXCEPTIONS -DBOOST_DATE_TIME_NO_LIB)
 
@@ -39,18 +30,19 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
 # Release: full optimization. Debug: symbols only, no optimization
 target_compile_options(${PROJECT_NAME} PRIVATE
-    $<IF:$<CONFIG:Release>,-O3
+    $<IF:$<CONFIG:Release>,-O3 -march=native -flto -Wall,-O0 -g -Wall>
 )
-
-# INCLUDE PATHS
-# We must include:
-# A. ${CMAKE_JS_INC}  -> The Node.js headers
-# B. node-addon-api   -> The wrapper headers
-# C. Boost            -> shared memory library
+target_link_options(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Release>:-flto -O3>
+)
+# ${CMAKE_JS_INC}  -> The Node.js headers
+# node-addon-api   -> The wrapper headers
+# Boost            -> shared memory library
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_JS_INC}
-    "${CMAKE_CURRENT_SOURCE_DIR}/node_modules/node-addon-api"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../node_modules/node-addon-api"
     ${BOOST_ROOT}
+    ${Boost_INCLUDE_DIRS}
 )
 
 # LINK LIBRARIES (This is the FIX)
@@ -58,9 +50,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_JS_LIB})
 
 # Output Settings
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-                      PREFIX "" 
-                      SUFFIX ".node")
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /EHsc)

@@ -4,13 +4,31 @@
         {
             "name": "default",
             "inherits": "base",
+            "displayName": "Debug",
             "generator": "Ninja",
             "environment": {
                 "BOOST_ROOT": "path/to/your/boost",
                 "CMAKE_CXX_COMPILER": "g++"
             },
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "base",
+            "displayName": "Release",
+            "generator": "Ninja",
+            "environment": {
+                "BOOST_ROOT": "path/to/your/boost",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc"
             }
         }
     ]

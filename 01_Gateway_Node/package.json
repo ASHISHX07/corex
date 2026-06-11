@@ -1,39 +1,36 @@
 {
-  "name": "01_gateway_node",
-  "version": "1.0.0",
-  "description": "Data import and I/O bound tasks node",
-  "keywords": [
-    "corex",
-    "data",
-    "trading"
-  ],
-  "homepage": "https://github.com/ASHISHX07/corex#readme",
+  "name"            : "01_gateway_node",
+  "version"         : "1.0.0",
+  "description"     : "Data import and I/O bound tasks node",
+  "keywords"        : [ "corex", "data", "trading" ],
+  "homepage"        : "https://github.com/ASHISHX07/corex#readme",
   "bugs": {
-    "url": "https://github.com/ASHISHX07/corex/issues"
+    "url"           : "https://github.com/ASHISHX07/corex/issues"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ASHISHX07/corex.git"
+    "type"          : "git",
+    "url"           : "git+https://github.com/ASHISHX07/corex.git"
   },
-  "license": "ISC",
-  "author": "Ashish Sindhav",
-  "type": "module",
-  "main": "index.js",
+  "license"         : "ISC",
+  "author"          : "Ashish Sindhav",
+  "type"            : "module",
+  "main"            : "index.js",
   "scripts": {
-    "build": "cmake-js compile -G Ninja --directory=bridge --CDBOOST_ROOT=\"D:\\boost_1_90_0\"",
-    "test": "node index.js"
+    "build"         : "cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge  --preset default",
+    "build:release" : "cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge --preset=release",
+    "test"          : "node index.js"
   },
   "dependencies": {
-    "axios": "^1.17.0",
-    "cmake-js": "^8.0.0",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "fyers-api-v3": "^1.9.0",
+    "axios"         : "^1.17.0",
+    "cmake-js"      : "^8.0.0",
+    "dotenv"        : "^17.4.2",
+    "express"       : "^5.2.1",
+    "fyers-api-v3"  : "^1.9.0",
     "node-addon-api": "^8.8.0",
-    "ntp-client": "^0.5.3",
-    "open": "^11.0.0"
+    "ntp-client"    : "^0.5.3",
+    "open"          : "^11.0.0"
   },
-  "devDependencies": {
-    "@types/node": "^25.9.1"
+  "devDependencies" : {
+    "@types/node"   : "^25.9.1"
   }
 }
