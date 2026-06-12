@@ -41,8 +41,8 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
 
     const indexSymbol = `${exchange}:${indexUnderlying ?? underlying}-INDEX`;
 
-    const poll = async () => {
-        
+    async function fetchAndWrite() {
+
         try {
             apiManagerInstance.dApiCall();
             const result = await fyers.getOptionChain({
@@ -55,7 +55,7 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
             if (result.code == 200) {
                 console.log(result.data);
                 onPollData(result.data);
-                return isLtpInit ? result.data.optionsChain[0].ltp : null;
+                return result.data;
             }
             else {
                 console.error('[NODE] optionPoll bad response: ', result);
@@ -66,14 +66,18 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
             console.error('[NODE] optionPoll error: ', err);
             return null;
         }
-        finally {
-            setTimeout(poll, interval);
-        }
-    };
 
-    isLtpInit = false;
+    }
 
-    poll();
+    // ── First call: awaited, returns live spot ────────────────────────────────
+    const firstData = await fetchAndWrite();
+    const liveSpot  = firstData?.optionsChain?.[0]?.ltp ?? null;
+
+    // ── Loop: fire and forget, no return value needed ─────────────────────────
+    const loop      = () => fetchAndWrite().finally(() => setTimeout(loop, interval));
+    setTimeout(loop, interval);
+
+    return liveSpot;
 
 }
 
