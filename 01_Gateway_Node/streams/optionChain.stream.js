@@ -3,14 +3,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { safeRead, safeMkdir } from "../helpers/fs.helper.js";
 import { buildOptionSymbols, snapToATM, STRIKE_GAP } from "../generators/optionGenerator.js";
-import { setSymbols } from "../helpers/activeSymbols.js";
+import { applyMap, onSocketTick } from "../shm/shmWriter.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
 const configPath = path.resolve(__dirname, '../../Config/option-config.json');
 const config = JSON.parse(safeRead(configPath));
 
-function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger}) {
+function optionAndIndicsStream({app_id, access_token, litemode, logger}) {
 
     const gap = STRIKE_GAP[config.underlying] ?? 100;
     let currentAtm = snapToATM(config.spotPrice, gap);
@@ -40,14 +40,15 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
         socket.subscribe(toSub);
 
         buildReverseMap(map);
-        setSymbols(map);
+        applyMap(map);
+
         currentAtm = newAtm;
         console.log(`[ATM SHIFT] -> ${newAtm}`);
     }
 
     const { map } = buildOptionSymbols(currentAtm);
     buildReverseMap(map);
-    setSymbols(map);
+    applyMap(map);
 
     let socket = fyersDataSocket.getInstance(`${app_id}:${access_token}`, safeMkdir(logDir), logger);
 
@@ -64,7 +65,7 @@ function optionAndIndicsStream({app_id, access_token, onTick, litemode, logger})
             const instrument = reverseMap.get(packet.symbol);
             if (instrument === undefined) continue;
             if (instrument < 10) reCenter(packet.ltp)
-            onTick(instrument < 10 ? 'index' : 'option', instrument, packet);
+            onSocketTick((instrument < 10), instrument, packet);
         }
     });
 

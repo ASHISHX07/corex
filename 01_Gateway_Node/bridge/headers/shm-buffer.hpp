@@ -27,11 +27,14 @@ struct IndicsHeader {
   double prevClose{};
   double ch{};
   double chp{};
-  double signal{};
-  double action{};
+  double fp{};
+  double fpch{};
+  double fpchp{};
   double iVixLtp{};
   double iVixCh{};
   double iVixChp{};
+  double signal{};
+  double action{};
 };
 
 struct OptionsHeader {
@@ -53,11 +56,12 @@ struct OptionsHeader {
   double prevClose{};
   double upperCkt{};
   double lowerCkt{};
-  double exchFeedTime{};
+  double iv{};
   double delta{};
   double theta{};
   double gamma{};
   double vega{};
+  double exchFeedTime{};
   double signal{};
   double action{};
 };

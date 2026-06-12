@@ -3,11 +3,12 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { safeRead, safeMkdir } from '../helpers/fs.helper.js';
 import { getExpiryTimeStamp } from '../generators/optionGenerator.js';
+import { onPollData } from '../shm/shmWriter.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const configPath = path.resolve(__dirname, '../../Config/option-config.json');
-const logPath = path.join(__dirname, '../../runtime/logs/option-poll');
-const config = JSON.parse(safeRead(configPath));
+const __dirname     = path.dirname(fileURLToPath(import.meta.url));
+const configPath    = path.resolve(__dirname, '../../Config/option-config.json');
+const logPath       = path.join(__dirname, '../../runtime/logs/option-poll');
+const config        = JSON.parse(safeRead(configPath));
 
 /**
  * Polls Fyers option chain API at a fixed interval.
@@ -20,7 +21,7 @@ const config = JSON.parse(safeRead(configPath));
  * @param {number} interval                 - ms between polls, default 5000
  */
 
-async function optionPoll(appId, accessToken, apiManagerInstance, onData, interval = 5000) {
+async function optionPoll(appId, accessToken, apiManagerInstance, interval = 5000) {
 
     const fyers = new fyersModel({path: safeMkdir(logPath), enableLogging: true});
     fyers.setAppId(appId);
@@ -29,29 +30,43 @@ async function optionPoll(appId, accessToken, apiManagerInstance, onData, interv
     const { exchange, underlying, visibility } = config;
 
     // Fyers option chain API uses the index symbol, not individual strikes
-    const indexSymbol = `${exchange}:${underlying === 'NIFTY' ? 'NIFTY50' : underlying}-INDEX`;
+    let indexUnderlying;
+
+    switch (underlying) {
+        case "NIFTY":
+            indexUnderlying = "NIFTY50";
+            break;
+        
+        case "BANKNIFTY":
+            indexUnderlying = "NIFTYBANK";
+            break;
+
+        default:
+            break;
+    }
+
+    const indexSymbol = `${exchange}:${indexUnderlying ?? underlying}-INDEX`;
 
     const poll = async () => {
-        
         
         try {
             apiManagerInstance.dApiCall();
             const result = await fyers.getOptionChain({
-                symbol: indexSymbol,
-                strikecount: visibility,
-                timestamp: String(getExpiryTimeStamp() ?? ''),
-                greeks: 1
+                symbol:         indexSymbol,
+                strikecount:    visibility,
+                timestamp:      String(getExpiryTimeStamp() ?? ''),
+                greeks:         1
             });
 
             if (result.code == 200) {
-                onData(result.data);
+                onPollData(result.data);
             }
             else {
                 console.error('[NODE] optionPoll bad response: ', result);
             }
         }
         catch (err) {
-            console.error('[NODE] optionPoll error: ', err.message());
+            console.error('[NODE] optionPoll error: ', err);
         }
         finally {
             setTimeout(poll, interval);

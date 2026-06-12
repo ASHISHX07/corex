@@ -6,7 +6,7 @@
     "OPTIONS": [ "instrument", "cp", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
 
     "TBTDEPTHDATA": {
-        "slots": 15,
+        "slots": 5,
         "double_array": { "bidPrice": 50, "askPrice": 50 },
         "int64": [ "tbq", "tsq", "timestamp", "sendtime" ],
         "int32": [ "active", "instrument", "seqNo" ],
