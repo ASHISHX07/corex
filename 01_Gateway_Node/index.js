@@ -9,35 +9,30 @@ import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 import expiryGuard from "./timers/expiryGuard.js";
 import { initShm, setReady } from "./shm/shmWriter.js";
 import { STRIKE_GAP } from "./generators/optionGenerator.js";
-import { safeRead } from "./helpers/fs.helper.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const APP_ID = process.env.FYERS_APP_ID;
 
 // make buffer headers first
 await expiryGuard();
 headerGenerator();
-
-const config = JSON.parse(safeRead(path.resolve(__dirname, '../Config/option-config.json')));
-const indicesCount = 2;
-const optionsCount = (config.visibility * 2 + 1) * 2;
-
-initShm(indicesCount, optionsCount);
+initShm();
 
 const API = new apiManager();
 const access_token = await ensureAccessToken();
 
+const liveSpot = await optionPoll(APP_ID, access_token, API, 1000);
+
 optionAndIndicsStream({
     app_id: APP_ID,
     access_token,
+    initialSpot: liveSpot,
     litemode: false,
     logger: false
 });
-
-await optionPoll(APP_ID, access_token, API, 1000);
 
 setReady();
 

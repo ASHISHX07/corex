@@ -31,18 +31,12 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
 
     // Fyers option chain API uses the index symbol, not individual strikes
     let indexUnderlying;
+    let isLtpInit = true;
 
     switch (underlying) {
-        case "NIFTY":
-            indexUnderlying = "NIFTY50";
-            break;
-        
-        case "BANKNIFTY":
-            indexUnderlying = "NIFTYBANK";
-            break;
-
-        default:
-            break;
+        case "NIFTY":       indexUnderlying  = "NIFTY50";     break;
+        case "BANKNIFTY":   indexUnderlying  = "NIFTYBANK";   break;
+        default:            indexUnderlying  = underlying;    break;
     }
 
     const indexSymbol = `${exchange}:${indexUnderlying ?? underlying}-INDEX`;
@@ -59,19 +53,25 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
             });
 
             if (result.code == 200) {
+                console.log(result.data);
                 onPollData(result.data);
+                return isLtpInit ? result.data.optionsChain[0].ltp : null;
             }
             else {
                 console.error('[NODE] optionPoll bad response: ', result);
+                return null;
             }
         }
         catch (err) {
             console.error('[NODE] optionPoll error: ', err);
+            return null;
         }
         finally {
             setTimeout(poll, interval);
         }
     };
+
+    isLtpInit = false;
 
     poll();
 

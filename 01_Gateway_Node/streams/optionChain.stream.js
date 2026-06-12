@@ -10,10 +10,10 @@ const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
 const configPath = path.resolve(__dirname, '../../Config/option-config.json');
 const config = JSON.parse(safeRead(configPath));
 
-function optionAndIndicsStream({app_id, access_token, litemode, logger}) {
+function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, logger}) {
 
     const gap = STRIKE_GAP[config.underlying] ?? 100;
-    let currentAtm = snapToATM(config.spotPrice, gap);
+    let currentAtm = snapToATM(initialSpot ?? config.spotPrice, gap);
     let reverseMap = new Map();
 
     function buildReverseMap(map) {
