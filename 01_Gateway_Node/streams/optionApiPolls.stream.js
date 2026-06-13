@@ -4,11 +4,10 @@ import path from 'path';
 import { safeRead, safeMkdir } from '../helpers/fs.helper.js';
 import { getExpiryTimeStamp } from '../generators/optionGenerator.js';
 import { onPollData } from '../shm/shmWriter.js';
+import { config } from '../helpers/loader.js';
 
 const __dirname     = path.dirname(fileURLToPath(import.meta.url));
-const configPath    = path.resolve(__dirname, '../../Config/option-config.json');
 const logPath       = path.join(__dirname, '../../runtime/logs/option-poll');
-const config        = JSON.parse(safeRead(configPath));
 
 /**
  * Polls Fyers option chain API at a fixed interval.

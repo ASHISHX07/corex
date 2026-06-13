@@ -2,12 +2,12 @@ import { createRequire } from "module";
 import path from "path";
 import { fileURLToPath } from "url";
 import { safeRead } from "../helpers/fs.helper.js";
+import { config } from "../helpers/loader.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require   = createRequire(import.meta.url);
 const bridge    = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
 const OFF       = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
-const config    = JSON.parse(safeRead(path.resolve(__dirname, '../../Config/option-config.json')));
 
 // ── Buffers & Views ───────────────────────────────────────────────────────────
 let ctrlView  = null;   // Int32Array  — controller fields (int32, 4 bytes each)
@@ -18,6 +18,9 @@ let optionsDV = null;   // DataView    — options buffer
 const instrumentToPos = new Map();
 // symbol string → instrument number  (mirror of reverseMap, set via applyMap)
 const symbolToInstrument = new Map();
+
+// freePositions acts as a LIFO stack — slot layout in SHM is not strike-ordered.
+// C++ must always read the instrument field to identify slot contents.
 const freePositions    = [];
 let totalOptionSlots   = 0;
 
@@ -136,7 +139,10 @@ function _writeIndicsSocket(instrument, p) {
 }
 
 function _writeIndicsFromPoll(row) {
-    const base = 0;
+    const instrument = symbolToInstrument.get(row.symbol);
+    if (instrument === undefined) return;
+
+    const base = (instrument - 1) * OFF.INDICS.__bytesPerSlot;
     const v    = indicsDV;
     const O    = OFF.INDICS;
 
@@ -146,7 +152,7 @@ function _writeIndicsFromPoll(row) {
 }
 
 function _writeIndicsVix(vix) {
-    const base = 0;
+    const base = 0;     // VIX belongs to NIFTY slot (instrument 1), always offset 0
     const v    = indicsDV;
     const O    = OFF.INDICS;
 

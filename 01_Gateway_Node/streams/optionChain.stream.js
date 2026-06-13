@@ -4,13 +4,12 @@ import { fileURLToPath } from 'url';
 import { safeRead, safeMkdir } from "../helpers/fs.helper.js";
 import { buildOptionSymbols, snapToATM, STRIKE_GAP } from "../generators/optionGenerator.js";
 import { applyMap, onSocketTick } from "../shm/shmWriter.js";
+import { config } from "../helpers/loader.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
-const configPath = path.resolve(__dirname, '../../Config/option-config.json');
-const config = JSON.parse(safeRead(configPath));
 
-function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, logger}) {
+function optionAndIndicsStream({app_id, access_token, initialSpot, onReady, litemode, logger}) {
 
     const gap = STRIKE_GAP[config.underlying] ?? 100;
     let currentAtm = snapToATM(initialSpot ?? config.spotPrice, gap);
