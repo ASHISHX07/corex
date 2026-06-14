@@ -15,25 +15,24 @@ let indicsDV  = null;   // DataView    — indics buffer
 let optionsDV = null;   // DataView    — options buffer
 
 // ── Registry ──────────────────────────────────────────────────────────────────
-const instrumentToPos = new Map();
 // symbol string → instrument number  (mirror of reverseMap, set via applyMap)
 const symbolToInstrument = new Map();
+const instrumentToPos = new Map();
 
 // freePositions acts as a LIFO stack — slot layout in SHM is not strike-ordered.
-// C++ must always read the instrument field to identify slot contents.
+// C++ side must always read the instrument field to identify slot contents.
 const freePositions    = [];
-let totalOptionSlots   = 0;
 
-const indicesCount = config.INDICS?.length ?? 1
+const indicsCount = config.INDICS?.length ?? 1
 const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initShm() {
-    totalOptionSlots = optionsCount;
 
     const ctrlBuf    = bridge.getControllerBuffer();
-    const indicsBuf  = bridge.getIndicsDataBuffer(indicesCount * OFF.INDICS.__bytesPerSlot);
+    const indicsBuf  = bridge.getIndicsDataBuffer(indicsCount * OFF.INDICS.__bytesPerSlot);
     const optionsBuf = bridge.getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);
+    bridge.getOrderBuffer(OFF.ORDER.__bytesPerSlot); // ← ensures ORDER_MEM segment exists before C++ opens it
 
     ctrlView  = new Int32Array(ctrlBuf.buffer, ctrlBuf.byteOffset, OFF.CONTROLLER.__bytesPerSlot / 4);
     indicsDV  = new DataView(indicsBuf.buffer, indicsBuf.byteOffset);
@@ -41,7 +40,7 @@ function initShm() {
 
     // Write controller header
     ctrlView[OFF.CONTROLLER.systemStatus                / 4] = 0;   // not read yet
-    ctrlView[OFF.CONTROLLER.IndicesCount                / 4] = indicesCount;
+    ctrlView[OFF.CONTROLLER.indicsCount                 / 4] = indicsCount;
     ctrlView[OFF.CONTROLLER.OptionsCount                / 4] = optionsCount;
     ctrlView[OFF.CONTROLLER.tbtSocketSymbolCount        / 4] = 0;
     ctrlView[OFF.CONTROLLER.apiSymbolCount              / 4] = 0;
@@ -49,16 +48,18 @@ function initShm() {
     ctrlView[OFF.CONTROLLER.action                      / 4] = 0;
 
     for (let i = 0; i < optionsCount; i++) freePositions.push(i);
-    console.log(`[SHM] INITIALIZED - Indics: ${indicesCount}, options: ${optionsCount}`);
+    console.log(`[SHM] INITIALIZED - Indics: ${indicsCount}, options: ${optionsCount}`);
 }
 
 function setReady() {
-    if (ctrlView) ctrlView[OFF.CONTROLLER.systemStatus / 4] = 1;
+    if (!ctrlView) throw new Error('[SHM] setReady called before initShm');
+    ctrlView[OFF.CONTROLLER.systemStatus / 4] = 1;
 }
 
 // ── applyMap — called on startup and every ATM shift ──────────────────────────
 // map: Map<instrument, symbol>  (from buildOptionSymbols)
 function applyMap(map) {
+    if (!optionsDV) throw new Error('[SHM] applyMap called before initShm');
     const newInstruments = new Set();
 
     // Rebuild symbolToInstrument from fresh map
@@ -66,6 +67,15 @@ function applyMap(map) {
     for (const [instrument, symbol] of map) {
         symbolToInstrument.set(symbol, instrument);
         if (instrument >= 10) newInstruments.add(instrument);
+    }
+
+    const toRemove = [];
+    for (const [instrument] of instrumentToPos) {
+        if (!newInstruments.has(instrument)) toRemove.push(instrument);
+    }
+    for (const instrument of toRemove) {
+        freePositions.push(instrumentToPos.get(instrument));
+        instrumentToPos.delete(instrument);
     }
 
     // Find instruments that are leaving → recycle their positions
@@ -105,10 +115,7 @@ function onSocketTick(isIndex, instrument, packet) {
 // ── onPollData — called from optionApiPolls.stream.js ─────────────────────────
 function onPollData(data) {
     // 1. IndiaVix → indics buffer
-    if (data.indiavixData) {
-        const vix = data.indiavixData;
-        _writeIndicsVix(vix);
-    }
+    if (data.indiavixData) _writeIndicsVix(data.indiavixData);
 
     // 2. optionsChain — first row is index (strike_price === -1), rest are options
     for (const row of data.optionsChain) {
@@ -169,7 +176,7 @@ function _writeOptionSocket(instrument, p) {
     const v    = optionsDV;
     const O    = OFF.OPTIONS;
 
-    v.setFloat64(base + O.instrument,       instrument           ?? 0, true);
+    v.setFloat64(base + O.instrument,       instrument,                true);
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
     v.setFloat64(base + O.ch,               p.ch                 ?? 0, true);
     v.setFloat64(base + O.chp,              p.chp                ?? 0, true);

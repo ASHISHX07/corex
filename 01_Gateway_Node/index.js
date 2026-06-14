@@ -8,7 +8,7 @@ import optionPoll from "./streams/optionApiPolls.stream.js";
 import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 import expiryGuard from "./timers/expiryGuard.js";
 import { initShm, setReady } from "./shm/shmWriter.js";
-import { STRIKE_GAP } from "./generators/optionGenerator.js";
+import { initReader, startSignalWatch } from "./shm/shmReader.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,6 +20,8 @@ const APP_ID = process.env.FYERS_APP_ID;
 await expiryGuard();
 headerGenerator();
 initShm();
+initReader();
+startSignalWatch(50);
 
 const API = new apiManager();
 const access_token = await ensureAccessToken();
@@ -34,7 +36,7 @@ optionAndIndicsStream({
     logger: false
 });
 
-setReady();
+setTimeout(setReady, 2000);
 
 
 

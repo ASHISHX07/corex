@@ -9,7 +9,13 @@
         "slots": 5,
         "double_array": { "bidPrice": 50, "askPrice": 50 },
         "int64": [ "tbq", "tsq", "timestamp", "sendtime" ],
-        "int32": [ "active", "instrument", "seqNo" ],
+        "int32": [ "active", "instrument", "seqNo", "signal", "action" ],
         "int32_array": { "bidqty": 50, "askqty": 50, "bidord": 50, "askord": 50 }
+    },
+
+    "ORDER": {
+        "header": ["count", "strategyId", "timestamp", "status"],
+        "leg":    ["instrument", "side", "orderType", "qty", "limitPrice", "stopPrice", "slPrice", "takeProfit"],
+        "maxLegs": 5
     }
 }

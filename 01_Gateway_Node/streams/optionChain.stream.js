@@ -9,7 +9,7 @@ import { config } from "../helpers/loader.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const logDir = path.join(__dirname, '../../runtime/logs/option-chain-logs');
 
-function optionAndIndicsStream({app_id, access_token, initialSpot, onReady, litemode, logger}) {
+function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, logger}) {
 
     const gap = STRIKE_GAP[config.underlying] ?? 100;
     let currentAtm = snapToATM(initialSpot ?? config.spotPrice, gap);
@@ -65,6 +65,7 @@ function optionAndIndicsStream({app_id, access_token, initialSpot, onReady, lite
             if (instrument === undefined) continue;
             if (instrument < 10) reCenter(packet.ltp)
             onSocketTick((instrument < 10), instrument, packet);
+            console.log(packet)
         }
     });
 
