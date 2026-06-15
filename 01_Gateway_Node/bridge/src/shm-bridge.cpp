@@ -61,7 +61,7 @@ static Napi::Value openAndMap(
 // Fixed size — struct layout is known at compile time
 Napi::Value getControllerBuffer(const Napi::CallbackInfo& info) {
     Napi::Env env { info.Env() };
-    return openAndMap(env, g_shm_controller, g_region_controller, "CONTROLLER", sizeof(ControllerHeader));
+    return openAndMap(env, g_shm_controller, g_region_controller, "CONTROLLER_MEM", sizeof(ControllerHeader));
 }
 
 Napi::Value getIndicsDataBuffer(const Napi::CallbackInfo& info) {
