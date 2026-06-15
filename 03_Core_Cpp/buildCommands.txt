@@ -1,0 +1,7 @@
+# Debug
+cmake --preset debug
+cmake --build --preset build-debug
+
+# Release
+cmake --preset release
+cmake --build --preset build-release

@@ -53,7 +53,7 @@ async function ensureAccessToken() {
     }
     catch (err) {
         clearSession();
-    throw new Error(`[AUTH] Authentication failed: ${err.message}`);
+    throw new Error(`[AUTH] Authentication failed: ${err}`);
     }
 }
 

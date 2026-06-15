@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "GCC Debug",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++.exe",
+        "CMAKE_C_COMPILER": "gcc.exe",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BOOST_ROOT": "path/to/your/boost/root"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "GCC Release",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++.exe",
+        "CMAKE_C_COMPILER": "gcc.exe",
+        "CMAKE_BUILD_TYPE": "Release",
+        "BOOST_ROOT": "path/to/your/boost/root"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "build-debug",   "configurePreset": "debug"   },
+    { "name": "build-release", "configurePreset": "release" }
+  ]
+}
