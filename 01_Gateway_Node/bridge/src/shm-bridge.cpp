@@ -3,6 +3,7 @@
 #include <utility>
 #include <cstdint>
 #include <iostream>
+#include <string>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include "../headers/shm-buffer.hpp"
@@ -32,12 +33,12 @@ static Napi::Value openAndMap(
     Napi::Env& env,
     std::unique_ptr<shared_memory_object>& shm,
     std::unique_ptr<mapped_region>&        region,
-    const char*                            name,
+    const std::string&                     name,
     std::size_t                            size
 ) {
     try {
         if (!shm) {
-            shm = std::make_unique<shared_memory_object>(open_or_create, name, read_write);
+            shm = std::make_unique<shared_memory_object>(open_or_create, name.c_str(), read_write);
             shm->truncate(size);
         }
         if (!region) {

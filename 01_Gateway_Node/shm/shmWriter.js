@@ -23,7 +23,7 @@ const instrumentToPos = new Map();
 // C++ side must always read the instrument field to identify slot contents.
 const freePositions    = [];
 
-const indicsCount = config.INDICS?.length ?? 1
+const indicsCount = config?.INDICS?.length ?? 1
 const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Init ──────────────────────────────────────────────────────────────────────

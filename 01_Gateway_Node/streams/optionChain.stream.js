@@ -42,7 +42,7 @@ function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, log
         applyMap(map);
 
         currentAtm = newAtm;
-        console.log(`[ATM SHIFT] -> ${newAtm}`);
+        // console.log(`[ATM SHIFT] -> ${newAtm}`);
     }
 
     const { map } = buildOptionSymbols(currentAtm);
@@ -65,7 +65,6 @@ function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, log
             if (instrument === undefined) continue;
             if (instrument < 10) reCenter(packet.ltp)
             onSocketTick((instrument < 10), instrument, packet);
-            console.log(packet)
         }
     });
 

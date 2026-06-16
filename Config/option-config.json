@@ -3,7 +3,7 @@
     "underlying": "NIFTY",
     "spotPrice": 23200,
     "visibility": 2,
-    "activeExpiry": 0,
+    "activeExpiry": 1,
     "expiries": [
         {
             "year": 26,
