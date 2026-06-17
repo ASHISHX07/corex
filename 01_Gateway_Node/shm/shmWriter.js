@@ -15,15 +15,14 @@ let indicsDV  = null;   // DataView    — indics buffer
 let optionsDV = null;   // DataView    — options buffer
 
 // ── Registry ──────────────────────────────────────────────────────────────────
-// symbol string → instrument number  (mirror of reverseMap, set via applyMap)
-const symbolToInstrument = new Map();
-const instrumentToPos = new Map();
-
+const indicsSymbolToPos   = new Map();  // index symbol  → indics slot
+const optionsSymbolToPos  = new Map();  // option symbol → options slot
 // freePositions acts as a LIFO stack — slot layout in SHM is not strike-ordered.
-// C++ side must always read the instrument field to identify slot contents.
-const freePositions    = [];
+// C++ side must always read the symbol field to identify slot contents.
+const freePositions       = [];         // LIFO stack of free option slots
+// const encoder             = new TextEncoder();
 
-const indicsCount = config?.INDICS?.length ?? 1
+const indicsCount  = 1;
 const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -40,7 +39,7 @@ function initShm() {
 
     // Write controller header
     ctrlView[OFF.CONTROLLER.systemStatus                / 4] = 0;   // not read yet
-    ctrlView[OFF.CONTROLLER.indicsCount                 / 4] = indicsCount;
+    ctrlView[OFF.CONTROLLER.IndicsCount                 / 4] = indicsCount;
     ctrlView[OFF.CONTROLLER.OptionsCount                / 4] = optionsCount;
     ctrlView[OFF.CONTROLLER.tbtSocketSymbolCount        / 4] = 0;
     ctrlView[OFF.CONTROLLER.apiSymbolCount              / 4] = 0;
@@ -56,85 +55,88 @@ function setReady() {
     ctrlView[OFF.CONTROLLER.systemStatus / 4] = 1;
 }
 
-// ── applyMap — called on startup and every ATM shift ──────────────────────────
-// map: Map<instrument, symbol>  (from buildOptionSymbols)
-function applyMap(map) {
+// ── applySymbols — called on startup and every ATM shift ──────────────────────
+// symbols: string[]  (from buildOptionSymbols)
+function applySymbols(symbols) {
     if (!optionsDV) throw new Error('[SHM] applyMap called before initShm');
-    const newInstruments = new Set();
 
-    // Rebuild symbolToInstrument from fresh map
-    symbolToInstrument.clear();
-    for (const [instrument, symbol] of map) {
-        symbolToInstrument.set(symbol, instrument);
-        if (instrument >= 10) newInstruments.add(instrument);
-    }
+    const newOptionSyms = new Set(symbols.filter(s => !s.includes('INDEX')));
+    const newIndicsSyms = new Set(symbols.filter(s =>  s.includes('INDEX')));
 
-    const toRemove = [];
-    for (const [instrument] of instrumentToPos) {
-        if (!newInstruments.has(instrument)) toRemove.push(instrument);
-    }
-    for (const instrument of toRemove) {
-        freePositions.push(instrumentToPos.get(instrument));
-        instrumentToPos.delete(instrument);
-    }
-
-    // Find instruments that are leaving → recycle their positions
-    for (const [instrument, pos] of instrumentToPos) {
-        if (!newInstruments.has(instrument)) {
-            instrumentToPos.delete(instrument);
+    // Recycle departed option slots
+    for (const [sym, pos] of optionsSymbolToPos) {
+        if (!newOptionSyms.has(sym)) {
             freePositions.push(pos);
+            optionsSymbolToPos.delete(sym);
         }
     }
 
-    // Assign positions to new instruments
-    for (const instrument of newInstruments) {
-        if (!instrumentToPos.has(instrument)) {
+    // Assign slots to new option symbols
+    for (const sym of newOptionSyms) {
+        if (!optionsSymbolToPos.has(sym)) {
             const pos = freePositions.pop();
             if (pos === undefined) {
-                console.error(`[SHM] No free positions for Instrument ${instrument}`);
-                continue;
+                console.error(`[SHM] No free slot for ${sym}`);
+                return;
             }
-            instrumentToPos.set(instrument, pos);
-            // Write instrument number into SHM immediately so C++ knows what's in this slot
-            const base = pos * OFF.OPTIONS.__bytesPerSlot;
-            optionsDV.setFloat64(base + OFF.OPTIONS.instrument, instrument, true);
+            optionsSymbolToPos.set(sym, pos);
+            _writeSymbol(sym, pos, false);
+        }
+    }
+
+    // Assign indics slots (only grows, never shrinks)
+    let nextIndicsSlot = indicsSymbolToPos.size;
+    for (const sym of newIndicsSyms) {
+        if (!indicsSymbolToPos.has(sym)) {
+            indicsSymbolToPos.set(sym, nextIndicsSlot);
+            _writeSymbol(sym, nextIndicsSlot, true);
+            nextIndicsSlot++;
         }
     }
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────
+function _writeSymbol(symbol, pos, isIndex) {
+    const dv        = isIndex ? indicsDV : optionsDV;
+    const bps       = isIndex ? OFF.INDICS.__bytesPerSlot : OFF.OPTIONS.__bytesPerSlot;
+    const symOff    = isIndex ? OFF.INDICS.symbol : OFF.OPTIONS.symbol
+    const base      = pos * bps + symOff;
+
+    // Write byte by byte via DataView — avoids any ArrayBuffer slice offset issue
+    const encoded   = new TextEncoder().encode(symbol.padEnd(32, '\0').slice(0, 32));
+    for (let i = 0; i < 32; i++) {
+        dv.setUint8(base + i, encoded[i] ?? 0);
+    }
+    // const buf       = new Uint8Array(dv.buffer, dv.byteOffset + base + symOff, 32);
+    // buf.fill(0);
+    // encoder.encodeInto(symbol, buf);
+}
+
 // ── onSocketTick — called from optionChain.stream.js ──────────────────────────
-function onSocketTick(isIndex, instrument, packet) {
-    if (isIndex) {
-        _writeIndicsSocket(instrument, packet);
-    }
-    else {
-        _writeOptionSocket(instrument, packet);
-    }
+function onSocketTick(isIndex, symbol, packet) {
+    if (isIndex) _writeIndicsSocket(symbol, packet);
+    else         _writeOptionSocket(symbol, packet);
 }
 
 // ── onPollData — called from optionApiPolls.stream.js ─────────────────────────
 function onPollData(data) {
-    // 1. IndiaVix → indics buffer
     if (data.indiavixData) _writeIndicsVix(data.indiavixData);
 
-    // 2. optionsChain — first row is index (strike_price === -1), rest are options
     for (const row of data.optionsChain) {
-        if (row.strike_price === -1) {
-            _writeIndicsFromPoll(row);
-            continue;
-        }
+        if (row.strike_price === -1) { _writeIndicsFromPoll(row); continue; }
         _writeOptionPoll(row);
     }
 }
 
 // ── Internal writers ──────────────────────────────────────────────────────────
 
-function _writeIndicsSocket(instrument, p) {
-    const base = (instrument - 1) * OFF.INDICS.__bytesPerSlot;  // instrument 1=NIFTY, 2=BANKNIFTY etc.
+function _writeIndicsSocket(symbol, p) {
+    const pos = indicsSymbolToPos.get(symbol);
+    if (pos === undefined) return;
+    const base = pos * OFF.INDICS.__bytesPerSlot;  // instrument 1=NIFTY, 2=BANKNIFTY etc.
     const v    = indicsDV;
     const O    = OFF.INDICS;
 
-    v.setFloat64(base + O.instrument,       instrument,                true);
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
     v.setFloat64(base + O.exchFeedTime,     p.exch_feed_time     ?? 0, true);
     v.setFloat64(base + O.high,             p.high_price         ?? 0, true);
@@ -146,10 +148,9 @@ function _writeIndicsSocket(instrument, p) {
 }
 
 function _writeIndicsFromPoll(row) {
-    const instrument = symbolToInstrument.get(row.symbol);
-    if (instrument === undefined) return;
-
-    const base = (instrument - 1) * OFF.INDICS.__bytesPerSlot;
+    const pos = indicsSymbolToPos.get(row.symbol);
+    if (pos === undefined) return;
+    const base = pos * OFF.INDICS.__bytesPerSlot;
     const v    = indicsDV;
     const O    = OFF.INDICS;
 
@@ -168,15 +169,14 @@ function _writeIndicsVix(vix) {
     v.setFloat64(base + O.iVixChp,          vix.ltpchp           ?? 0, true);
 }
 
-function _writeOptionSocket(instrument, p) {
-    const pos = instrumentToPos.get(instrument);
+function _writeOptionSocket(symbol, p) {
+    const pos = optionsSymbolToPos.get(symbol);
     if (pos === undefined) return;  // not in active window, ignore
 
     const base = pos * OFF.OPTIONS.__bytesPerSlot;
     const v    = optionsDV;
     const O    = OFF.OPTIONS;
 
-    v.setFloat64(base + O.instrument,       instrument,                true);
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
     v.setFloat64(base + O.ch,               p.ch                 ?? 0, true);
     v.setFloat64(base + O.chp,              p.chp                ?? 0, true);
@@ -194,10 +194,7 @@ function _writeOptionSocket(instrument, p) {
 }
 
 function _writeOptionPoll(row) {
-    const instrument = symbolToInstrument.get(row.symbol);
-    if (instrument === undefined) return;   // outside current ATM window, skip
-
-    const pos = instrumentToPos.get(instrument);
+    const pos = optionsSymbolToPos.get(row.symbol);
     if (pos === undefined) return;
 
     const base = pos * OFF.OPTIONS.__bytesPerSlot;
@@ -214,4 +211,4 @@ function _writeOptionPoll(row) {
     v.setFloat64(base + O.vega,             g.vega               ?? 0, true);
 }
 
-export { initShm, setReady, applyMap, onSocketTick, onPollData };
+export { initShm, setReady, applySymbols, onSocketTick, onPollData };

@@ -24,7 +24,10 @@ function buildOrderStruct(name, section) {
     let cpp = `struct ${structName}Header {\n`;
     section.header.forEach(f => { cpp += `  double ${f}{};\n`; });
     for (let i = 0; i < section.maxLegs; i++) {
-        section.leg.forEach(f => { cpp += `  double leg${i}_${f}{};\n`; });
+        section.leg.forEach(f => {
+            if (f === 'symbol') cpp += `  char leg${i}_symbol[32]{};\n`;
+            else                cpp += `  double leg${i}_${f}{};\n`;
+        });
     }
     cpp += `};\n\n`;
     return cpp;
@@ -35,7 +38,10 @@ function buildFlatStruct(name, fields) {
     const type = (name === 'CONTROLLER') ? 'int' : 'double';
     const structName = name.charAt(0) + name.slice(1).toLowerCase();
     let cpp = `struct ${structName}Header {\n`;
-    fields.forEach(f => { cpp += `  ${type} ${f}{};\n`; });
+    fields.forEach(f => {
+        if (f === 'symbol') cpp += `  char symbol[32]{};\n`;
+        else                cpp += `  ${type} ${f}{};\n`;
+    });
     cpp += `};\n\n`;
     return cpp;
 }
@@ -44,6 +50,8 @@ function buildFlatStruct(name, fields) {
 function buildStructuredStruct(name, section) {
     const structName = name.charAt(0) + name.slice(1).toLowerCase();
     let cpp = `struct ${structName}Header {\n`;
+
+    if(section.symbol) cpp += `  char symbol[32]{};\n`;
 
     if (section.double)
         section.double.forEach(f => { cpp += `  double ${f}{};\n`; });
@@ -79,11 +87,13 @@ function computeOffsets(section) {
         byte += byteSize * count;
     }
 
+    if (section.symbol) add('symbol', 32);
+
     (section.double     ?? []).forEach(f => add(f, 8));
     Object.entries(section.double_array ?? {}).forEach(([f, n]) => add(f, 8, n));
     (section.int64      ?? []).forEach(f => add(f, 8));
     (section.int32      ?? []).forEach(f => add(f, 4));
-    Object.entries(section.int32_array ?? []).forEach(([f, n]) => add(f, 4, n));
+    Object.entries(section.int32_array ?? {}).forEach(([f, n]) => add(f, 4, n));
 
     offsets.__bytesPerSlot = byte;
     return offsets;
@@ -97,7 +107,10 @@ function computeOrderOffsets(section) {
     section.header.forEach(f => { offSets[f] = byte; byte += 8; });
 
     for (let i = 0; i < section.maxLegs; i++) {
-        section.leg.forEach(f => { offSets[`leg${i}_${f}`] = byte; byte += 8; });
+        section.leg.forEach(f => {
+            offSets[`leg${i}_${f}`] = byte;
+            byte += (f === 'symbol') ? 32 : 8;
+        });
     }
 
     offSets.__bytesPerSlot = byte;
@@ -136,7 +149,10 @@ function headerGenerator() {
             const byteSize = (key === 'CONTROLLER') ? 4 : 8;
             const flatOffsets = {};
             let byte = 0;
-            section.forEach(f => { flatOffsets[f] = byte; byte += byteSize; });
+            section.forEach(f => {
+                flatOffsets[f] = byte;
+                byte += (f === 'symbol') ? 32 : byteSize;
+            });
             flatOffsets.__bytesPerSlot = byte;
 
             allOffsets[key] = flatOffsets;

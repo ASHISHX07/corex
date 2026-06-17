@@ -18,7 +18,7 @@ struct ControllerHeader {
 };
 
 struct IndicsHeader {
-  double instrument{};
+  char symbol[32]{};
   double ltp{};
   double exchFeedTime{};
   double high{};
@@ -38,7 +38,7 @@ struct IndicsHeader {
 };
 
 struct OptionsHeader {
-  double instrument{};
+  char symbol[32]{};
   double cp{};
   double ltp{};
   double ch{};
@@ -67,6 +67,7 @@ struct OptionsHeader {
 };
 
 struct TbtdepthdataHeader {
+  char symbol[32]{};
   std::array<double, 50> bidPrice{};
   std::array<double, 50> askPrice{};
   std::int64_t tbq{};
@@ -74,7 +75,6 @@ struct TbtdepthdataHeader {
   std::int64_t timestamp{};
   std::int64_t sendtime{};
   std::int32_t active{};
-  std::int32_t instrument{};
   std::int32_t seqNo{};
   std::int32_t signal{};
   std::int32_t action{};
@@ -89,7 +89,7 @@ struct OrderHeader {
   double strategyId{};
   double timestamp{};
   double status{};
-  double leg0_instrument{};
+  char leg0_symbol[32]{};
   double leg0_side{};
   double leg0_orderType{};
   double leg0_qty{};
@@ -97,7 +97,7 @@ struct OrderHeader {
   double leg0_stopPrice{};
   double leg0_slPrice{};
   double leg0_takeProfit{};
-  double leg1_instrument{};
+  char leg1_symbol[32]{};
   double leg1_side{};
   double leg1_orderType{};
   double leg1_qty{};
@@ -105,7 +105,7 @@ struct OrderHeader {
   double leg1_stopPrice{};
   double leg1_slPrice{};
   double leg1_takeProfit{};
-  double leg2_instrument{};
+  char leg2_symbol[32]{};
   double leg2_side{};
   double leg2_orderType{};
   double leg2_qty{};
@@ -113,7 +113,7 @@ struct OrderHeader {
   double leg2_stopPrice{};
   double leg2_slPrice{};
   double leg2_takeProfit{};
-  double leg3_instrument{};
+  char leg3_symbol[32]{};
   double leg3_side{};
   double leg3_orderType{};
   double leg3_qty{};
@@ -121,7 +121,7 @@ struct OrderHeader {
   double leg3_stopPrice{};
   double leg3_slPrice{};
   double leg3_takeProfit{};
-  double leg4_instrument{};
+  char leg4_symbol[32]{};
   double leg4_side{};
   double leg4_orderType{};
   double leg4_qty{};

@@ -1,21 +1,22 @@
 {
     "CONTROLLER": [ "systemStatus", "IndicesCount", "OptionsCount", "tbtSocketSymbolCount", "apiSymbolCount", "signal", "action" ],
 
-    "INDICS": [ "instrument", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
+    "INDICS": [ "symbol", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
     
-    "OPTIONS": [ "instrument", "cp", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
+    "OPTIONS": [ "symbol", "cp", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
 
     "TBTDEPTHDATA": {
         "slots": 5,
+        "symbol": "symbol",
         "double_array": { "bidPrice": 50, "askPrice": 50 },
         "int64": [ "tbq", "tsq", "timestamp", "sendtime" ],
-        "int32": [ "active", "instrument", "seqNo", "signal", "action" ],
+        "int32": [ "active", "seqNo", "signal", "action" ],
         "int32_array": { "bidqty": 50, "askqty": 50, "bidord": 50, "askord": 50 }
     },
 
     "ORDER": {
         "header": ["count", "strategyId", "timestamp", "status"],
-        "leg":    ["instrument", "side", "orderType", "qty", "limitPrice", "stopPrice", "slPrice", "takeProfit"],
+        "leg":    ["symbol", "side", "orderType", "qty", "limitPrice", "stopPrice", "slPrice", "takeProfit"],
         "maxLegs": 5
     }
 }

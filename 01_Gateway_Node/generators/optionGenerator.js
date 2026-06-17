@@ -1,7 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { makeOptionSymbolString, makeOptionInstrument } from './symbology.js';
-import getDateTime from '../timers/atomicClock.js';
+import { makeOptionSymbolString } from './symbology.js';
 import { safeRead, safeWrite } from '../helpers/fs.helper.js';
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
@@ -17,29 +16,6 @@ function snapToATM(spot, gap) {
     return Math.round(spot / gap) * gap;
 }
 
-/**
- * Builds the option universe for one expiry around ATM.
- *
- * @param {number} spotPrice                - current live spot (e.g. 24350)
- * @param {object} config                   - initial configuration Object
- * @param {string} config.exchange          - "NSE" | "BSE" | "MCX"
- * @param {string} config.underlying        - "NIFTY" | "BANKNIFTY" | "SENSEX" | "BANKEX"
- * @param {number} config.year              - last two digits e.g. 26
- * @param {number} config.month             - 1-12
- * @param {number} config.day               - expiry day (ignored if monthly)
- * @param {boolean} config.isMonthly        - true for monthly expiry
- * @param {number} config.visibility        - strikes on each side of ATM e.g. 4
- *
- * @returns {{ atm: number, map: Map<number,string>, instruments: number[], symbols: string[] }}
- */
-
-const indexAssigns = {
-    'NIFTY': 1,
-    'BANKNIFTY': 2,
-    'SENSEX': 3,
-    "BANKEX": 4
-}
-
 function buildOptionSymbols(spotPrice) {
     const { exchange, underlying, visibility, activeExpiry, expiries } = config;
 
@@ -52,9 +28,7 @@ function buildOptionSymbols(spotPrice) {
     const atm = snapToATM(spotPrice, gap);
     const low = atm - visibility * gap;
     const total = visibility * 2 + 1;
-
-    /** @type {Map<number, string>} */
-    const map = new Map();
+    const symbols = [];
 
     let uStr;
     switch (underlying) {
@@ -69,8 +43,7 @@ function buildOptionSymbols(spotPrice) {
             break;
     }
     const index = `${exchange}:${uStr}-INDEX`;
-
-    map.set(indexAssigns[underlying], index);
+    symbols.push(index);
 
     for (let i = 0; i < total; i++) {
         const strike = low + i * gap;
@@ -87,12 +60,12 @@ function buildOptionSymbols(spotPrice) {
                 isMonthly: active.isMonthly,
             };
 
-            const instrument = makeOptionInstrument(params);
             const symbol = makeOptionSymbolString(params);
-            map.set(instrument, symbol);
+            symbols.push(symbol);
         }
     }
-    return { atm, map };
+
+    return { atm, symbols };
 }
 
 function computeExpiryTimeStamp() {
