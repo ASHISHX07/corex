@@ -19,7 +19,7 @@ const indicsSymbolToPos   = new Map();  // index symbol  → indics slot
 const optionsSymbolToPos  = new Map();  // option symbol → options slot
 // freePositions acts as a LIFO stack — slot layout in SHM is not strike-ordered.
 // C++ side must always read the symbol field to identify slot contents.
-const freePositions       = [];         // LIFO stack of free option slots
+const freePositions       = [];         // LIFO stack of free option slots.
 // const encoder             = new TextEncoder();
 
 const indicsCount  = 1;
@@ -39,7 +39,7 @@ function initShm() {
 
     // Write controller header
     ctrlView[OFF.CONTROLLER.systemStatus                / 4] = 0;   // not read yet
-    ctrlView[OFF.CONTROLLER.IndicsCount                 / 4] = indicsCount;
+    ctrlView[OFF.CONTROLLER.IndicesCount                / 4] = indicsCount;
     ctrlView[OFF.CONTROLLER.OptionsCount                / 4] = optionsCount;
     ctrlView[OFF.CONTROLLER.tbtSocketSymbolCount        / 4] = 0;
     ctrlView[OFF.CONTROLLER.apiSymbolCount              / 4] = 0;
@@ -211,4 +211,9 @@ function _writeOptionPoll(row) {
     v.setFloat64(base + O.vega,             g.vega               ?? 0, true);
 }
 
-export { initShm, setReady, applySymbols, onSocketTick, onPollData };
+function closeProcess() {
+    if (!ctrlView) return;
+    ctrlView[OFF.CONTROLLER.systemStatus  / 4] = 0;
+}
+
+export { initShm, setReady, applySymbols, onSocketTick, onPollData, closeProcess };

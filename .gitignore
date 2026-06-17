@@ -13,6 +13,7 @@ cache/
 runtime/
 systemLogs/
 
+shm-buffer.hpp
 logs
 .env
 CmakeUserPresets.json

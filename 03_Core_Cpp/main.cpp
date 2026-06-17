@@ -17,7 +17,7 @@ void onSignal(int) {
 
 void PrintIndex(int slot, const IndicsHeader& idx) {
     std::cout << "\n[INDEX #" << slot << "]"
-              << "\n instrument         : " << std::fixed << std::setprecision(0) << idx.instrument
+              << "\n instrument         : " << std::fixed << std::setprecision(0) << idx.symbol
               << "\n ltp                : " << std::fixed << std::setprecision(2) << idx.ltp
               << "\n open               : " << std::fixed << std::setprecision(2) << idx.open
               << "\n high               : " << std::fixed << std::setprecision(2) << idx.high
@@ -38,7 +38,7 @@ void PrintIndex(int slot, const IndicsHeader& idx) {
 
 void printOptions(int slot, const OptionsHeader& opt) {
     std::cout << "\n[OPTION #" << slot << "]"
-              << "\n instrument         : " << std::fixed << std::setprecision(0) << opt.instrument
+              << "\n instrument         : " << std::fixed << std::setprecision(0) << opt.symbol
               << "\n cp                 : " << std::fixed << std::setprecision(2) << opt.cp
               << "\n ltp                : " << std::fixed << std::setprecision(2) << opt.ltp
               << "\n ch                 : " << std::fixed << std::setprecision(2) << opt.ch
