@@ -31,7 +31,7 @@ function gracefulShutdown() {
 
 // Launcher writes Data/stop.flag → we pick it up here
 const _stopWatcher = setInterval(() => {
-    if (fs.existsSync(STOP_FLAG)) gracefulShutdown();
+    if (_shuttingDown) gracefulShutdown();
 }, 500);
 
 // Also handle direct Ctrl+C when running Node standalone (not via launcher)
