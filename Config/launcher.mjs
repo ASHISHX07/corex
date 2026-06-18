@@ -12,12 +12,13 @@ const PY_SRC    = path.resolve(__dirname, '../02_Strategies_Python/example.py');
 const procs = [];
 let stopping = false;
 
-function launch(label, cmd, args) {
+function launch(label, cmd, args, { ignorecleanExit = false } = {}) {
     console.log(`[LAUNCHER] Starting ${label}...`);
     const p = spawn(cmd, args, { stdio: 'inherit', shell: false });
 
     p.on('exit', (code) => {
         console.log(`[LAUNCHER] ${label} exited (code ${code})`);
+        if (ignorecleanExit && code === 0) return;  // ← Python done, not a crash
         if (!stopping) stopAll();
     });
     procs.push({ label, p });
@@ -41,7 +42,7 @@ console.log('[LAUNCHER] Waiting 3s for Node to create SHM...');
 await new Promise(r => setTimeout(r, 3000));
 
 launch('C++ Core', CPP_EXE, []);
-launch('Python', 'python', [PY_SRC]);
+launch('Python', 'python', [PY_SRC], { ignorecleanExit: true });
 
 // ── Ctrl+C handler ────────────────────────────────────────────────────────────
 process.on('SIGINT',  stopAll);
