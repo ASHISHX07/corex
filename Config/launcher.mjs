@@ -1,36 +1,50 @@
 import { spawn } from "child_process";
-import path from "path";
-import { fileURLToPath } from "url";
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// executables paths
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const cppExe = path.resolve(__dirname, '../03_Core_Cpp/out/build/gcc-ninja/main.exe');
-const pySrc = path.resolve(__dirname, '../02_Strategies_Python/example.py');
-const nodeGateway = path.resolve(__dirname, '../01_Gateway_Node/index.js');
 
-console.log(`[LAUNCHER] Starting....`);
+const NODE_CMD  = process.execPath;
+const NODE_ARGS = ['--experimental-vm-modules', path.resolve(__dirname, '../01_Gateway_Node/index.js')];
+const CPP_EXE   = path.resolve(__dirname, '../03_Core_Cpp/out/build/debug/main.exe');
+const PY_SRC    = path.resolve(__dirname, '../02_Strategies_Python/example.py');
 
-// 1. Start Node.js FIRST
-console.log(`[LAUNCHER] -----> Launching Node Gateway...`);
-const nodeProcess = spawn('node', [nodeGateway], { stdio: 'inherit' });
-console.log(`[LAUNCHER] -----> Launching Python Layer....`);
-const pyProcess = spawn('python', [pySrc], {stdio: 'inherit'});
-// 2. Wait 3 seconds for Node to create memory, then start C++
-setTimeout(() => {
-    console.log(`[LAUNCHER] Launching C++ Core (Worker)...`);
-    const cppProcess = spawn(cppExe, [], { stdio: 'inherit' });
-    
-    // Optional: Launch Python here too
-    // const pyProcess = spawn('python', [pySrc], { stdio: 'inherit' });
+const procs = [];
+let stopping = false;
 
-    // Handle Cleanup
-    nodeProcess.on('close', (code) => {
-        console.log(`[LAUNCHER] Node exited (${code}).`);
-        cppProcess.kill();
-        pyProcess.kill();
-        process.exit(code);
+function launch(label, cmd, args) {
+    console.log(`[LAUNCHER] Starting ${label}...`);
+    const p = spawn(cmd, args, { stdio: 'inherit', shell: false });
+
+    p.on('exit', (code) => {
+        console.log(`[LAUNCHER] ${label} exited (code ${code})`);
+        if (!stopping) stopAll();
     });
+    procs.push({ label, p });
+    return p;
+}
 
-}, 3000); // 3 Second Warmup
+function stopAll() {
+    if (stopping) return;
+    stopping = true;
+    console.log('\n[LAUNCHER] Shutting down all processes...');
+    for (const { label, p } of procs) {
+        console.log(`[LAUNCHER] SIGTERM -> ${label}`);
+        p.kill('SIGTERM');
+    }
+    setTimeout(() => process.exit(0), 2000);    // force-exit after 2s if anything hangs
+}
 
+// ── Launch sequence ───────────────────────────────────────────────────────────
+launch('Node Gateway', NODE_CMD, NODE_ARGS);
+console.log('[LAUNCHER] Waiting 3s for Node to create SHM...');
+await new Promise(r => setTimeout(r, 3000));
 
+launch('C++ Core', CPP_EXE, []);
+launch('Python', 'python', [PY_SRC]);
+
+// ── Ctrl+C handler ────────────────────────────────────────────────────────────
+process.on('SIGINT',  stopAll);
+process.on('SIGTERM', stopAll);
+
+console.log('[LAUNCHER] All process running.\nPress Ctrl+C to stop');

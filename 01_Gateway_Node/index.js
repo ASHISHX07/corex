@@ -9,6 +9,7 @@ import { optionAndIndicsStream } from "./streams/optionChain.stream.js";
 import expiryGuard from "./timers/expiryGuard.js";
 import { initShm, setReady } from "./shm/shmWriter.js";
 import { initReader, startSignalWatch } from "./shm/shmReader.js";
+import { closeProcess } from "./shm/shmWriter.js";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,7 +39,21 @@ optionAndIndicsStream({
 
 setTimeout(setReady, 2000);
 
+let close = false;
 
+async function shutdown(signal) {
+    if (close) return;
+    close = true;
+    console.log(`\n[NODE] ${signal} received - shutting down...`);
+    closeProcess();     // sets systemStatus = 0 in SHM
+    // give streams ~500ms to flush their last tick before exit
+    await new Promise(r => setTimeout(r, 500));
+    console.log('[NODE] Shutdown complete.');
+    process.exit(0);
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM',() => shutdown('SIGTERM')); 
 
 
 
