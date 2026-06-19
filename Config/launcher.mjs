@@ -13,7 +13,7 @@ const procs = [];
 let stop = false;
 
 function Launch(label, cmd, args, { ignoreCleanExit = false } = {}) {
-    console.log(`[LAUNCHER] Starting....`);
+    console.log(`[LAUNCHER] Starting ${label}....`);
     const p = spawn(cmd, args, {stdio: 'inherit', shell: false});
 
     p.on('exit', (code) => {

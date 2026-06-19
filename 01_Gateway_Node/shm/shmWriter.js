@@ -178,6 +178,7 @@ function _writeOptionSocket(symbol, p) {
     const v    = optionsDV;
     const O    = OFF.OPTIONS;
 
+    v.setFloat64(base + O.cp,               (p.symbol.includes('CE')) ? 1 : 2 ?? 0, true);
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
     v.setFloat64(base + O.ch,               p.ch                 ?? 0, true);
     v.setFloat64(base + O.chp,              p.chp                ?? 0, true);

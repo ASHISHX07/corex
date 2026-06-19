@@ -59,10 +59,10 @@ void printOptions(int slot, const OptionsHeader& opt) {
               << "\n upperCkt           : " << std::fixed << std::setprecision(2) << opt.upperCkt
               << "\n lowerCkt           : " << std::fixed << std::setprecision(2) << opt.lowerCkt
               << "\n iv                 : " << std::fixed << std::setprecision(2) << opt.iv
-              << "\n delta              : " << std::fixed << std::setprecision(2) << opt.delta
-              << "\n theta              : " << std::fixed << std::setprecision(2) << opt.theta
-              << "\n gamma              : " << std::fixed << std::setprecision(2) << opt.gamma
-              << "\n vega               : " << std::fixed << std::setprecision(2) << opt.vega
+              << "\n delta              : " << std::fixed << std::setprecision(4) << opt.delta
+              << "\n theta              : " << std::fixed << std::setprecision(4) << opt.theta
+              << "\n gamma              : " << std::fixed << std::setprecision(4) << opt.gamma
+              << "\n vega               : " << std::fixed << std::setprecision(4) << opt.vega
               << "\n exchFeedTime       : " << std::fixed << std::setprecision(0) << opt.exchFeedTime
               << "\n signal             : " << std::fixed << std::setprecision(0) << opt.signal
               << std::endl;
@@ -118,8 +118,6 @@ void watchOptions(const ShmMem& mem) {
 int main() {
     std::signal(SIGINT, onSignal);
     std::signal(SIGTERM, onSignal);
-
-    std::cout << "[CORE] starting diagnostic mode." << std::endl;
 
     ShmMem mem;
     mem.connectController();
