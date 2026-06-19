@@ -13,7 +13,6 @@ const procs = [];
 let stop = false;
 
 function Launch(label, cmd, args, { ignoreCleanExit = false } = {}) {
-    console.log(`[LAUNCHER] Starting ${label}....`);
     const p = spawn(cmd, args, {stdio: 'inherit', shell: false});
 
     p.on('exit', (code) => {
@@ -30,7 +29,6 @@ function stopAll() {
     stop = true;
     console.log('\n[LAUNCHER] Shutting down all processes...');
     for (const { label, p } of procs) {
-        console.log(`[LAUNCHER] Shutting down ${label}`);
         p.kill('SIGTERM');
     }
     setTimeout(() => process.exit(0), 2000);
@@ -38,7 +36,6 @@ function stopAll() {
 
 // ── Launch sequence ───────────────────────────────────────────────────────────
 Launch('Node Gateway', NODE_CMD, NODE_ARGS);
-console.log('[LAUNCHER] Waiting 3s for Node to create SHM...');
 await new Promise(r => setTimeout(r, 3000))
 
 Launch('C++ Core', CPP_EXE, []);

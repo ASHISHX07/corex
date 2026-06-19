@@ -67,6 +67,8 @@ function applySymbols(symbols) {
     // Recycle departed option slots
     for (const [sym, pos] of optionsSymbolToPos) {
         if (!newOptionSyms.has(sym)) {
+            const base = pos * OFF.OPTIONS.__bytesPerSlot;
+            new Uint8Array(optionsDV.buffer, optionsDV.byteOffset + base, OFF.OPTIONS.__bytesPerSlot).fill(0);
             freePositions.push(pos);
             optionsSymbolToPos.delete(sym);
         }
@@ -108,9 +110,6 @@ function _writeSymbol(symbol, pos, isIndex) {
     for (let i = 0; i < 32; i++) {
         dv.setUint8(base + i, encoded[i] ?? 0);
     }
-    // const buf       = new Uint8Array(dv.buffer, dv.byteOffset + base + symOff, 32);
-    // buf.fill(0);
-    // encoder.encodeInto(symbol, buf);
 }
 
 // ── onSocketTick — called from optionChain.stream.js ──────────────────────────
@@ -178,7 +177,7 @@ function _writeOptionSocket(symbol, p) {
     const v    = optionsDV;
     const O    = OFF.OPTIONS;
 
-    v.setFloat64(base + O.cp,               (p.symbol.includes('CE')) ? 1 : 2 ?? 0, true);
+    v.setFloat64(base + O.cp,               (p.symbol.includes('CE') ? 1 : 2) ?? 0, true);
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
     v.setFloat64(base + O.ch,               p.ch                 ?? 0, true);
     v.setFloat64(base + O.chp,              p.chp                ?? 0, true);
