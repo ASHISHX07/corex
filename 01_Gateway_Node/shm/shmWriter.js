@@ -7,6 +7,7 @@ import { config } from "../helpers/loader.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require   = createRequire(import.meta.url);
 const bridge    = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
+let OFF = null;  // loaded lazily inside initShm()
 
 // ── Buffers & Views ───────────────────────────────────────────────────────────
 let ctrlView  = null;   // Int32Array  — controller fields (int32, 4 bytes each)
@@ -26,8 +27,8 @@ const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initShm() {
+    OFF = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
     
-    const OFF       = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
     const ctrlBuf    = bridge.getControllerBuffer();
     const indicsBuf  = bridge.getIndicsDataBuffer(indicsCount * OFF.INDICS.__bytesPerSlot);
     const optionsBuf = bridge.getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);

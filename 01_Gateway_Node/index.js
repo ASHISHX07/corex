@@ -15,9 +15,30 @@ import { closeProcess } from "./shm/shmWriter.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const APP_ID = process.env.FYERS_APP_ID;
+const APP_ID    = process.env.FYERS_APP_ID;
+const STOP_FLAG = path.resolve(__dirname, '../Data/stop.flag');
 
-// make buffer headers first
+// ── Graceful shutdown ─────────────────────────────────────────────────────────
+let _shuttingDown = false;
+function gracefulShutdown() {
+    if (_shuttingDown) return;
+    _shuttingDown = true;
+    console.log('[NODE] Shutting down — setting systemStatus = 0...');
+    closeProcess();                        // signals C++ Core to exit cleanly
+    if (fs.existsSync(STOP_FLAG)) fs.unlinkSync(STOP_FLAG);
+    setTimeout(() => process.exit(0), 1000);
+}
+
+// Launcher writes Data/stop.flag → we pick it up here
+const _stopWatcher = setInterval(() => {
+    if (_shuttingDown) gracefulShutdown();
+}, 500);
+
+// Also handle direct Ctrl+C when running Node standalone (not via launcher)
+process.on('SIGINT',  gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
 await expiryGuard();
 headerGenerator();
 initShm();
