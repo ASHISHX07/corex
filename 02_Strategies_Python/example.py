@@ -1,8 +1,10 @@
-# import pandas as pd
+import signal, sys
 
-# a = pd.DataFrame()
+def handle(sig, frame):
+    sys.exit(0)
 
-# print(dir(a))
-
-x = "Hellow there from python side"
+x = "Hello there from python side"
 print(x)
+
+signal.signal(signal.SIGINT, handle)
+signal.signal(signal.SIGTERM, handle)
