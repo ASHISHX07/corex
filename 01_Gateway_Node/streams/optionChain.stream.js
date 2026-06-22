@@ -55,7 +55,7 @@ function optionAndIndicsStream({app_id, access_token, initialSpot, litemode, log
             const isIndex = packet.type === 'if';
             if (isIndex) reCenter(packet.ltp)
             onSocketTick(isIndex, packet.symbol, packet);
-            console.log(message);
+            // console.log(message);
         }
     });
 

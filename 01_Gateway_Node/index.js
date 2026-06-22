@@ -44,11 +44,9 @@ let close = false;
 async function shutdown(signal) {
     if (close) return;
     close = true;
-    console.log(`\n[NODE] ${signal} received - shutting down...`);
     closeProcess();     // sets systemStatus = 0 in SHM
     // give streams ~500ms to flush their last tick before exit
     await new Promise(r => setTimeout(r, 500));
-    console.log('[NODE] Shutdown complete.');
     process.exit(0);
 }
 

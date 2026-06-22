@@ -48,7 +48,6 @@ public:
                 _shm_ctrl = std::make_unique<shared_memory_object>(open_only, "CONTROLLER_MEM", read_only);
                 _reg_ctrl = std::make_unique<mapped_region>(*_shm_ctrl, read_only);
                 ctrl      = static_cast<const ControllerHeader*>(_reg_ctrl->get_address());
-                std::cout << "[CORE] Controller attached." << std::endl;
                 return;
             }
             catch (...) {
@@ -65,7 +64,6 @@ public:
         }
         n_indices = ctrl->IndicesCount;
         n_options = ctrl->OptionsCount;
-        std::cout << "[CORE] Ready. Indices: " << n_indices << " | Options: " << n_options << std::endl;
     }
 
     // ── connect indices + options data segments ─────────────
@@ -78,8 +76,6 @@ public:
             _shm_options    = std::make_unique<shared_memory_object>(open_only, "OPTIONS_DATA_MEM", read_only);
             _reg_options    = std::make_unique<mapped_region>(*_shm_options, read_only);
             options         = static_cast<const OptionsHeader*>(_reg_options->get_address());
-
-            std::cout << "[CORE] Data segments attached." << std::endl;
         }
         catch (const std::exception& e) {
             std::cerr << "[CORE] ERROR: connectDataSegments: " << e.what() << std::endl;
@@ -93,8 +89,6 @@ public:
             _shm_order = std::make_unique<shared_memory_object>(open_only, "ORDER_MEM", read_write);
             _reg_order = std::make_unique<mapped_region>(*_shm_order, read_write);
             order      = static_cast<OrderHeader*>(_reg_order->get_address());
-
-            std::cout << "[CORE] Order segment attached." << std::endl;
         }
         catch (const std::exception& e) {
             std::cerr << "[CORE] ERROR connectOrderSegment: " << e.what() << std::endl;
@@ -104,8 +98,6 @@ public:
 
     // ── Cleanup ─────────────────────────────────────────────
     ~ShmMem() = default;
-
     ShmMem(const ShmMem&)            = delete;
     ShmMem& operator=(const ShmMem&) = delete;
-
 };

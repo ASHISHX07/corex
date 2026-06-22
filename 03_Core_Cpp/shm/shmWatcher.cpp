@@ -106,7 +106,6 @@ void watchIndex(const ShmMem& mem) {
 }
 
 void watchOptions(const ShmMem& mem) {
-    // const int previewSlots = std::min(mem.n_options, 3);
     while (running) {
         for (int i = 0; i < mem.n_options; i++) {
             printOptions(i, mem.options[i]);
