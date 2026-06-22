@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <csignal>
-#include "headers/shmReader.hpp"
+#include "headers/shmManager.hpp"
 #include "headers/shmWatcher.hpp"
 
 int main() {
