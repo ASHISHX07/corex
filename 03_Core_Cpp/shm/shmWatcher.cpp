@@ -101,7 +101,7 @@ void watchIndex(const ShmMem& mem) {
         for (int i = 0; i < mem.n_indices; i++) {
             PrintIndex(i, mem.indices[i]);
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 
@@ -110,6 +110,6 @@ void watchOptions(const ShmMem& mem) {
         for (int i = 0; i < mem.n_options; i++) {
             printOptions(i, mem.options[i]);
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
