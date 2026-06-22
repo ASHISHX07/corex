@@ -1,4 +1,8 @@
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function startAuthServer(port = 3000) {
 
@@ -16,23 +20,20 @@ export function startAuthServer(port = 3000) {
             const authCode = req.query.auth_code;
             const status = req.query.s;
 
+            res.sendFile(path.join(__dirname, '../others/auth-status.html'));
+
             if(!authCode || status !== 'ok') {
                 clearTimeout(timeout);
-
-                res.status(400).send(`
-                    <h2>Auth Failed</h2>
-                    <p>No auth code received or login was cancelled.</p>    
-                `);
                 server.close();
                 return reject(new Error(`[AUTH] Redirect received but no valid auth code. status=${status}`));
             }
 
             clearTimeout(timeout);
 
-            res.send(`
-                <h2>Login sucessful</h2>    
-                <p>Auth code received. you can close this tab.</p>
-            `);
+            // res.send(`
+            //     <h2>Login sucessful</h2>    
+            //     <p>Auth code received. you can close this tab.</p>
+            // `);
 
             server.close(() => {
                 resolve(authCode);

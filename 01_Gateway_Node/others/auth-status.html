@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corex | Auth</title>
+    <style>
+        :root {
+            --bg-body: #030712;
+            --bg-card: #111827;
+            --border-card: #1f2937;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+
+            --success-color: #34d399;
+            --success-bg: rgba(52, 211, 153, 0.1);
+            
+            --error-color: #fb7185;
+            --error-bg: rgba(251, 113, 133, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-self: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            max-width: 28rem;
+            width: 100%;
+            text-align: center;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .card.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 5rem;
+            width: 5rem;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .message {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .action-hint {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+        }
+
+        .theme-success .icon-container {
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .theme-success .title { color: var(--success-color); }
+        .theme-success .action-hint {
+            color: var(--success-color);
+            background-color: var(--success-bg);
+        }
+
+        .theme-error .icon-container {
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            .theme-error .action-hint {
+                color: var(--error-color);
+                background-color: var(--error-bg);
+            }
+
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: .5; }
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Card container -->
+    <div id="status-card" class="card">
+        <div id="icon-container" class="icon-container">
+            <!-- SVG injected here by JS -->
+        </div>
+
+        <h2 id="status-title" class="title">Authenticating...</h2>
+        <p id="status-message" class="message">Please wait while we verify your session.</p>
+
+        <div id="action-hint" class="action-hint">
+            Processing...
+        </div>
+    </div>
+
+    <script>
+        // Inline SVG
+        const Icons = {
+            success: `<svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`,
+            error: `<svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`
+        }
+
+        const card = document.getElementById('status-card');
+        const iconContainer = document.getElementById('icon-container');
+        const title = document.getElementById('status-title');
+        const message = document.getElementById('status-message');
+        const actionHint = document.getElementById('action-hint');
+
+        // Check URL parameters provided by FYERS
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('s');
+        const authCode = urlParams.get('auth_code');
+
+        setTimeout(() => {
+            if (status === 'ok' && authCode) {
+                // SUCCESS STATE
+                card.classList.add('theme-success');
+                iconContainer.innerHTML = Icons.success;
+                title.textContent = "Authentication Successful";
+                message.textContent = "COREX has securely received your session token. Your terminal is now connected to the live market.";
+                actionHint.textContent = "You can safely close this browser tab.";
+            } else {
+                // ERROR STATE
+                card.classList.add('theme-error');
+                iconContainer.innerHTML = Icons.error;
+                title.textContent = "Authentication Failed";
+                message.textContent = "We could not verify the login. You may have cancelled the request or the token expired.";
+                actionHint.textContent = "Please check your terminal for error logs.";
+            }
+
+            card.classList.add('visible');
+        }, 50);
+    </script>
+
+</body>
+</html>
