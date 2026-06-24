@@ -90,11 +90,10 @@ void watchController(const ShmMem& mem) {
         }
         // If Node sets systemStatus = 0 → it's shutting down, follow it
         if (wasReady && mem.ctrl->systemStatus == 0) {
-            std::cout << "[CORE] Node signalled shutdown." << std::endl;
             running = false;
             return;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 

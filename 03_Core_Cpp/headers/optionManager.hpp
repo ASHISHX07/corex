@@ -13,7 +13,6 @@ public:
     explicit OptionManager(const ShmMem& mem) : _mem { mem } {}
 
     // ── Index ────────────────────────────────────────────
-    const IndicsHeader& getIndex(int slot = 0) const;
     double getSpotPrice() const;
     double getFuturesPrice() const;
 

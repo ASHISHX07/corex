@@ -2,23 +2,24 @@
 #include <cmath>
 #include <algorithm>
 
-double OptionManager::getSpotPrice() const {
-    return _mem.indices[0].ltp;
+double OptionManager::getSpotPrice(const int& slot) const {
+    return _mem.indices[slot].ltp;
 }
 
-double OptionManager::getFuturesPrice() const {
-    return _mem.indices[0]fp;
+double OptionManager::getFuturesPrice(const int& slot) const {
+    return _mem.indices[slot].fp;
 }
 
-int OptionManager::getAtmStrike() const {
-    double spot = getSpotPrice();
-    return static_cast<int>(std::round(spot / 50.0) * 50);
+int OptionManager::getAtmStrike(const int& slot, const bool& isNifty = true) const {
+    double spot = getSpotPrice(slot);
+    double divisor { isNifty ? 50.0 : 100.0 } 
+    return static_cast<int>(std::round(spot / divisor) * divisor);
 }
 
 const OptionsHeader* OptionManager::getOption(int strike, const std::string& type) const {
     for (int i = 0; i < _mem.n_options; i++) {
         const auto& opt = _mem.options[i];
-        bool isCall = (opt.cp == 1.0);
+        bool isCall = (static_cast<int>(opt.cp) == 1.0);
         bool matchType = (type == 'CE') ? isCall : !isCall;
         if (matchType && static_cast<int>(opt.strike_price) == strike)
         return &opt;

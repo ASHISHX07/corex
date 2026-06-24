@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 project(main)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -15,7 +15,10 @@ find_package(Boost QUIET)
 set(SOURCE_FILES
     main.cpp
     shm/shmWatcher.cpp
+    managers/optionManager.cpp
 )
+
+# file(GLOB_RECURSE MANAGER_SOURCES CONFIGURE_DEPENDS "managers/*.cpp")
 
 # file(GLOB SOURCE_FILES 
 #     "*.cpp"
@@ -39,3 +42,5 @@ target_include_directories(main PRIVATE
     ${BOOST_ROOT}
     ${Boost_INCLUDE_DIRS}
 )
+
+# add_subdirectory(shm)
