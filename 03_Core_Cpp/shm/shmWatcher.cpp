@@ -29,6 +29,8 @@ void PrintIndex(int slot, const IndicsHeader& idx) {
               << "\n fp                 : " << std::fixed << std::setprecision(2) << idx.fp
               << "\n fpch               : " << std::fixed << std::setprecision(2) << idx.fpch
               << "\n fpchp              : " << std::fixed << std::setprecision(2) << idx.fpchp
+              << "\n tCallOi            : " << std::fixed << std::setprecision(0) << idx.tCallOi
+              << "\n tPutOi             : " << std::fixed << std::setprecision(0) << idx.tPutOi
               << "\n iVix               : " << std::fixed << std::setprecision(2) << idx.iVixLtp
               << "\n iVixCh             : " << std::fixed << std::setprecision(2) << idx.iVixCh
               << "\n iVixChp            : " << std::fixed << std::setprecision(2) << idx.iVixChp

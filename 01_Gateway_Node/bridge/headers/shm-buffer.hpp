@@ -30,6 +30,8 @@ struct IndicsHeader {
   double fp{};
   double fpch{};
   double fpchp{};
+  double tCallOi{};
+  double tPutOi{};
   double iVixLtp{};
   double iVixCh{};
   double iVixChp{};

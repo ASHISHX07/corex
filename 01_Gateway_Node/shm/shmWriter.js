@@ -122,6 +122,12 @@ function onSocketTick(isIndex, symbol, packet) {
 function onPollData(data) {
     if (data.indiavixData) _writeIndicsVix(data.indiavixData);
 
+    if (data.callOi !== undefined || data.putOi !== undefined) {
+        const base = 0;
+        indicsDV.setFloat64(base + OFF.INDICS.tCallOi, data.callOi ?? 0, true);
+        indicsDV.setFloat64(base + OFF.INDICS.tPutOi, data.putOi ?? 0, true);
+    }
+
     for (const row of data.optionsChain) {
         if (row.strike_price === -1) { _writeIndicsFromPoll(row); continue; }
         _writeOptionPoll(row);

@@ -52,9 +52,8 @@ async function optionPoll(appId, accessToken, apiManagerInstance, interval = 500
             });
 
             if (result.code == 200) {
-                // console.log(result.data);
                 onPollData(result.data);
-                // console.log((result.data));
+                console.log((result.data));
                 return result.data;
             }
             else {

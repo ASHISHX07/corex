@@ -1,7 +1,7 @@
 {
     "CONTROLLER": [ "systemStatus", "IndicesCount", "OptionsCount", "tbtSocketSymbolCount", "apiSymbolCount", "signal", "action" ],
 
-    "INDICS": [ "symbol", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
+    "INDICS": [ "symbol", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "tCallOi", "tPutOi", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
     
     "OPTIONS": [ "symbol", "cp", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
 
