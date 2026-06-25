@@ -15,7 +15,7 @@ find_package(Boost QUIET)
 set(SOURCE_FILES
     main.cpp
     shm/shmWatcher.cpp
-    managers/optionManager.cpp
+    # managers/optionManager.cpp
 )
 
 # file(GLOB_RECURSE MANAGER_SOURCES CONFIGURE_DEPENDS "managers/*.cpp")

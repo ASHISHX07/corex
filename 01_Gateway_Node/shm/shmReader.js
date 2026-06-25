@@ -56,7 +56,7 @@ function _checkController() {
     const signal = ctrlView[OFF.CONTROLLER.signal / 4];
     if (signal !== 0 && signal !== lastCtrlSignal) {
         lastCtrlSignal = signal;
-        console.log(`[SHM] controller signal ${signal}`);
+        // console.log(`[SHM] controller signal ${signal}`);
         ctrlView[OFF.CONTROLLER.action / 4] = signal;
     }
 }
@@ -68,7 +68,7 @@ function _checkIndics() {
         if (signal !== 0 && signal !== lastIndicsSignal[i]) {
             lastIndicsSignal[i] = signal;
             const instrument = indicsDV.getFloat64(base + OFF.INDICS.instrument, true);
-            console.log(`[SHM] INDICS slot ${i} (instrument ${instrument}) signal ${signal}`);
+            // console.log(`[SHM] INDICS slot ${i} (instrument ${instrument}) signal ${signal}`);
             indicsDV.setInt32(base + OFF.INDICS.action, signal, true);
         }
     }
@@ -81,7 +81,7 @@ function _checkOptions() {
         if (signal !== 0 && signal !== lastOptionSignal[i]) {
             lastOptionSignal[i] = signal;
             const instrument = optionsDV.getFloat64(base + OFF.OPTIONS.instrument, true);
-            console.log(`[SHM] OPTIONS slot ${i} (instrument ${instrument}) signal ${signal}`);
+            // console.log(`[SHM] OPTIONS slot ${i} (instrument ${instrument}) signal ${signal}`);
             optionsDV.setInt32(base + OFF.OPTIONS.action, signal, true);
         }
     }

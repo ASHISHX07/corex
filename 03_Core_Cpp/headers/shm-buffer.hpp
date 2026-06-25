@@ -42,6 +42,7 @@ struct IndicsHeader {
 struct OptionsHeader {
   char symbol[32]{};
   double cp{};
+  double strike{};
   double ltp{};
   double ch{};
   double chp{};

@@ -2,7 +2,7 @@
     "exchange": "NSE",
     "underlying": "NIFTY",
     "spotPrice": 23200,
-    "visibility": 6,
+    "visibility": 4,
     "activeExpiry": 0,
     "expiries": [
         {

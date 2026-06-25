@@ -44,10 +44,11 @@ void printOptions(int slot, const OptionsHeader& opt) {
     std::cout << "\n[OPTION #" << slot << "]"
               << "\n instrument         : " << std::fixed << std::setprecision(0) << opt.symbol
               << "\n cp                 : " << std::fixed << std::setprecision(2) << opt.cp
+              << "\n strike             : " << std::fixed << std::setprecision(0) << opt.strike
               << "\n ltp                : " << std::fixed << std::setprecision(2) << opt.ltp
               << "\n ch                 : " << std::fixed << std::setprecision(2) << opt.ch
               << "\n chp                : " << std::fixed << std::setprecision(2) << opt.chp
-              << "\n volume             : " << std::fixed << std::setprecision(2) << opt.volume
+              << "\n volume             : " << std::fixed << std::setprecision(0) << opt.volume
               << "\n oi                 : " << std::fixed << std::setprecision(0) << opt.oi
               << "\n chngInOi           : " << std::fixed << std::setprecision(0) << opt.chngInOi
               << "\n prevOi             : " << std::fixed << std::setprecision(0) << opt.prevOi

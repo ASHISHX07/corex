@@ -82,6 +82,10 @@ function applySymbols(symbols) {
                 console.error(`[SHM] No free slot for ${sym}`);
                 return;
             }
+            // Zero the slot before use — prevents stale/garbage memory reads on C++ side
+            const base = pos * OFF.OPTIONS.__bytesPerSlot;
+            new Uint8Array(optionsDV.buffer, optionsDV.byteOffset + base, OFF.OPTIONS.__bytesPerSlot).fill(0);
+
             optionsSymbolToPos.set(sym, pos);
             _writeSymbol(sym, pos, false);
         }
@@ -209,9 +213,11 @@ function _writeOptionPoll(row) {
     const O    = OFF.OPTIONS
     const g    = row.greeks ?? {};
 
+    v.setFloat64(base + O.strike,           row.strike_price     ?? 0, true);
     v.setFloat64(base + O.oi,               row.oi               ?? 0, true);
     v.setFloat64(base + O.chngInOi,         row.oich             ?? 0, true);
     v.setFloat64(base + O.prevOi,           row.prev_oi          ?? 0, true);
+    v.setFloat64(base + O.iv,               row.iv               ?? 0, true);
     v.setFloat64(base + O.delta,            g.delta              ?? 0, true);
     v.setFloat64(base + O.theta,            g.theta              ?? 0, true);
     v.setFloat64(base + O.gamma,            g.gamma              ?? 0, true);
