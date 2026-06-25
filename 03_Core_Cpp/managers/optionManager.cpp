@@ -12,7 +12,7 @@ double OptionManager::getFuturesPrice(const int& slot) const {
 
 int OptionManager::getAtmStrike(const int& slot, const bool& isNifty = true) const {
     double spot = getSpotPrice(slot);
-    double divisor { isNifty ? 50.0 : 100.0 } 
+    double divisor { isNifty ? 50.0 : 100.0 };
     return static_cast<int>(std::round(spot / divisor) * divisor);
 }
 
@@ -20,8 +20,8 @@ const OptionsHeader* OptionManager::getOption(int strike, const std::string& typ
     for (int i = 0; i < _mem.n_options; i++) {
         const auto& opt = _mem.options[i];
         bool isCall = (static_cast<int>(opt.cp) == 1.0);
-        bool matchType = (type == 'CE') ? isCall : !isCall;
-        if (matchType && static_cast<int>(opt.strike_price) == strike)
+        bool matchType = (type == "CE") ? isCall : !isCall;
+        if (matchType && static_cast<int>(opt.strike) == strike)
         return &opt;
     }
     return nullptr;

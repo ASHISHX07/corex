@@ -4,15 +4,20 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
+#include <condition_variable>
 #include "shmWatcher.hpp"
 #include "shm-buffer.hpp"
 
 std::atomic<bool> running { true };
 static std::mutex g_consoleMutex;
+static std::mutex g_shutDownCvMtx{};
+static std::condition_variable g_shutDownCv{};
+static volatile sig_atomic_t g_signalReceived { 0 };
 
 void onSignal(int) {
-    std::cout << "\n[CORE] Shutting down..." << std::endl;
+    g_signalReceived = 1;
     running = false;
+    g_shutDownCv.notify_all();
 }
 
 void PrintIndex(int slot, const IndicsHeader& idx) {
@@ -84,17 +89,19 @@ void printController(const ControllerHeader& ctrl) {
 void watchController(const ShmMem& mem) {
     bool wasReady { false };
 
-    while (running) {
+    while (g_signalReceived) {
+        std::cout << "\n[CORE] Shutting Down..." << std::endl;
+        const volatile int status = mem.ctrl->systemStatus;
         printController(*mem.ctrl);
-        if (mem.ctrl->systemStatus == 1) {
-            wasReady = true;     // Node is up and running
-        }
+        if (status == 1) wasReady = true;     // Node is up and running
         // If Node sets systemStatus = 0 → it's shutting down, follow it
-        if (wasReady && mem.ctrl->systemStatus == 0) {
+        if (wasReady && status == 0) {
             running = false;
             return;
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::unique_lock lk(g_shutDownCvMtx);
+        g_shutDownCv.wait_for(lk, std::chrono::seconds(1), []{ return !running.load(); });
+        if (!running) return;
     }
 }
 
@@ -103,15 +110,20 @@ void watchIndex(const ShmMem& mem) {
         for (int i = 0; i < mem.n_indices; i++) {
             PrintIndex(i, mem.indices[i]);
         }
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::unique_lock lk(g_shutDownCvMtx);
+        g_shutDownCv.wait_for(lk, std::chrono::seconds(1), []{ return !running.load(); });
+        if (!running) return;
     }
 }
 
 void watchOptions(const ShmMem& mem) {
     while (running) {
         for (int i = 0; i < mem.n_options; i++) {
+            if (mem.options[i].symbol[0] == '\0') continue;
             printOptions(i, mem.options[i]);
         }
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::unique_lock lk(g_shutDownCvMtx);
+        g_shutDownCv.wait_for(lk, std::chrono::seconds(1), []{ return !running.load(); });
+        if (!running) return;
     }
 }

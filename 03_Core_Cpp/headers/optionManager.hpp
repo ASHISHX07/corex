@@ -13,11 +13,11 @@ public:
     explicit OptionManager(const ShmMem& mem) : _mem { mem } {}
 
     // ── Index ────────────────────────────────────────────
-    double getSpotPrice() const;
-    double getFuturesPrice() const;
+    double getSpotPrice(const int& slot) const;
+    double getFuturesPrice(const int& slot) const;
 
     // ── Strike lookup ────────────────────────────────────
-    int getAtmStrike() const;     // nearest strike to spot
+    int getAtmStrike(const int& slot, const bool& isNifty = true) const;     // nearest strike to spot
     const OptionsHeader* getOption(int strike, const std::string& type) const;  // CE or PE
     std::pair<const OptionsHeader*, const OptionsHeader*> getPair(int strike) const; // CE + PE
 
