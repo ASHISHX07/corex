@@ -41,8 +41,8 @@ public:
     int n_options { 0 };
 
     // ── connect to controller, retry until Node creates it ──
-    void connectController() {
-        std::cout << "[CORE] Waiting for Controller..." << std::endl;
+    void connectController(const int timeout = 30) {
+        auto deadline { std::chrono::steady_clock::now() + std::chrono::seconds(timeout) };
         while (true) {
             try {
                 _shm_ctrl = std::make_unique<shared_memory_object>(open_only, "CONTROLLER_MEM", read_only);
@@ -50,16 +50,33 @@ public:
                 ctrl      = static_cast<const ControllerHeader*>(_reg_ctrl->get_address());
                 return;
             }
-            catch (...) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            catch (const interprocess_exception& e) {
+                // Expected: SHM not created yet — keep waiting
             }
+            catch (const std::exception& e) {
+                std::cerr << "[CORE] FETAL: unexpected error: " << e.what() << '\n';
+                std::exit(1);
+            }
+            if (std::chrono::steady_clock::now() > deadline) {
+                std::cerr << "[CORE] FETAL: CONTROLLER_MEM never appeared. Is Node running?\n";
+                std::exit(1);
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
     }
 
     // ── block until Node sets systemStatus = 1 (ready) ──────
-    void waitForReady() {
+    void waitForReady(const int timeout = 30) {
         std::cout << "[CORE] Waiting for Node..." << std::endl;
-        while (ctrl->systemStatus != 1) {
+        auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
+        while (true) {
+            // volatile read prevents compiler caching
+            int status { *reinterpret_cast<volatile const int*>(&ctrl->systemStatus) };
+            if (status == 1) break;
+            if (std::chrono::steady_clock::now() > deadline) {
+                std::cerr << "[CORE] FETAL: Node did not become ready in " << timeout << "s. Aborting...\n";
+                std::exit(1);
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         n_indices = ctrl->IndicesCount;
@@ -94,6 +111,13 @@ public:
             std::cerr << "[CORE] ERROR connectOrderSegment: " << e.what() << std::endl;
             exit(1);
         }
+    }
+
+    void writeOrder(const OrderHeader& o) {
+        assert(order != nullptr && "[CORE] Order segment not attached");
+        // Validate before committing
+        assert(o.leg0_qty > 0 && "[CORE] Order has zero quantity");
+        *order = o;
     }
 
     // ── Cleanup ─────────────────────────────────────────────

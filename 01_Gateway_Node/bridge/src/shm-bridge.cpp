@@ -38,11 +38,14 @@ static Napi::Value openAndMap(
 ) {
     try {
         if (!shm) {
-            shm = std::make_unique<shared_memory_object>(open_or_create, name.c_str(), read_write);
+            shared_memory_object::remove(name.c_str());     // clear any leftover from previous run
+            shm = std::make_unique<shared_memory_object>(create_only, name.c_str(), read_write);
             shm->truncate(size);
         }
         if (!region) {
             region = std::make_unique<mapped_region>(*shm, read_write);
+            // Zero the entire region on fresh create - no garbage bytes
+            std::memset(region->get_address(), 0, size);
         }
         return Napi::Buffer<std::uint8_t>::New(
             env,

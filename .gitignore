@@ -13,7 +13,8 @@ cache/
 runtime/
 systemLogs/
 
-shm-buffer.hpp
+01_Gateway_Node/bridge/headers/shm-buffer.hpp
+03_Core_Cpp/headers/shm-buffer.hpp
 logs
 .env
 CmakeUserPresets.json

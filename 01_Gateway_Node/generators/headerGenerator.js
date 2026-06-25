@@ -158,6 +158,25 @@ function headerGenerator() {
             allOffsets[key] = flatOffsets;
         }
     }
+
+    hpp += `\n// Layout size constants - verified against struct sizes at compile time\n`;
+    hpp += `// If you see a static_assert failure, re-run headerGenerator.js and rebuild.\n`;
+
+    const sizeMap = {
+        CONTROLLER: 'ControllerHeader',
+        INDICS:     'IndicsHeader',
+        OPTIONS:    'OptionsHeader',
+        ORDER:      'OrderHeader',
+    };
+
+    for (const [key, structName] of Object.entries(sizeMap)) {
+        const bytes = allOffsets[key]?.__bytesPerSlot;
+        if (bytes !== undefined) {
+            hpp += `static_assert(sizeof(${structName}) == ${bytes},\n`;
+            hpp += `    "Layout mismatch: ${structName} - re-run headerGenerator.js and rebuild");\n`;
+        }
+    }
+
     hpp += `#endif // BUFFER_HEADERS_H`;
 
     safeWrite(nodeBufferHeader, hpp);
