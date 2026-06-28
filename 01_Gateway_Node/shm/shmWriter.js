@@ -6,8 +6,16 @@ import { config } from "../helpers/loader.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require   = createRequire(import.meta.url);
-const bridge    = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
-let OFF = null;  // loaded lazily inside initShm()
+
+let OFF         = null;  // loaded lazily inside initShm()
+let _bridge     = null;  // loaded lazily inside getBridge()
+
+function getBridge() {
+    if (!_bridge) {
+        _bridge = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
+    }
+    return _bridge;
+}
 
 // ── Buffers & Views ───────────────────────────────────────────────────────────
 let ctrlView  = null;   // Int32Array  — controller fields (int32, 4 bytes each)
@@ -27,12 +35,23 @@ const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initShm() {
+
+    // Friendly error instead of cryptic "cannot find module"
+    try {
+        getBridge();
+    }
+    catch (e) {
+        console.error('[SHM] shm_bridge.node not found.');
+        console.error('[SHM] Run "npm run bootstrap" first to generate headers and compile the bridge.');
+        process.exit(1);
+    }
+
     OFF = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
     
-    const ctrlBuf    = bridge.getControllerBuffer();
-    const indicsBuf  = bridge.getIndicsDataBuffer(indicsCount * OFF.INDICS.__bytesPerSlot);
-    const optionsBuf = bridge.getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);
-    bridge.getOrderBuffer(OFF.ORDER.__bytesPerSlot); // ← ensures ORDER_MEM segment exists before C++ opens it
+    const ctrlBuf    = getBridge().getControllerBuffer();
+    const indicsBuf  = getBridge().getIndicsDataBuffer(indicsCount * OFF.INDICS.__bytesPerSlot);
+    const optionsBuf = getBridge().getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);
+    getBridge().getOrderBuffer(OFF.ORDER.__bytesPerSlot); // ← ensures ORDER_MEM segment exists before C++ opens it
 
     ctrlView  = new Int32Array(ctrlBuf.buffer, ctrlBuf.byteOffset, OFF.CONTROLLER.__bytesPerSlot / 4);
     indicsDV  = new DataView(indicsBuf.buffer, indicsBuf.byteOffset);
@@ -187,21 +206,21 @@ function _writeOptionSocket(symbol, p) {
     const v    = optionsDV;
     const O    = OFF.OPTIONS;
 
-    v.setFloat64(base + O.cp,               (p.symbol.includes('CE') ? 1 : 2) ?? 0, true);
-    v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
-    v.setFloat64(base + O.ch,               p.ch                 ?? 0, true);
-    v.setFloat64(base + O.chp,              p.chp                ?? 0, true);
-    v.setFloat64(base + O.volume,           p.vol_traded_today   ?? 0, true);
-    v.setFloat64(base + O.totBuyQty,        p.tot_buy_qty        ?? 0, true);
-    v.setFloat64(base + O.totSellQty,       p.tot_sell_qty       ?? 0, true);
-    v.setFloat64(base + O.avgTradePrice,    p.avg_trade_price    ?? 0, true);
-    v.setFloat64(base + O.high,             p.high_price         ?? 0, true);
-    v.setFloat64(base + O.low,              p.low_price          ?? 0, true);
-    v.setFloat64(base + O.open,             p.open_price         ?? 0, true);
-    v.setFloat64(base + O.prevClose,        p.prev_close_price   ?? 0, true);
-    v.setFloat64(base + O.upperCkt,         p.upper_ckt          ?? 0, true);
-    v.setFloat64(base + O.lowerCkt,         p.lower_ckt          ?? 0, true);
-    v.setFloat64(base + O.exchFeedTime,     p.exch_feed_time     ?? 0, true);
+    v.setInt32(base    + O.cp, (p.symbol.includes('CE') ? 1 : 2) ?? 0, true);
+    v.setFloat64(base  + O.ltp,              p.ltp                       ?? 0,  true);
+    v.setFloat64(base  + O.ch,               p.ch                        ?? 0,  true);
+    v.setFloat64(base  + O.chp,              p.chp                       ?? 0,  true);
+    v.setBigInt64(base + O.volume,           BigInt(p.vol_traded_today   ?? 0), true);
+    v.setBigInt64(base + O.totBuyQty,        BigInt(p.tot_buy_qty        ?? 0), true);
+    v.setBigInt64(base + O.totSellQty,       BigInt(p.tot_sell_qty       ?? 0), true);
+    v.setFloat64(base  + O.avgTradePrice,    p.avg_trade_price           ?? 0,  true);
+    v.setFloat64(base  + O.high,             p.high_price                ?? 0,  true);
+    v.setFloat64(base  + O.low,              p.low_price                 ?? 0,  true);
+    v.setFloat64(base  + O.open,             p.open_price                ?? 0,  true);
+    v.setFloat64(base  + O.prevClose,        p.prev_close_price          ?? 0,  true);
+    v.setFloat64(base  + O.upperCkt,         p.upper_ckt                 ?? 0,  true);
+    v.setFloat64(base  + O.lowerCkt,         p.lower_ckt                 ?? 0,  true);
+    v.setBigInt64(base + O.exchFeedTime,     BigInt(p.exch_feed_time     ?? 0), true);
 }
 
 function _writeOptionPoll(row) {
@@ -213,15 +232,15 @@ function _writeOptionPoll(row) {
     const O    = OFF.OPTIONS
     const g    = row.greeks ?? {};
 
-    v.setFloat64(base + O.strike,           row.strike_price     ?? 0, true);
-    v.setFloat64(base + O.oi,               row.oi               ?? 0, true);
-    v.setFloat64(base + O.chngInOi,         row.oich             ?? 0, true);
-    v.setFloat64(base + O.prevOi,           row.prev_oi          ?? 0, true);
-    v.setFloat64(base + O.iv,               row.iv               ?? 0, true);
-    v.setFloat64(base + O.delta,            g.delta              ?? 0, true);
-    v.setFloat64(base + O.theta,            g.theta              ?? 0, true);
-    v.setFloat64(base + O.gamma,            g.gamma              ?? 0, true);
-    v.setFloat64(base + O.vega,             g.vega               ?? 0, true);
+    v.setInt32(    base + O.strike,            row.strike_price     ?? 0, true);
+    v.setBigInt64( base + O.oi,                BigInt(row.oi)       ?? 0, true);
+    v.setBigInt64( base + O.chngInOi,          BigInt(row.oich)     ?? 0, true);
+    v.setBigInt64( base + O.prevOi,            BigInt(row.prev_oi)  ?? 0, true);
+    v.setFloat64(  base + O.iv,                row.iv               ?? 0, true);
+    v.setFloat64(  base + O.delta,             g.delta              ?? 0, true);
+    v.setFloat64(  base + O.theta,             g.theta              ?? 0, true);
+    v.setFloat64(  base + O.gamma,             g.gamma              ?? 0, true);
+    v.setFloat64(  base + O.vega,              g.vega               ?? 0, true);
 }
 
 function closeProcess() {

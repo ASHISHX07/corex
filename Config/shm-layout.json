@@ -1,22 +1,110 @@
 {
-    "CONTROLLER": [ "systemStatus", "IndicesCount", "OptionsCount", "tbtSocketSymbolCount", "apiSymbolCount", "signal", "action" ],
+    "CONTROLLER": {
+        "fields": [
+            [ "systemStatus",           "int32_t" ],
+            [ "IndicesCount",           "int32_t" ],
+            [ "OptionsCount",           "int32_t" ],
+            [ "tbtSocketSymbolCount",   "int32_t" ],
+            [ "apiSymbolCount",         "int32_t" ],
+            [ "signal",                 "int32_t" ],
+            [ "action",                 "int32_t" ]
+        ]
+    },
 
-    "INDICS": [ "symbol", "ltp", "exchFeedTime", "high", "low", "open", "prevClose", "ch", "chp", "fp", "fpch", "fpchp", "tCallOi", "tPutOi", "iVixLtp", "iVixCh", "iVixChp", "signal", "action" ],
+    "INDICS": {
+        "fields": [
+            [ "symbol",                 "char32"  ],
+            [ "ltp",                    "double"  ],
+            [ "exchFeedTime",           "int64_t" ],
+            [ "high",                   "double"  ],
+            [ "low",                    "double"  ],
+            [ "open",                   "double"  ],
+            [ "prevClose",              "double"  ],
+            [ "ch",                     "double"  ],
+            [ "chp",                    "double"  ],
+            [ "fp",                     "double"  ],
+            [ "fpch",                   "double"  ],
+            [ "fpchp",                  "double"  ],
+            [ "tCallOi",                "int64_t" ],
+            [ "tPutOi",                 "int64_t" ],
+            [ "iVixLtp",                "double"  ],
+            [ "iVixCh",                 "double"  ],
+            [ "iVixChp",                "double"  ],
+            [ "signal",                 "int32_t" ],
+            [ "action",                 "int32_t" ]
+        ]   
+    },
+
+    "OPTIONS": {
+        "fields": [
+            [ "symbol",                 "char32"  ],
+            [ "cp",                     "int32_t" ],
+            [ "strike",                 "int32_t" ],
+            [ "ltp",                    "double"  ],
+            [ "ch",                     "double"  ],
+            [ "chp",                    "double"  ],
+            [ "volume",                 "int64_t" ],
+            [ "oi",                     "int64_t" ],
+            [ "chngInOi",               "int64_t" ],
+            [ "prevOi",                 "int64_t" ],
+            [ "totBuyQty",              "int64_t" ],
+            [ "totSellQty",             "int64_t" ],
+            [ "avgTradePrice",          "double"  ],
+            [ "high",                   "double"  ],
+            [ "low",                    "double"  ],
+            [ "open",                   "double"  ],
+            [ "prevClose",              "double"  ],
+            [ "upperCkt",               "double"  ],
+            [ "lowerCkt",               "double"  ],
+            [ "iv",                     "double"  ],
+            [ "delta",                  "double"  ],
+            [ "theta",                  "double"  ],
+            [ "gamma",                  "double"  ],
+            [ "vega",                   "double"  ],
+            [ "exchFeedTime",           "int64_t" ],
+            [ "signal",                 "int32_t" ],
+            [ "action",                 "int32_t" ]
+        ]
+    },
     
-    "OPTIONS": [ "symbol", "cp", "strike", "ltp", "ch", "chp", "volume", "oi", "chngInOi", "prevOi", "totBuyQty", "totSellQty", "avgTradePrice", "high", "low", "open", "prevClose", "upperCkt", "lowerCkt", "iv", "delta", "theta", "gamma", "vega", "exchFeedTime", "signal", "action" ],
-
     "TBTDEPTHDATA": {
         "slots": 5,
-        "symbol": "symbol",
-        "double_array": { "bidPrice": 50, "askPrice": 50 },
-        "int64": [ "tbq", "tsq", "timestamp", "sendtime" ],
-        "int32": [ "active", "seqNo", "signal", "action" ],
-        "int32_array": { "bidqty": 50, "askqty": 50, "bidord": 50, "askord": 50 }
+        "fields": [
+            [ "symbols",                "char32"  ],
+            [ "bidPrice",               "double", 50 ],
+            [ "askPrice",               "double", 50 ],
+            [ "tbq",                    "int64_t" ],
+            [ "tsq",                    "int64_t" ],
+            [ "timestamp",              "int64_t" ],
+            [ "sendtime",               "int64_t" ],
+            [ "active",                 "int32_t" ],
+            [ "seqNo",                  "int32_t" ],
+            [ "signal",                 "int32_t" ],
+            [ "action",                 "int32_t" ],
+            [ "bidqty",                 "int32_t", 50 ],
+            [ "askqty",                 "int32_t", 50 ],
+            [ "bidord",                 "int32_t", 50 ],
+            [ "askord",                 "int32_t", 50 ]
+        ]
     },
 
     "ORDER": {
-        "header": ["count", "strategyId", "timestamp", "status"],
-        "leg":    ["symbol", "side", "orderType", "qty", "limitPrice", "stopPrice", "slPrice", "takeProfit"],
+        "header": [
+            [ "count",                  "int32_t" ],
+            [ "strategyId",             "int32_t" ],
+            [ "timestamp",              "int32_t" ],
+            [ "status",                 "int32_t" ]
+        ],
+        "leg": [
+            [ "symbol",                 "char32"  ],
+            [ "side",                   "int32_t" ],
+            [ "orderType",              "int32_t" ],
+            [ "qty",                    "int32_t" ],
+            [ "limitPrice",             "double"  ],
+            [ "stopPrice",              "double"  ],
+            [ "slPrice",                "double"  ],
+            [ "takeProfit",             "double"  ]
+        ],
         "maxLegs": 5
     }
 }

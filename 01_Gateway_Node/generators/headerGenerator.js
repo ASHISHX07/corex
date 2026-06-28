@@ -11,172 +11,85 @@ const cppBufferHeader   = path.join(__dirname, '../../03_Core_Cpp/headers/shm-bu
 
 const layout = JSON.parse(safeRead(layoutPath));
 
-function isOrderSection(section) {
-    return !Array.isArray(section) && section.header && section.leg;
+// char32 is the only special token — everything else is a literal C++ type name.
+const BYTE_SIZE = { double: 8, int64_t: 8, int32_t: 4, char32: 32 };
+
+function fieldLine(name, type, count = 1) {
+    if (type === 'char32') return `    char ${name}[32]{};\n`;
+    if (count > 1)         return `    std::array<${type}, ${count}> ${name}{};\n`;
+    return                        `    ${type} ${name}{};\n`;
 }
 
-function isStructured(section) {
-    return !Array.isArray(section);
+function fieldSize(type, count = 1) {
+    const b = BYTE_SIZE[type];
+    if (b === undefined) throw new Error(`[NODE] Unknown type: "${type}"`);
+    return b * count;
 }
 
-function buildOrderStruct(name, section) {
-    const structName = name.charAt(0) + name.slice(1).toLowerCase();
-    let cpp = `struct ${structName}Header {\n`;
-    section.header.forEach(f => { cpp += `  double ${f}{};\n`; });
-    for (let i = 0; i < section.maxLegs; i++) {
-        section.leg.forEach(f => {
-            if (f === 'symbol') cpp += `  char leg${i}_symbol[32]{};\n`;
-            else                cpp += `  double leg${i}_${f}{};\n`;
-        });
-    }
-    cpp += `};\n\n`;
-    return cpp;
-}
-
-// Flat section ( CONTROLLER, INDICES, OPTIONS )
-function buildFlatStruct(name, fields) {
-    const type = (name === 'CONTROLLER') ? 'int' : 'double';
-    const structName = name.charAt(0) + name.slice(1).toLowerCase();
-    let cpp = `struct ${structName}Header {\n`;
-    fields.forEach(f => {
-        if (f === 'symbol') cpp += `  char symbol[32]{};\n`;
-        else                cpp += `  ${type} ${f}{};\n`;
-    });
-    cpp += `};\n\n`;
-    return cpp;
-}
-
-// Structured section ( TBTDEPTHDATA ) typed regions + array support
-function buildStructuredStruct(name, section) {
-    const structName = name.charAt(0) + name.slice(1).toLowerCase();
-    let cpp = `struct ${structName}Header {\n`;
-
-    if(section.symbol) cpp += `  char symbol[32]{};\n`;
-
-    if (section.double)
-        section.double.forEach(f => { cpp += `  double ${f}{};\n`; });
-
-    if (section.double_array)
-        Object.entries(section.double_array).forEach(([f, n]) => {
-            cpp += `  std::array<double, ${n}> ${f}{};\n`;
-        });
-
-    if (section.int64)
-        section.int64.forEach(f => { cpp += `  std::int64_t ${f}{};\n`; });
-
-    if (section.int32)
-        section.int32.forEach(f => { cpp += `  std::int32_t ${f}{};\n`; });
-
-    if (section.int32_array)
-        Object.entries(section.int32_array).forEach(([f, n]) => {
-            cpp += `  std::array<std::int32_t, ${n}> ${f}{};\n`;    
-        });
-
-    cpp += `};\n\n`;
-    return cpp;
-}
-
-// Compute byte offsets for every field in a structured section.
-// Returns { fieldName: byteOffset, ... } — also includes array base offsets.
-function computeOffsets(section) {
+function walkFields(fields) {
+    let cpp = '';
     const offsets = {};
     let byte = 0;
 
-    function add(name, byteSize, count = 1) {
+    for (const [name, type, count = 1] of fields) {
+        cpp += fieldLine(name, type, count);
         offsets[name] = byte;
-        byte += byteSize * count;
+        byte += fieldSize(type, count);
     }
-
-    if (section.symbol) add('symbol', 32);
-
-    (section.double     ?? []).forEach(f => add(f, 8));
-    Object.entries(section.double_array ?? {}).forEach(([f, n]) => add(f, 8, n));
-    (section.int64      ?? []).forEach(f => add(f, 8));
-    (section.int32      ?? []).forEach(f => add(f, 4));
-    Object.entries(section.int32_array ?? {}).forEach(([f, n]) => add(f, 4, n));
-
-    offsets.__bytesPerSlot = byte;
-    return offsets;
+    return { cpp, offsets, bytesPerSlot: byte };
 }
 
-// offset computer for ORDER
-function computeOrderOffsets(section) {
-    const offSets = {};
-    let byte = 0;
+function buildSection(key, section) {
+    const structName = `${key[0]}${key.slice(1).toLowerCase()}Header`;
+    const { cpp, offsets, bytesPerSlot } = walkFields(section.fields);
+    const allOffsets = { ...offsets, __bytesPerSlot: bytesPerSlot };
 
-    section.header.forEach(f => { offSets[f] = byte; byte += 8; });
+    if (section.slots) allOffsets.slots = section.slots;
+    return { cpp: `struct ${structName} {\n${cpp}};\n\n`, offsets: allOffsets, structName };
+}
 
-    for (let i = 0; i < section.maxLegs; i++) {
-        section.leg.forEach(f => {
-            offSets[`leg${i}_${f}`] = byte;
-            byte += (f === 'symbol') ? 32 : 8;
-        });
-    }
+function buildOrder(key, section) {
+    const structName = `${key[0]}${key.slice(1).toLowerCase()}Header`;
+    const legFields  = Array.from({ length: section.maxLegs }, (_, i) =>
+        section.leg.map(([name, type, count]) => [`leg${i}_${name}`, type, count])
+    ).flat();
 
-    offSets.__bytesPerSlot = byte;
-    offSets.__maxLegs = section.maxLegs;
-    return offSets;
+    const { cpp, offsets, bytesPerSlot } = walkFields([...section.header, ...legFields]);
+
+    return {
+        cpp: `struct ${structName} {\n${cpp}};\n\n`,
+        offsets: { ...offsets, __bytesPerSlot: bytesPerSlot, __maxLegs: section.maxLegs },
+        structName,
+    };
 }
 
 function headerGenerator() {
     let hpp = `// AUTO-GENERATED by headerGenerator.js - DO NOT EDIT\n`;
     hpp    += `// Source of truth: Config/shm-layout.json\n\n`;
     hpp    += `#ifndef BUFFER_HEADERS_H\n#define BUFFER_HEADERS_H\n\n`;
-    hpp    += `#include <cstdint>\n`;
-    hpp    += `#include <array>\n\n`;
+    hpp    += `#include <cstdint>\n#include <array>\n\n`;
+    hpp    += `#pragma pack(push, 1)\n\n`;
 
     const allOffsets = {};
+    const asserts    = [];
     
     for (const [key, section] of Object.entries(layout)) {
 
-        if (isOrderSection(section)) {
-            hpp += buildOrderStruct(key, section);
-            allOffsets[key] = computeOrderOffsets(section);
-        }
+        const { cpp, offsets, structName } = section.leg
+            ? buildOrder(key, section)
+            : buildSection(key, section);
 
-        else if(isStructured(section)) {
-            hpp += buildStructuredStruct(key, section);
-
-            allOffsets[key] = {
-                slots: section.slots ?? 1,
-                ...computeOffsets(section),
-            };
-        }
-        
-        else {
-            hpp += buildFlatStruct(key, section);
-
-            const byteSize = (key === 'CONTROLLER') ? 4 : 8;
-            const flatOffsets = {};
-            let byte = 0;
-            section.forEach(f => {
-                flatOffsets[f] = byte;
-                byte += (f === 'symbol') ? 32 : byteSize;
-            });
-            flatOffsets.__bytesPerSlot = byte;
-
-            allOffsets[key] = flatOffsets;
-        }
+        hpp += cpp;
+        allOffsets[key] = offsets;
+        asserts.push({ structName, bytes: offsets.__bytesPerSlot });
     }
 
-    hpp += `\n// Layout size constants - verified against struct sizes at compile time\n`;
-    hpp += `// If you see a static_assert failure, re-run headerGenerator.js and rebuild.\n`;
+    hpp += `#pragma pack(pop)\n\n`;
+    hpp += `// Layout size constants — re-run headerGenerator.js if any assert fails\n`;
 
-    const sizeMap = {
-        CONTROLLER: 'ControllerHeader',
-        INDICS:     'IndicsHeader',
-        OPTIONS:    'OptionsHeader',
-        ORDER:      'OrderHeader',
-    };
-
-    for (const [key, structName] of Object.entries(sizeMap)) {
-        const bytes = allOffsets[key]?.__bytesPerSlot;
-        if (bytes !== undefined) {
-            hpp += `static_assert(sizeof(${structName}) == ${bytes},\n`;
-            hpp += `    "Layout mismatch: ${structName} - re-run headerGenerator.js and rebuild");\n`;
-        }
+    for (const { structName, bytes } of asserts) {
+        hpp += `static_assert(sizeof(${structName}) == ${bytes},\n    "Layout mismatch: ${structName} - re-run headerGenerator.js and rebuild");\n`;
     }
-
     hpp += `#endif // BUFFER_HEADERS_H`;
 
     safeWrite(nodeBufferHeader, hpp);

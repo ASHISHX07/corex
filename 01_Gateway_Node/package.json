@@ -16,9 +16,10 @@
   "type"            : "module",
   "main"            : "index.js",
   "scripts": {
-    "build"         : "cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge  --preset default",
-    "build:release" : "cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge --preset=release",
-    "test"          : "node index.js"
+    "test"          : "node index.js",
+    "bootstrap"     : "node -e \"import('./generators/ensureBridge.js').then(m => m.default())\"",
+    "build"         : "npx cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc           --directory=bridge  --preset default",
+    "build:release" : "npx cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge --preset=release"
   },
   "dependencies": {
     "axios"         : "^1.17.0",

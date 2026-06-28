@@ -6,19 +6,24 @@ import { config } from "../helpers/loader.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require   = createRequire(import.meta.url);
-const bridge    = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
-const OFF       = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
+
+let _bridge   = null;  // loaded lazily inside getBridge()
+let OFF       = null;  // loaded lazily inside initReader()
+
+function getBridge() {
+    if (!_bridge) {
+        _bridge = require(path.join(__dirname, '../bridge/build/shm_bridge.node'));
+    }
+    return _bridge;
+}
 
 const indicesCount = config.INDICS?.length ?? 1;
 const optionsCount = (config.visibility * 2 + 1) * 2;
 
 // ── Views (shared with shmWriter via same bridge buffers) ─────────────────────
-let ctrlView  = null;
-let indicsDV  = null;
-let optionsDV = null;
-let orderDV   = null;
-
+let ctrlView = null, indicsDV = null, optionsDV = null, orderDV = null;
 let lastCtrlSignal = 0;
+
 const lastIndicsSignal = new Int32Array(indicesCount);
 const lastOptionSignal = new Int32Array(optionsCount);
 
@@ -26,10 +31,12 @@ let _onOrder = null;
 function setOrderHandler(fn) { _onOrder = fn; }
 
 function initReader() {
-    const ctrlBuf = bridge.getControllerBuffer();
-    const indicsBuf = bridge.getIndicsDataBuffer(indicesCount * OFF.INDICS.__bytesPerSlot);
-    const optionsBuf = bridge.getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);
-    const orderBuf = bridge.getOrderBuffer(OFF.ORDER.__bytesPerSlot);
+    OFF = JSON.parse(safeRead(path.resolve(__dirname, '../../runtime/shm-offsets.json')));
+
+    const ctrlBuf = getBridge().getControllerBuffer();
+    const indicsBuf = getBridge().getIndicsDataBuffer(indicesCount * OFF.INDICS.__bytesPerSlot);
+    const optionsBuf = getBridge().getOptionChainBuffer(optionsCount * OFF.OPTIONS.__bytesPerSlot);
+    const orderBuf = getBridge().getOrderBuffer(OFF.ORDER.__bytesPerSlot);
 
     ctrlView = new Int32Array(ctrlBuf.buffer, ctrlBuf.byteOffset, OFF.CONTROLLER.__bytesPerSlot / 4);
     indicsDV = new DataView(indicsBuf.buffer, indicsBuf.byteOffset);
@@ -54,9 +61,9 @@ function startSignalWatch(intervalMs = 50) {
 
 function _checkController() {
     const signal = ctrlView[OFF.CONTROLLER.signal / 4];
+
     if (signal !== 0 && signal !== lastCtrlSignal) {
         lastCtrlSignal = signal;
-        // console.log(`[SHM] controller signal ${signal}`);
         ctrlView[OFF.CONTROLLER.action / 4] = signal;
     }
 }
@@ -65,10 +72,10 @@ function _checkIndics() {
     for (let i = 0; i < indicesCount; i++) {
         const base = i * OFF.INDICS.__bytesPerSlot;
         const signal = indicsDV.getInt32(base + OFF.INDICS.signal, true);
+
         if (signal !== 0 && signal !== lastIndicsSignal[i]) {
             lastIndicsSignal[i] = signal;
-            const instrument = indicsDV.getFloat64(base + OFF.INDICS.instrument, true);
-            // console.log(`[SHM] INDICS slot ${i} (instrument ${instrument}) signal ${signal}`);
+            const symbol = _readString(indicsDV, base + OFF.INDICS.symbol, 32);
             indicsDV.setInt32(base + OFF.INDICS.action, signal, true);
         }
     }
@@ -80,8 +87,7 @@ function _checkOptions() {
         const signal = optionsDV.getInt32(base + OFF.OPTIONS.signal, true);
         if (signal !== 0 && signal !== lastOptionSignal[i]) {
             lastOptionSignal[i] = signal;
-            const instrument = optionsDV.getFloat64(base + OFF.OPTIONS.instrument, true);
-            // console.log(`[SHM] OPTIONS slot ${i} (instrument ${instrument}) signal ${signal}`);
+            const symbol = _readString(optionsDV, base + OFF.OPTIONS.symbol, 32);
             optionsDV.setInt32(base + OFF.OPTIONS.action, signal, true);
         }
     }
@@ -89,23 +95,25 @@ function _checkOptions() {
 
 function _checkOrder() {
     if (!orderDV) return;
+
     const O = OFF.ORDER;
-    const status = orderDV.getFloat64(O.status, true);
+    const status = orderDV.getInt32(O.status, true);
+
     if (status !== 1) return;
 
-    orderDV.setFloat64(O.status, 2, true);
+    orderDV.setInt32(O.status, 2, true);
 
-    const count         = orderDV.getFloat64(O.count, true);
-    const strategyId    = orderDV.getFloat64(O.strategyId, true);
-    const timestamp     = orderDV.getFloat64(O.timestamp, true);
+    const count         = orderDV.getInt32(O.count, true);
+    const strategyId    = orderDV.getInt32(O.strategyId, true);
+    const timestamp     = orderDV.getInt32(O.timestamp, true);
 
     const legs = [];
     for (let i = 0; i < Math.min(count, O.__maxLegs); i++) {
         legs.push({
-            instrument: orderDV.getFloat64(O[`leg${i}_instrument`], true),
-            side      : orderDV.getFloat64(O[`leg${i}_side  `],     true),
-            orderType : orderDV.getFloat64(O[`leg${i}_orderType`],  true),
-            qty       : orderDV.getFloat64(O[`leg${i}_qty`],        true),
+            symbol    : orderDV._readString(orderDV, O[`legs${i}_symbol`], 32),
+            side      : orderDV.getInt32(O[`leg${i}_side`],     true),
+            orderType : orderDV.getInt32(O[`leg${i}_orderType`],  true),
+            qty       : orderDV.getInt32(O[`leg${i}_qty`],        true),
             limitPrice: orderDV.getFloat64(O[`leg${i}_limitPrice`], true),
             stopPrice : orderDV.getFloat64(O[`leg${i}_stopPrice`],  true),
             slPrice   : orderDV.getFloat64(O[`leg${i}_slPrice`],    true),
@@ -120,6 +128,17 @@ function _checkOrder() {
             orderDV.setFloat64(O.status, result === 'ok' ? 3 : -1, true);
         });
     }
+}
+
+// ── Helper: read null-terminated string from DataView ─────────────────────────
+function _readString(dv, offset, maxLen) {
+    let str = '';
+    for (let i = 0; i < maxLen; i++) {
+        const byte = dv.getUint8(offset + i);
+        if (byte === 0) break;
+        str += String.fromCharCode(byte);
+    }
+    return str;
 }
 
 export { initReader, startSignalWatch, setOrderHandler };

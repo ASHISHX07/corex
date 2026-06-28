@@ -23,56 +23,56 @@ void onSignal(int) {
 void PrintIndex(int slot, const IndicsHeader& idx) {
     std::lock_guard<std::mutex> lock(g_consoleMutex);
     std::cout << "\n[INDEX #" << slot << "]"
-              << "\n instrument         : " << std::fixed << std::setprecision(0) << idx.symbol
-              << "\n ltp                : " << std::fixed << std::setprecision(2) << idx.ltp
-              << "\n open               : " << std::fixed << std::setprecision(2) << idx.open
-              << "\n high               : " << std::fixed << std::setprecision(2) << idx.high
-              << "\n low                : " << std::fixed << std::setprecision(2) << idx.low
-              << "\n close              : " << std::fixed << std::setprecision(2) << idx.prevClose
-              << "\n ch                 : " << std::fixed << std::setprecision(2) << idx.ch
-              << "\n chp                : " << std::fixed << std::setprecision(2) << idx.chp
-              << "\n fp                 : " << std::fixed << std::setprecision(2) << idx.fp
-              << "\n fpch               : " << std::fixed << std::setprecision(2) << idx.fpch
-              << "\n fpchp              : " << std::fixed << std::setprecision(2) << idx.fpchp
-              << "\n tCallOi            : " << std::fixed << std::setprecision(0) << idx.tCallOi
-              << "\n tPutOi             : " << std::fixed << std::setprecision(0) << idx.tPutOi
-              << "\n iVix               : " << std::fixed << std::setprecision(2) << idx.iVixLtp
-              << "\n iVixCh             : " << std::fixed << std::setprecision(2) << idx.iVixCh
-              << "\n iVixChp            : " << std::fixed << std::setprecision(2) << idx.iVixChp
-              << "\n exchFeedTime       : " << std::fixed << std::setprecision(0) << idx.exchFeedTime
-              << "\n signal             : " << std::fixed << std::setprecision(0) << idx.signal
+              << "\n instrument         : " << std::fixed << idx.symbol
+              << "\n ltp                : " << std::fixed << idx.ltp
+              << "\n open               : " << std::fixed << idx.open
+              << "\n high               : " << std::fixed << idx.high
+              << "\n low                : " << std::fixed << idx.low
+              << "\n close              : " << std::fixed << idx.prevClose
+              << "\n ch                 : " << std::fixed << idx.ch
+              << "\n chp                : " << std::fixed << idx.chp
+              << "\n fp                 : " << std::fixed << idx.fp
+              << "\n fpch               : " << std::fixed << idx.fpch
+              << "\n fpchp              : " << std::fixed << idx.fpchp
+              << "\n tCallOi            : " << std::fixed << idx.tCallOi
+              << "\n tPutOi             : " << std::fixed << idx.tPutOi
+              << "\n iVix               : " << std::fixed << idx.iVixLtp
+              << "\n iVixCh             : " << std::fixed << idx.iVixCh
+              << "\n iVixChp            : " << std::fixed << idx.iVixChp
+              << "\n exchFeedTime       : " << std::fixed << idx.exchFeedTime
+              << "\n signal             : " << std::fixed << idx.signal
               << std::endl;
 }
 
 void printOptions(int slot, const OptionsHeader& opt) {
     std::lock_guard<std::mutex> lock(g_consoleMutex);
     std::cout << "\n[OPTION #" << slot << "]"
-              << "\n instrument         : " << std::fixed << std::setprecision(0) << opt.symbol
-              << "\n cp                 : " << std::fixed << std::setprecision(2) << opt.cp
-              << "\n strike             : " << std::fixed << std::setprecision(0) << opt.strike
-              << "\n ltp                : " << std::fixed << std::setprecision(2) << opt.ltp
-              << "\n ch                 : " << std::fixed << std::setprecision(2) << opt.ch
-              << "\n chp                : " << std::fixed << std::setprecision(2) << opt.chp
-              << "\n volume             : " << std::fixed << std::setprecision(0) << opt.volume
-              << "\n oi                 : " << std::fixed << std::setprecision(0) << opt.oi
-              << "\n chngInOi           : " << std::fixed << std::setprecision(0) << opt.chngInOi
-              << "\n prevOi             : " << std::fixed << std::setprecision(0) << opt.prevOi
-              << "\n totBuyQty          : " << std::fixed << std::setprecision(2) << opt.totBuyQty
-              << "\n totSellQty         : " << std::fixed << std::setprecision(2) << opt.totSellQty
-              << "\n avgTradePrice      : " << std::fixed << std::setprecision(2) << opt.avgTradePrice
-              << "\n high               : " << std::fixed << std::setprecision(2) << opt.high
-              << "\n low                : " << std::fixed << std::setprecision(2) << opt.low
-              << "\n open               : " << std::fixed << std::setprecision(2) << opt.open
-              << "\n close              : " << std::fixed << std::setprecision(2) << opt.prevClose
-              << "\n upperCkt           : " << std::fixed << std::setprecision(2) << opt.upperCkt
-              << "\n lowerCkt           : " << std::fixed << std::setprecision(2) << opt.lowerCkt
-              << "\n iv                 : " << std::fixed << std::setprecision(2) << opt.iv
-              << "\n delta              : " << std::fixed << std::setprecision(4) << opt.delta
-              << "\n theta              : " << std::fixed << std::setprecision(4) << opt.theta
-              << "\n gamma              : " << std::fixed << std::setprecision(4) << opt.gamma
-              << "\n vega               : " << std::fixed << std::setprecision(4) << opt.vega
-              << "\n exchFeedTime       : " << std::fixed << std::setprecision(0) << opt.exchFeedTime
-              << "\n signal             : " << std::fixed << std::setprecision(0) << opt.signal
+              << "\n instrument         : " << std::fixed << opt.symbol
+              << "\n cp                 : " << std::fixed << opt.cp
+              << "\n strike             : " << std::fixed << opt.strike
+              << "\n ltp                : " << std::fixed << opt.ltp
+              << "\n ch                 : " << std::fixed << opt.ch
+              << "\n chp                : " << std::fixed << opt.chp
+              << "\n volume             : " << std::fixed << opt.volume
+              << "\n oi                 : " << std::fixed << opt.oi
+              << "\n chngInOi           : " << std::fixed << opt.chngInOi
+              << "\n prevOi             : " << std::fixed << opt.prevOi
+              << "\n totBuyQty          : " << std::fixed << opt.totBuyQty
+              << "\n totSellQty         : " << std::fixed << opt.totSellQty
+              << "\n avgTradePrice      : " << std::fixed << opt.avgTradePrice
+              << "\n high               : " << std::fixed << opt.high
+              << "\n low                : " << std::fixed << opt.low
+              << "\n open               : " << std::fixed << opt.open
+              << "\n close              : " << std::fixed << opt.prevClose
+              << "\n upperCkt           : " << std::fixed << opt.upperCkt
+              << "\n lowerCkt           : " << std::fixed << opt.lowerCkt
+              << "\n iv                 : " << std::fixed << opt.iv
+              << "\n delta              : " << std::fixed << opt.delta
+              << "\n theta              : " << std::fixed << opt.theta
+              << "\n gamma              : " << std::fixed << opt.gamma
+              << "\n vega               : " << std::fixed << opt.vega
+              << "\n exchFeedTime       : " << std::fixed << opt.exchFeedTime
+              << "\n signal             : " << std::fixed << opt.signal
               << std::endl;
 } 
 

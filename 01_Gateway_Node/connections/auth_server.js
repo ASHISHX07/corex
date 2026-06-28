@@ -30,18 +30,13 @@ export function startAuthServer(port = 3000) {
 
             clearTimeout(timeout);
 
-            // res.send(`
-            //     <h2>Login sucessful</h2>    
-            //     <p>Auth code received. you can close this tab.</p>
-            // `);
-
             server.close(() => {
                 resolve(authCode);
             });
         });
 
         server = app.listen(port, '127.0.0.1', () => {
-            console.log(`[AUTH] listening on https://127.0.0.1:${port}/callback`);
+            console.log(`[AUTH] listening on http://127.0.0.1:${port}/callback`);
         });
 
         server.on("error", (err) => {
