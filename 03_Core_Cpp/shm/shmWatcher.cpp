@@ -23,7 +23,7 @@ void onSignal(int) {
 
 void PrintIndex(int slot, const IndicsHeader& idx) {
     std::lock_guard<std::mutex> lock(g_consoleMutex);
-    std::cout << "\n[INDEX #" << slot << "]"
+    std::cout << "\n[INDEX #" << slot + 1 << "]"
               << "\n instrument         : " << std::fixed << idx.symbol
               << "\n ltp                : " << std::fixed << std::setprecision(2) << idx.ltp
               << "\n open               : " << std::fixed << std::setprecision(2) << idx.open
@@ -47,7 +47,7 @@ void PrintIndex(int slot, const IndicsHeader& idx) {
 
 void printOptions(int slot, const OptionsHeader& opt) {
     std::lock_guard<std::mutex> lock(g_consoleMutex);
-    std::cout << "\n[OPTION #" << slot << "]"
+    std::cout << "\n[OPTION #" << slot + 1 << "]"
               << "\n instrument         : " << std::fixed << opt.symbol
               << "\n cp                 : " << std::fixed << opt.cp
               << "\n strike             : " << std::fixed << std::setprecision(2) << opt.strike
@@ -72,7 +72,9 @@ void printOptions(int slot, const OptionsHeader& opt) {
               << "\n theta              : " << std::fixed << std::setprecision(3) << opt.theta
               << "\n gamma              : " << std::fixed << std::setprecision(3) << opt.gamma
               << "\n vega               : " << std::fixed << std::setprecision(3) << opt.vega
+              << "\n lastTradedQty      : " << std::fixed << opt.lastTradedQty
               << "\n exchFeedTime       : " << std::fixed << opt.exchFeedTime
+              << "\n lastTradedAt       : " << std::fixed << opt.lastTradedAt
               << "\n signal             : " << std::fixed << opt.signal
               << std::endl;
 } 

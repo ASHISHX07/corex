@@ -61,7 +61,9 @@
             [ "theta",                  "double"  ],
             [ "gamma",                  "double"  ],
             [ "vega",                   "double"  ],
+            [ "lastTradedQty",          "int64_t" ],
             [ "exchFeedTime",           "int64_t" ],
+            [ "lastTradedAt",           "int64_t" ],
             [ "signal",                 "int32_t" ],
             [ "action",                 "int32_t" ]
         ]
