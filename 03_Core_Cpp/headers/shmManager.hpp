@@ -9,6 +9,7 @@
 #include <thread>
 #include <chrono>
 #include <memory>
+#include <cstdint>
 #include "shm-buffer.hpp"
 
 using namespace boost::interprocess;
@@ -37,8 +38,8 @@ public:
     const OptionsHeader*     options    { nullptr };
     OrderHeader*             order      { nullptr };
 
-    int n_indices { 0 };
-    int n_options { 0 };
+    std::int32_t n_indices { 0 };
+    std::int32_t n_options { 0 };
 
     // ── connect to controller, retry until Node creates it ──
     void connectController(const int timeout = 30) {
@@ -66,7 +67,7 @@ public:
     }
 
     // ── block until Node sets systemStatus = 1 (ready) ──────
-    void waitForReady(const int timeout = 30) {
+    void waitForReady(const int timeout = 120) {
         std::cout << "[CORE] Waiting for Node..." << std::endl;
         auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
         while (true) {

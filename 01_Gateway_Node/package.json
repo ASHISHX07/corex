@@ -17,7 +17,7 @@
   "main"            : "index.js",
   "scripts": {
     "test"          : "node index.js",
-    "bootstrap"     : "node -e \"import('./generators/ensureBridge.js').then(m => m.default())\"",
+    "bootstrap"     : "node -e \"import('./helpers/ensureBridge.js').then(m => m.default())\"",
     "build"         : "npx cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc           --directory=bridge  --preset default",
     "build:release" : "npx cmake-js compile --generator \"Ninja\" --CDCmake_CXX_COMPILER=g++ --CDCmake_C_COMPILER=gcc --directory=bridge --preset=release"
   },

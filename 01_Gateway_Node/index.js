@@ -9,17 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Must run synchronously before any SHM import — generates headers + compiles if needed or not available
-if (ensureBridge()) {
-    // Bridge was just compiled — re-exec this file in-place.
-    // execFileSync replaces the current process synchronously,
-    // so launcher never sees an exit — it's seamless.
-    console.log('[BRIDGE] Restarting node process...');
-    execFileSync(process.execPath, process.argv.slice(1), {
-        stdio: 'inherit',
-        shell: false
-    });
-    process.exit(0);
-}
+ensureBridge();
 
 const { initShm, setReady, closeProcess } = await import('./shm/shmWriter.js');
 const { initReader, startSignalWatch }    = await import('./shm/shmReader.js');

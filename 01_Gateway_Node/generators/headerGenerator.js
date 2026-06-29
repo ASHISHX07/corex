@@ -16,7 +16,8 @@ const BYTE_SIZE = { double: 8, int64_t: 8, int32_t: 4, char32: 32 };
 
 function fieldLine(name, type, count = 1) {
     if (type === 'char32') return `    char ${name}[32]{};\n`;
-    if (count > 1)         return `    std::array<${type}, ${count}> ${name}{};\n`;
+    if (count > 1)         return `    std::array<${type.includes('_') ? 'std::' : ''}${type}, ${count}> ${name}{};\n`;
+    if (type.includes('_'))return `    std::${type} ${name}{};\n`;
     return                        `    ${type} ${name}{};\n`;
 }
 
