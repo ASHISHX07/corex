@@ -16,7 +16,6 @@ function Launch(label, cmd, args, { ignoreCleanExit = false } = {}) {
     const p = spawn(cmd, args, {stdio: 'inherit', shell: false});
 
     p.on('exit', (code) => {
-        console.log(`[LAUNCHER] ${label} exited (code ${code})`);
         if (ignoreCleanExit && code === 0) return;
         if (!stop) stopAll();
     });
@@ -27,7 +26,6 @@ function Launch(label, cmd, args, { ignoreCleanExit = false } = {}) {
 function stopAll() {
     if (stop) return;
     stop = true;
-    console.log('\n[LAUNCHER] Shutting down all processes...');
     for (const { label, p } of procs) {
         p.kill('SIGTERM');
     }

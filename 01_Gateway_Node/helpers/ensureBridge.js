@@ -29,7 +29,8 @@ export default function ensureBridge() {
             stdio: 'inherit',
             shell: true
         });
-        console.log('[BRIDGE] Compiled successfully.');
+        console.log('[BRIDGE] Compiled successfully please run again.');
+        process.exit(0);
     }
     catch (e) {
         console.error('[BRIDGE] Compilation Failed. Fix the error above and try again.');
