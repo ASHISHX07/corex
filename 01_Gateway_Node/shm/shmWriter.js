@@ -148,7 +148,7 @@ function onPollData(data) {
     if (data.callOi !== undefined || data.putOi !== undefined) {
         const base = 0;
         indicsDV.setBigInt64(base + OFF.INDICS.tCallOi, BigInt(data.callOi ?? 0), true);
-        indicsDV.setBigInt64(base + OFF.INDICS.tPutOi,  BigInt(data.putOi ?? 0), true);
+        indicsDV.setBigInt64(base + OFF.INDICS.tPutOi,  BigInt(data.putOi  ?? 0), true);
     }
 
     for (const row of data.optionsChain) {
@@ -167,7 +167,7 @@ function _writeIndicsSocket(symbol, p) {
     const O    = OFF.INDICS;
 
     v.setFloat64(base + O.ltp,              p.ltp                ?? 0, true);
-    v.setBigInt64(base+ O.exchFeedTime,     BigInt(p.exch_feed_time ?? 0), true);
+    v.setFloat64(base + O.exchFeedTime,     p.exch_feed_time     ?? 0, true);
     v.setFloat64(base + O.high,             p.high_price         ?? 0, true);
     v.setFloat64(base + O.low,              p.low_price          ?? 0, true);
     v.setFloat64(base + O.open,             p.open_price         ?? 0, true);
