@@ -47,6 +47,7 @@ async function shutdown(signal) {
     if (close) return;
     close = true;
     closeProcess();     // sets systemStatus = 0 in SHM
+    API.finish();
     // give streams ~500ms to flush their last tick before exit
     await new Promise(r => setTimeout(r, 500));
     process.exit(0);

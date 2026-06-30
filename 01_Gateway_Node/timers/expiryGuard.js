@@ -21,8 +21,8 @@ export default async function expiryGuard() {
 
     if (validIndices.length === config.expiries.length) return;
 
-    const expiredCount = config.expiries.length - validIndices.length;
-    config.activeExpiry = Math.max(0, config.activeExpiry - expiredCount);
+    const expiredCount      = config.expiries.length - validIndices.length;
+    config.activeExpiry     = Math.max(0, config.activeExpiry - expiredCount);
 
     config.expiries         = validIndices.map(i => config.expiries[i]);
     config.expiryTimeStamps = validIndices.map(i => config.expiryTimeStamps[i]);
