@@ -12,7 +12,7 @@ node_modules/
 cache/
 runtime/
 systemLogs/
-__pycache__
+__pycache__/
 
 01_Gateway_Node/bridge/headers/shm-buffer.hpp
 03_Core_Cpp/headers/shm-buffer.hpp

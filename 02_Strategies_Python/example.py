@@ -2,9 +2,11 @@ import signal, sys
 import time
 from shm import ShmReader
 
+reader = ShmReader()
+
 # Wait for Gateway Node to be ready
 print("Waiting for Gateway Node...")
-while not reader.is_ready():
+while not reader.isReady():
     time.sleep(0.1)
 print('Connected!')
 
@@ -27,6 +29,7 @@ for opt in calls[:3]:
     print(f"  {opt.symbol:30s} | Strike: {opt.strike:6d} | LTP: {opt.ltp:8.2f} | IV: {opt.iv:.4f}")
 
 def handle(sig, frame):
+    reader.close()
     sys.exit(0)
 
 x = "Hello there from python side"

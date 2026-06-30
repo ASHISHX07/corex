@@ -10,25 +10,31 @@ _OFFSETS_PATH = os.path.join(
 with open(_OFFSETS_PATH) as f:
     OFF = json.load(f)
 
-C = OFF[CONTROLLER]
-I = OFF[INDICS]
-O = OFF[OPTIONS]
+C = OFF['CONTROLLER']
+I = OFF['INDICS']
+O = OFF['OPTIONS']
 
 # Sanity-check format sizes match static_asserts
 _FMT_INDICS  = '<32sddddddddddqqddddii'
-_FMT_OPTIONS = '<32siiiddddqqqqqqdddddddddddqii'
+_FMT_OPTIONS = '<32siidddqqqqqqddddddddddddqdqii'
 
 assert struct.calcsize(_FMT_INDICS)  == I['__bytesPerSlot'], \
-    f"INDICS format mismatch: got {struct.calcsize(_FMT_OPTIONS)}, expected {I['__bytesPerSlot']}"
+    f"INDICS format mismatch: got {struct.calcsize(_FMT_INDICS)}, expected {I['__bytesPerSlot']}"
 assert struct.calcsize(_FMT_OPTIONS) == O['__bytesPerSlot'], \
-    f"OPTIONS formate mismatch: got {struct.calcsize(_FMT_OPTIONS)}, expected {I['__bytesPerSlot']}"
+    f"OPTIONS formate mismatch: got {struct.calcsize(_FMT_OPTIONS)}, expected {O['__bytesPerSlot']}"
 
 class ShmReader:
     def __init__(self):
         try:
+            # Controller is fixed size — always 28 bytes
             self._ctrl           = open_segment('CONTROLLER_MEM')
-            self._indics        = open_segment('INDICES_DATA_MEM')
-            self._options       = open_segment('OPTIONS_DATA_MEM')
+
+            # Read actual counts from controller before opening the other segments
+            n_indics,  = struct.unpack_from('<i', self._ctrl, C['IndicesCount'])
+            n_options, = struct.unpack_from('<i', self._ctrl, C['OptionsCount'])
+
+            self._indics  = open_segment('INDICES_DATA_MEM', I['__bytesPerSlot'] * max(n_indics, 1))
+            self._options = open_segment('OPTIONS_DATA_MEM', O['__bytesPerSlot'] * max(n_options, 1))
         except (FileNotFoundError, OSError) as e:
             raise RuntimeError(
                 f'[SHM-P] FATAL: Cannot Open segments: {e}\n'
@@ -49,7 +55,7 @@ class ShmReader:
 
     def get_index(self, slot: int = 0) -> IndexData:
         base = slot * I['__bytesPerSlot']
-        raw  = struct.unpack_from(_FMT_INDICS, self.indics, base)
+        raw  = struct.unpack_from(_FMT_INDICS, self._indics, base)
         sym  = raw[0].rstrip(b'\x00').decode('utf-8', errors = 'replace')
         return IndexData(sym, *raw[1:])
 
