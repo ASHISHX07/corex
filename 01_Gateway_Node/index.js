@@ -27,8 +27,8 @@ initShm();
 initReader();
 startSignalWatch(50);
 
-const API           = new apiManager();
 const access_token  = await ensureAccessToken();
+const API           = new apiManager();
 const liveSpot      = await optionPoll(APP_ID, access_token, API, 1000);
 
 optionAndIndicsStream({
