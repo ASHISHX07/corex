@@ -1,4 +1,4 @@
-import path from "path";
+ import path from "path";
 import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import ensureBridge from "./helpers/ensureBridge.js";
@@ -15,7 +15,7 @@ const { initShm, setReady, closeProcess } = await import('./shm/shmWriter.js');
 const { initReader, startSignalWatch }    = await import('./shm/shmReader.js');
 const expiryGuard                         = (await import('./timers/expiryGuard.js')).default;
 const { ensureAccessToken }               = await import('./connections/fyers_connect.js');
-const apiManager                          = (await import('./helpers/apiPulse.js')).default;
+const apiManager                          = (await import('./helpers/apiManager.js')).default;
 const optionPoll                          = (await import('./streams/optionApiPolls.stream.js')).default;
 const { optionAndIndicsStream }           = await import('./streams/optionChain.stream.js');
 
@@ -40,18 +40,16 @@ optionAndIndicsStream({
 });
 
 setTimeout(setReady, 2000);
-
 let close = false;
 
 async function shutdown(signal) {
     if (close) return;
     close = true;
     closeProcess();     // sets systemStatus = 0 in SHM
-    API.finish();
     // give streams ~500ms to flush their last tick before exit
     await new Promise(r => setTimeout(r, 500));
+    API.finish();
     process.exit(0);
 }
-
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM',() => shutdown('SIGTERM')); 

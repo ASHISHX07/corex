@@ -42,4 +42,4 @@ function clearSession() {
     safeWrite(sessionPath, '{}');
 }
 
-export {loadCacheToken, saveToken, clearSession, getDateString}
+export {loadCacheToken, saveToken, clearSession}

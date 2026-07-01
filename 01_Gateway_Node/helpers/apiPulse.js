@@ -8,7 +8,6 @@ const __dirname   = path.dirname(fileURLToPath(import.meta.url));
 const sessionPath = path.resolve(__dirname, '../../runtime/session.json');
 const dateString  = await getDateString();
 
-
 class apiManager {
     #data;
     #transactional;
