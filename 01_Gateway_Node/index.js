@@ -2,7 +2,6 @@
 import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import ensureBridge from "./helpers/ensureBridge.js";
-import { execFileSync } from "child_process";
 
 // for absolute path and ENV variables
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
