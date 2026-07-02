@@ -13,7 +13,7 @@ const PY_SRC        = path.resolve('02_Strategies_Python/example.py');
 const procs = [];
 let stop = false;
 
-function Launch(label, cmd, args, opts = {} = {}) {
+function Launch(label, cmd, args, opts = {}) {
     const { ignoreCleanExit = false, ipc = false } = opts;
     const p = spawn(cmd, args, {
         stdio: ipc ? ['inherit', 'inherit', 'inherit', 'ipc'] : 'inherit',

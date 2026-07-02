@@ -16,10 +16,10 @@ int OptionManager::getAtmStrike(const int& slot, const bool& isNifty = true) con
     return static_cast<int>(std::round(spot / divisor) * divisor);
 }
 
-const OptionsHeader* OptionManager::getOption(int strike, const std::string& type) const {
+const OptionsHeader* OptionManager::getOption(int& strike, const std::string& type) const {
     for (int i = 0; i < _mem.n_options; i++) {
         const auto& opt = _mem.options[i];
-        bool isCall = (static_cast<int>(opt.cp) == 1.0);
+        bool isCall = (static_cast<int>(opt.cp) == 1);
         bool matchType = (type == "CE") ? isCall : !isCall;
         if (matchType && static_cast<int>(opt.strike) == strike)
         return &opt;
@@ -33,7 +33,7 @@ double OptionManager::getPCR() const {
         if (_mem.options[i].cp == 1.0) callOI += _mem.options[i].oi;
         else                           putOI  += _mem.options[i].oi;
     }
-    return (callOI > 0) ? putOI / callOI : 0.0;
+    return (callOI > 0) ? putOI / callOI : 0;
 }
 
 std::vector<const OptionsHeader*> OptionManager::getCalls() const {

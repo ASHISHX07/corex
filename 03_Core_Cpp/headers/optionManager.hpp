@@ -18,7 +18,7 @@ public:
 
     // ── Strike lookup ────────────────────────────────────
     int getAtmStrike(const int& slot, const bool& isNifty = true) const;     // nearest strike to spot
-    const OptionsHeader* getOption(int strike, const std::string& type) const;  // CE or PE
+    const OptionsHeader* getOption(int* strike, const std::string& type) const;  // CE or PE
     std::pair<const OptionsHeader*, const OptionsHeader*> getPair(int strike) const; // CE + PE
 
     // ── Chain analytics ──────────────────────────────────
