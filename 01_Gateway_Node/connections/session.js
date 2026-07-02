@@ -3,8 +3,16 @@ import { fileURLToPath } from 'node:url';
 import { safeRead, safeWrite } from '../helpers/fs.helper.js';
 import getDateTime from '../timers/atomicClock.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname   = path.dirname(fileURLToPath(import.meta.url));
 const sessionPath = path.resolve(__dirname, '../../runtime/session.json');
+
+function patchSession(patch) {
+    let current = {};
+    try {
+        current = JSON.parse(safeRead(sessionPath, '{}'));
+    } catch {}
+    safeWrite(sessionPath, JSON.stringify({ ...current, ...patch }, null, 2));
+}
 
 async function getDateString() {
     const date = await getDateTime();
@@ -16,30 +24,24 @@ async function getTimeString() {
 }
 
 async function loadCacheToken() {
-    const raw = safeRead(sessionPath, '{}');
     try {
-        const session = JSON.parse(raw);
-        if (session.date !== await getDateString()) {
-            return null;
-        }
-        return session.accessToken ?? null
+        const session = JSON.parse(safeRead(sessionPath, '{}'));
+        if (session.date !== await getDateString()) return null;
+        return session.accessToken ?? null;
     }
-    catch {
-        return null;
-    }
+    catch { return null; }
 }
 
 async function saveToken(accessToken) {
-    const session = {
+    patchSession({
         accessToken,
         date: await getDateString(),
-        savedAt: await getTimeString()
-    }
-    safeWrite(sessionPath, JSON.stringify(session, null, 2));
+        savedAt: await getTimeString(),
+    });
 }
 
 function clearSession() {
-    safeWrite(sessionPath, '{}');
+    patchSession({ accessToken: null, savedAt: null });
 }
 
-export {loadCacheToken, saveToken, clearSession, getDateString}
+export {loadCacheToken, saveToken, clearSession, getDateString, patchSession}

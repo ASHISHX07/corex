@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "fs";
 import path from 'path';
 
 function safeMkdir(filePath) {
@@ -30,17 +30,20 @@ function safeRead(filePath, defaultValue = "") {
 
 function safeWrite(filePath, content = "") {
     const resolvedPath = path.resolve(filePath)
+    const tempPath = `${resolvedPath}.tmp`;
     try {
-        writeFileSync(resolvedPath, content, 'utf8');
+        writeFileSync(tempPath, content, 'utf8');
+        renameSync(tempPath, resolvedPath);
         return true;
     }
     catch (error) {
-        if (error.code == 'ENOENT') {
+        if (error.code === 'ENOENT') {
             safeMkdir(path.dirname(resolvedPath))
-            writeFileSync(resolvedPath, content, 'utf8');
+            writeFileSync(tempPath, content, 'utf8');
+            renameSync(tempPath, resolvedPath);
             return true;
         }
-        else throw new Error(`Error occured while creating ${filePath}\n${error}`);
+        else throw new Error(`Error occured while creating/writing to ${resolvedPath}\n${error}`);
     }
 }
 
