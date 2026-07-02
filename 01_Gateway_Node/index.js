@@ -52,3 +52,4 @@ async function shutdown(signal) {
 }
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM',() => shutdown('SIGTERM')); 
+process.on('message', (m) => { if (m === 'shutdown') shutdown('IPC'); });
