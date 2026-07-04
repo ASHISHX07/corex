@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import open from "open";
 import { startAuthServer } from "./auth_server.js";
 import { exchangeForToken } from "./token.js";
-import { loadCacheToken, saveToken, clearSession } from "./session.js";
+import { loadCacheToken, saveToken, clearSession } from "../helpers/session.js";
 import getProfileInfo from "../account/profile_info.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,7 +53,7 @@ async function ensureAccessToken() {
     }
     catch (err) {
         clearSession();
-    throw new Error(`[AUTH] Authentication failed: ${err}`);
+        throw new Error(`[AUTH] Authentication failed: ${err}`);
     }
 }
 
