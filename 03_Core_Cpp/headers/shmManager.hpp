@@ -16,16 +16,16 @@ using namespace boost::interprocess;
 
 class ShmMem {
 private:
-    std::unique_ptr<shared_memory_object>    _shm_ctrl      { nullptr }; 
+    std::unique_ptr<shared_memory_object>    _shm_ctrl      { nullptr };
     std::unique_ptr<mapped_region>           _reg_ctrl      { nullptr };
 
-    std::unique_ptr<shared_memory_object>    _shm_indices   { nullptr }; 
+    std::unique_ptr<shared_memory_object>    _shm_indices   { nullptr };
     std::unique_ptr<mapped_region>           _reg_indices   { nullptr };
 
-    std::unique_ptr<shared_memory_object>    _shm_options   { nullptr }; 
+    std::unique_ptr<shared_memory_object>    _shm_options   { nullptr };
     std::unique_ptr<mapped_region>           _reg_options   { nullptr };
 
-    std::unique_ptr<shared_memory_object>    _shm_order     { nullptr }; 
+    std::unique_ptr<shared_memory_object>    _shm_order     { nullptr };
     std::unique_ptr<mapped_region>           _reg_order     { nullptr };
 
 public:

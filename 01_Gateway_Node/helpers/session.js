@@ -17,7 +17,7 @@ function _patch(patch) {
     for (const [k, v] of Object.entries(patch)) {
         merged[k] = (v && typeof v === 'object' && !Array.isArray(v)) ? { ...(current[k] ?? {}), ...v } : v;
     }
-    safeWrite(sessionPath, JSON.stringify(merged, null, 2));
+    safeWrite(sessionPath, JSON.stringify(merged, null, 4));
 }
 
 async function _today() {
