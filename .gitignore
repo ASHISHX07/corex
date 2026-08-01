@@ -19,4 +19,4 @@ __pycache__/
 logs
 .env
 CmakeUserPresets.json
-*.exe
+*.exenotes/ 
