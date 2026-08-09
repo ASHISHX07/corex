@@ -90,11 +90,7 @@ def bs_implied_vol (price, S, K, T, r, cp, q=0.0):
         sigma = max(sigma - (error / vega), 1e-6)
 
 
-    # near expiry + deep ITM/OTM, vega -> 0 and price is flat across
-    # nearly the entire sigma range. bisection will "converge" but the
-    # returned sigma is numerically arbitrary, not a real IV estimate.
-    # known limitation for prototype — do not trust IV outputs when the
-    # matching bs_greeks vega_raw is near VEGA_FLOOR.
+    # near expiry + deep ITM/OTM, vega -> 0 and price is flat across, so i mean bisection will work and get you some converge value, but don't trust it as a real IV estimate 
 
     low, high = 0.005, 5
     for i in range(MAX_ITR_BISECT):
