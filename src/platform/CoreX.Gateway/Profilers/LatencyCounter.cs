@@ -1,14 +1,22 @@
 namespace CoreX.Gateway.Profilers;
 
-#if DEBUG
-internal static class DebugProfiler
+internal static class PerformanceProfiler
 {
-    static long start = Stopwatch.GetTimestamp();
+    private static long start = default;
 
-    [Conditional("DEBUG")]
+    [Conditional("PERF_PROFILE")]
     public static void StartMonitoring()
     {
-        
+        start = Stopwatch.GetTimestamp();
+    }
+
+    [Conditional("PERF_PROFILE")]
+    public static void StopMonitoring(bool saveLog = false)
+    {
+        if (saveLog)
+        {
+            
+        }
+        Console.WriteLine($"[PROFILER]\n  Took - {Stopwatch.GetElapsedTime(start)}");
     }
 }
-#endif

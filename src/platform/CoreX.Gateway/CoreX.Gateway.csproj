@@ -9,12 +9,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants>(DefineConstants);PERF_PROFILE</DefineConstants>
+    <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="fyers-api-v3" Version="1.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <RunTime>
   </ItemGroup>
 
 </Project>
