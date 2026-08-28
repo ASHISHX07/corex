@@ -9,7 +9,7 @@ internal class ApiManager
     public int DataPolls => _dataPolls;
     public int OrderPolls => _orderPolls;
 
-    // Interlocked guarantees thread-safety across multiple CPU cores
+    // Interlocked guarantees thread-safety across multiple threads
     public void DApiCall() => Interlocked.Increment(ref _dataPolls);
     public void OApiCall() => Interlocked.Increment(ref _orderPolls);
 

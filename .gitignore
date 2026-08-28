@@ -5,9 +5,11 @@
 
 .vscode/
 .vs/
+.vccode/
 .vnev/
 .pytest_cache/
 build/
+install/
 out/
 dist/
 cache/
@@ -18,11 +20,14 @@ logs/
 bin/
 obj/
 cmake-build-*/
+src/platform/**/bin/
+src/platform/**/obj/
 
 logs
 .env
-CmakeUserPresets.json
-compile_commands.json
 *.exe
 *.dll
 *.pyc
+CmakeUserPresets.json
+compile_commands.json
+compile_commands.json
