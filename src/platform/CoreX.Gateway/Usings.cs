@@ -1,9 +1,11 @@
-// Platform
+// System/Platform
 global using System;
 global using System.IO;
 global using System.Net.Http;
+global using System.Text;
 global using System.Text.Json;
 global using System.Threading;
+global using System.Security.Cryptography;
 global using System.Threading.Tasks;
 
 // Memory
