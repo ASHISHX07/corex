@@ -2,7 +2,7 @@
 
 int main()
 {
-	std::cout << "Hello from Core side!";
+	std::cout << "Hello from CoreX-Core";
 
 	return 0;
 }

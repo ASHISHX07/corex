@@ -43,9 +43,9 @@ internal sealed class BiDictionary<TKey, TValue>
         _reverse[value] = key;
     }
     
-    /// <summary>Removes a Key Value pair.</summary>
-    /// <param name="key">Key or Value to remove</param>
-    /// <returns>Returns true if element exists and is removed, false otherwise.</returns>
+    /// <summary>Removes the key-value pair associated with the specified key.</summary>
+    /// <param name="key">The key of the pair to remove</param>
+    /// <returns>True if the pair existed and was removed; otherwise, false.</returns>
     public bool Remove(TKey key)
     {
         if (!_forward.Remove(key, out var value))
@@ -64,6 +64,9 @@ internal sealed class BiDictionary<TKey, TValue>
     {
         if (!_forward.TryGetValue(key, out var oldValue))
             throw new KeyNotFoundException("Key does not exists.");
+
+        if (EqualityComparer<TValue>.Default.Equals(oldValue, value))
+            return;
 
         if (_reverse.ContainsKey(value))
             throw new ArgumentException("Value already exists.");

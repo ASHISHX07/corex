@@ -2,7 +2,7 @@
 
 namespace CoreX.Gateway.Brokers;
 
-internal class FyersSymbols : ISymbolMapper
+internal sealed class FyersSymbols : ISymbolMapper
 {
     private static BiDictionary<int, string> _symbols = new();
 
@@ -21,7 +21,7 @@ internal class FyersSymbols : ISymbolMapper
     public void Replace(int symbolId, in string symbol) =>
         _symbols.Replace(symbolId, symbol);
 
-    public void Remove(int symbolId)=>
+    public void Remove(int symbolId) =>
         _symbols.Remove(symbolId);
 
     public void Clear() =>

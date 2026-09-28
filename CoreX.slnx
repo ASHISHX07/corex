@@ -1,6 +1,13 @@
 <Solution>
-  <Folder Name="/src/" />
+
+  <!-- C++ project -->
+  <!-- <Folder Name="/src/core" />
+    <File Path="src/core/CMakeLists.txt" />
+  </Folder> -->
+
+  <!-- C# project -->
   <Folder Name="/src/platform/">
     <Project Path="src/platform/CoreX.Gateway/CoreX.Gateway.csproj" />
   </Folder>
+
 </Solution>

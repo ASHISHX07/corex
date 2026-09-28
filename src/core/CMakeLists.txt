@@ -1,5 +1,5 @@
 add_library(corex_core STATIC
-    src/math/basic-math.cpp
+    src/math/statistics.cpp
 )
 
 target_compile_features(corex_core PUBLIC cxx_std_23)

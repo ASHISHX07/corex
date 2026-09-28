@@ -10,11 +10,19 @@
 
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
+	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+	  <!-- <IsAotCompatible>true</IsAotCompatible>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer> -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="fyers-api-v3" Version="1.4.0" />
+    <PackageReference Include="fyers-api-v3" Version="1.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@ build/
 install/
 out/
 dist/
-cache/
+/cache/
 runtime/
 systemLogs/
 __pycache__/
@@ -22,6 +22,7 @@ obj/
 cmake-build-*/
 src/platform/**/bin/
 src/platform/**/obj/
+config/credentials.json
 
 logs
 .env
