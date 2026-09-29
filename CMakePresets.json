@@ -13,20 +13,24 @@
         },
         {
             "name": "debug",
-            "displayName": "GCC debug",
+            "displayName": "GCC debug (memory saftey and all debug helping flags enabled)",
             "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_FLAGS_DEBUG": "-g3 -O0 -Wall -Wextra -Wpedantic -fsanitize=address -fsanitize=undefined -fanalyzer",
+                "CMAKE_C_FLAGS_DEBUG": "-g3 -O0 -Wall -Wextra -Wpedantic -fsanitize=address -fsanitize=undefined -fanalyzer",
+                "CMAKE_EXE_LINKER_FLAGS_DEBUG": "-fsanitize=address -fsanitize=undefined"
             }
         },
         {
             "name": "release",
-            "displayName": "GCC release",
+            "displayName": "GCC release (maximum execution speed all debug flags disabled)",
             "inherits": "base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -flto -DNDEBUG",
-                "CMAKE_C_FLAGS_RELEASE": "-O3 -march=native -flto -DNDEBUG"
+                "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -flto -DNDEBUG -fstack-protector-strong",
+                "CMAKE_C_FLAGS_RELEASE": "-O3 -march=native -flto -DNDEBUG -fstack-protector-strong",
+                "CMAKE_EXE_LINKER_FLAGS_RELEASE": "-flto"
             }
         }
     ],
