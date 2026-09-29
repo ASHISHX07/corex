@@ -23,8 +23,8 @@ internal class CoreXPlatfrom
 // using System.Text;
 // using System.Net.Http.Json;
 
-// const string ClientId = "QSXMT8C3KC-100";
-// const string SecretKey = "ATF24JBJDH";
+// const string ClientId = "AppId";
+// const string SecretKey = "Secret";
 // const string RedirectUri = "http://127.0.0.1:3000/callback";
 
 // using var listener = new HttpListener();
