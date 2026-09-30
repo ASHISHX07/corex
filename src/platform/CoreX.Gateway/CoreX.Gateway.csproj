@@ -1,5 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Target Name="ValidateRequiredFiles" BeforeTargets="Build">
+	  <ItemGroup>
+	    <!-- <RequiredFiles Include="" /> -->
+	  </ItemGroup> 
+  </Target>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -11,8 +17,8 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
 	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-	  <!-- <IsAotCompatible>true</IsAotCompatible>
-	  <EnableAotAnalyzer>true</EnableAotAnalyzer> -->
+	  <IsAotCompatible>true</IsAotCompatible>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>

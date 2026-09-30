@@ -10,12 +10,12 @@ internal static class JsonHandler
         
     };
 
-    public static bool SerializeToJsonString(in string path, in string data)
-    {
-        string json = JsonSerializer.Serialize(data, _serializerOption);
+    // public static bool SerializeToJsonString(in string path, in string data)
+    // {
+    //     string json = JsonSerializer.Serialize(data, _serializerOption);
 
 
 
-        return true;
-    }
+    //     return true;
+    // }
 }
