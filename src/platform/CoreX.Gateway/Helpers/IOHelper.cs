@@ -2,8 +2,8 @@ namespace CoreX.Gateway.Helpers;
 
 internal static class Fs
 {
-    public static readonly string BaseAppData   = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-    public static readonly string AppData       = Path.Combine(BaseAppData, @"CoreX");
+    private static readonly string _baseAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    private static readonly string AppData      = Path.Combine(_baseAppData, @"CoreX");
 
     public static readonly string Cache         = Path.Combine(AppData, @"cache");
     public static readonly string Data          = Path.Combine(AppData, @"data");
