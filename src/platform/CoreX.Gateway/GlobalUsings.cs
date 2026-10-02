@@ -1,9 +1,14 @@
 // System/Platform
 global using System;
 global using System.IO;
-global using System.Text;
+global using System.IO.Compression;
+global using System.IO.MemoryMappedFiles;
+global using System.IO.Pipes;
+global using System.IO.Pipelines;
 global using System.Net;
 global using System.Net.Http;
+global using System.Net.Http.Json;
+global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Schema;
 global using System.Text.Json.Serialization;

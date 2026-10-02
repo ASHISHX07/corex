@@ -10,15 +10,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors> -->
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
 	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-	  <IsAotCompatible>true</IsAotCompatible>
-	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
+	  <!-- <IsAotCompatible>true</IsAotCompatible>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer> -->
   </PropertyGroup>
 
   <ItemGroup>
