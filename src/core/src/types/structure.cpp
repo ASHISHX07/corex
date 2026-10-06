@@ -1,9 +1,9 @@
 #include <cstdint>
 #include <array>
 
-namespace CoreX::types
+namespace CoreX::DataStruct
 {
-    struct optionGreeks
+    struct optionGreeks final
     {
         double delta {};
         double gamma {};
