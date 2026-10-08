@@ -1,4 +1,4 @@
-namespace CoreX.Gateway.Contracts.Auth;
+namespace CoreX.Gateway.Contracts;
 
 internal enum Brokers : byte
 {
@@ -14,5 +14,5 @@ internal interface IBrokerAuthenticator
     bool IsAuthenticated { get; }
 
     Task AuthenticateUser();
-    Task<bool> ValidateUser();
+    Task<bool> ValidateUser();   
 }

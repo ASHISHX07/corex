@@ -14,3 +14,9 @@ internal interface IBrokerAdapter
     public Brokers? _brokerId { get; init; }
     public string? _accessToken { get; protected set; }
 }
+
+internal interface IBroker
+{
+    void AuthenticateUser();
+    void ValidateUser();
+}

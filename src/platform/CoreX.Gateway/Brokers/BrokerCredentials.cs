@@ -1,2 +1,0 @@
-﻿namespace CoreX.Gateway.Brokers;
-
