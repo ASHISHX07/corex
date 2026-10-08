@@ -22,6 +22,7 @@ obj/
 cmake-build-*/
 src/platform/**/bin/
 src/platform/**/obj/
+temp/
 config/credentials.json
 
 logs
