@@ -8,7 +8,7 @@ namespace CoreX.Gateway.Brokers;
 internal class Fyers
 {
     const string ClientId = "QSXMT8C3KC-100";
-    const string SecretId = "ATF24JBJDH";
+    const string SecretId = "";
     const string RedirectUri = "http://127.0.0.1:3000/callback";
 
     static string BuildLoginUrl()

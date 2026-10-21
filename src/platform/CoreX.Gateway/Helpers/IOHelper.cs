@@ -23,8 +23,8 @@ internal static class Fs
     public static readonly string PlatformPath          = @"./";
     public static readonly string CorePath              = @"../core";
     public static readonly string AppConfigPath         = Path.Combine(RootPath, @"config", @"appsettings.json");
-    public static readonly string CredentialPath         = Path.Combine(RootPath, @"config", @"credentials.json");
-    public static readonly string SharedDirPath        = Path.Combine(RootPath, @"shared");
+    public static readonly string CredentialPath        = Path.Combine(RootPath, @"config", @"credentials.json");
+    public static readonly string SharedDirPath         = Path.Combine(RootPath, @"shared");
 
     // Files
     public static FileInfo AppConfigJson                = new(AppConfigPath);

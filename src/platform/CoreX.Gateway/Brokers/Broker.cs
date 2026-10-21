@@ -1,22 +1,11 @@
 namespace CoreX.Gateway.Brokers;
 
-internal enum Brokers : byte
+internal abstract class BaseHttpClient
 {
-    Zerodha,
-    Fyers,
-    Groww,
-    Upstox,
-    AngelOne
-}
+    protected readonly HttpClient httpClient;
 
-internal interface IBrokerAdapter
-{
-    public Brokers? _brokerId { get; init; }
-    public string? _accessToken { get; protected set; }
-}
-
-internal interface IBroker
-{
-    void AuthenticateUser();
-    void ValidateUser();
+    protected BaseHttpClient(HttpClient client)
+    {
+        httpClient = client ?? throw new ArgumentNullException(nameof(client));
+    }
 }

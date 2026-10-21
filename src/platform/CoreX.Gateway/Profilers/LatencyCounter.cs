@@ -2,21 +2,39 @@ namespace CoreX.Gateway.Profilers;
 
 internal static class PerformanceProfiler
 {
-    private static long start = default;
-
-    [Conditional("PERF_PROFILE")]
-    public static void StartMonitoring()
+    private static long _start = default;
+    internal enum Ticker : byte
     {
-        start = Stopwatch.GetTimestamp();
+        Ticks,
+        Milliseconds,
+        Microseconds
     }
 
     [Conditional("PERF_PROFILE")]
-    public static void StopMonitoring(bool saveLog = false)
+    public static void StartTicker()
     {
-        if (saveLog)
+        _start = default;
+        _start = Stopwatch.GetTimestamp();
+    }
+
+    [Conditional("PERF_PROFILE")]
+    public static void FinishTicker(Ticker ticker, bool logger = false)
+    {
+        TimeSpan stop = Stopwatch.GetElapsedTime(_start);
+
+        long ticks = ticker switch
+        {   
+            Ticker.Ticks => stop.Ticks,
+            Ticker.Milliseconds => (long)stop.TotalMilliseconds,
+            Ticker.Microseconds => stop.Microseconds,
+            _ => throw new ArgumentException("Invalid Ticker")
+        };
+
+        if (logger)
         {
             
         }
-        Console.WriteLine($"[PROFILER]\n  Took - {Stopwatch.GetElapsedTime(start)}");
+        
+        Console.WriteLine($"[PROFILER]\n  Took - {ticks} Microseconds.");
     }
 }

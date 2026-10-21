@@ -17,8 +17,9 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
 	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-	  <!-- <IsAotCompatible>true</IsAotCompatible>
-	  <EnableAotAnalyzer>true</EnableAotAnalyzer> -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <IsAotCompatible>true</IsAotCompatible>
+	  <EnableAotAnalyzer>true</EnableAotAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>

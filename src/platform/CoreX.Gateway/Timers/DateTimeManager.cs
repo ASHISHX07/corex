@@ -1,19 +1,21 @@
 namespace CoreX.Gateway.Timers;
 
-internal static class Timer
+internal static class Date
 {
-    private static long _start = default;
-    public static TimeSpan Stop { get; set; } = default;
-    public static DateTimeOffset dateTime = TimeProvider.System.GetLocalNow();
+    private static DateOnly _date = new DateOnly();
 
-    public static void StartTimer()
+    public static DateOnly GetDate()
     {
-        _start = Stopwatch.GetTimestamp();
+        return _date;
     }
+}
 
-    public static void StopTimer(bool saveLog = true)
+internal static class Time
+{
+    private static TimeProvider _time = TimeProvider.System;
+
+    public static TimeProvider GetTime()
     {
-        Stop = Stopwatch.GetElapsedTime(_start);
-        if (saveLog) Console.WriteLine(Stop);
+        return _time;
     }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace CoreX::math
+namespace CoreX
 {
 	class Math
     {
@@ -13,8 +13,8 @@ namespace CoreX::math
     public:
         static double getPcr(int putOi, int callOi);
 
-        double normal_cdf(double x);
-        double normal_pdf(double x);
+        static double normal_cdf(double x);
+        static double normal_pdf(double x);
         
     };
 }

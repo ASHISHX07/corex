@@ -3,8 +3,8 @@ namespace CoreX.Gateway.Helpers;
 internal static class Logger
 {
     #pragma warning disable IDE0071
-    private static readonly string _systemLogPath = Path.Combine(Fs.LogsPath, @"system", $"{Timers.Timer.dateTime.ToString("dd-mm-yyyy")}.log");
-    private static readonly string _networkLogPath = Path.Combine(Fs.LogsPath, @"network", $"{Timers.Timer.dateTime.ToString("dd-mm-yyyy")}.log");
+    private static readonly string _systemLogPath = Path.Combine(Fs.LogsPath, @"system", $"{Time.Timer.dateTime.ToString("dd-mm-yyyy")}.log");
+    private static readonly string _networkLogPath = Path.Combine(Fs.LogsPath, @"network", $"{Time.Timer.dateTime.ToString("dd-mm-yyyy")}.log");
     #pragma warning restore IDE0071
 
     public static void WriteSystemLog(string content) =>
