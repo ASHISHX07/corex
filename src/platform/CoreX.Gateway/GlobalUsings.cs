@@ -39,7 +39,6 @@ global using CoreX.Gateway.Helpers;
 global using CoreX.Gateway.Profilers;
 global using CoreX.Gateway.Timers;
 global using CoreX.Gateway.Memory;
-global using CoreX.Gateway.Base;
 
 // Third-Party
 global using Microsoft.Extensions.DependencyInjection;
