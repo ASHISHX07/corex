@@ -6,7 +6,7 @@ internal static class Fs
     private static readonly string _baseAppData         = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
     private static readonly string AppData              = Path.Combine(_baseAppData, @"CoreX");
 
-    // Inside App-Data (Base)
+    // Inside App-Data Paths (Base)
     public static readonly string CachePath             = Path.Combine(AppData, @"cache");
     public static readonly string DataPath              = Path.Combine(AppData, @"data");
     public static readonly string TempPath              = Path.Combine(AppData, @"temp");
@@ -23,12 +23,14 @@ internal static class Fs
     public static readonly string PlatformPath          = @"./";
     public static readonly string CorePath              = @"../core";
     public static readonly string AppConfigPath         = Path.Combine(RootPath, @"config", @"appsettings.json");
-    public static readonly string CredentialPath        = Path.Combine(RootPath, @"config", @"credentials.json");
+    public static readonly string CredentialPath        = Path.Combine(RootPath, @"config", @"user-credentials.json");
+    public static readonly string BrokerConfigPath      = Path.Combine(RootPath, @"config", @"broker.config.json");
     public static readonly string SharedDirPath         = Path.Combine(RootPath, @"shared");
 
     // Files
     public static FileInfo AppConfigJson                = new(AppConfigPath);
     public static FileInfo CredentialsJson              = new(CredentialPath);
+    public static FileInfo BrokerConfigJson             = new(BrokerConfigPath);
 
     public static void Init()
     {
@@ -37,6 +39,9 @@ internal static class Fs
             
         if (!CredentialsJson.Exists)
             throw new FileNotFoundException($"[PLATFORM] - Missing {CredentialsJson.Name} at {CredentialsJson.DirectoryName}");
+
+        if (!BrokerConfigJson.Exists)
+            throw new FileNotFoundException($"[PLATFORM] - Missing {BrokerConfigJson.Name} at {BrokerConfigJson.DirectoryName}");
 
         CacheDir.Create();
         DataDir.Create();
