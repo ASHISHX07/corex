@@ -2,7 +2,7 @@ namespace CoreX.Gateway.Timers;
 
 internal static class Date
 {
-    private static DateOnly _date = new DateOnly();
+    private static DateOnly _date = DateOnly.FromDateTime(DateTimeOffset.UtcNow.DateTime);
 
     public static DateOnly GetDate()
     {

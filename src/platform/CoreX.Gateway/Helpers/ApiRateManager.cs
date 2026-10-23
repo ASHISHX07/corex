@@ -6,7 +6,7 @@ internal class ApiManager
     private int _dataPolls = default;
     private int _orderPolls = default;
 
-    public Brokers broker { get; set; }
+    public BrokerId broker { get; set; }
     public int DataPolls => _dataPolls;
     public int OrderPolls => _orderPolls;
 
