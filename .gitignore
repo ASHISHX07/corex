@@ -23,7 +23,8 @@ cmake-build-*/
 src/platform/**/bin/
 src/platform/**/obj/
 temp/
-config/credentials.json
+config/user-credentials.json
+
 
 logs
 .env
