@@ -28,20 +28,20 @@ internal static class Fs
     public static readonly string SharedDirPath         = Path.Combine(RootPath, @"shared");
 
     // Files
-    public static FileInfo AppConfigJson                = new(AppConfigPath);
-    public static FileInfo CredentialsJson              = new(CredentialPath);
-    public static FileInfo BrokerConfigJson             = new(BrokerConfigPath);
+    public static FileInfo AppConfigJsonFile            = new(AppConfigPath);
+    public static FileInfo CredentialsJsonFile          = new(CredentialPath);
+    public static FileInfo BrokerConfigJsonFile         = new(BrokerConfigPath);
 
     public static void Init()
     {
-        if (!AppConfigJson.Exists)
-            throw new FileNotFoundException($"[PLATFORM] - Missing {AppConfigJson.Name} at {AppConfigJson.DirectoryName}");
+        if (!AppConfigJsonFile.Exists)
+            throw new FileNotFoundException($"[PLATFORM] - Missing {AppConfigJsonFile.Name} at {AppConfigJsonFile.DirectoryName}");
             
-        if (!CredentialsJson.Exists)
-            throw new FileNotFoundException($"[PLATFORM] - Missing {CredentialsJson.Name} at {CredentialsJson.DirectoryName}");
+        if (!CredentialsJsonFile.Exists)
+            throw new FileNotFoundException($"[PLATFORM] - Missing {CredentialsJsonFile.Name} at {CredentialsJsonFile.DirectoryName}");
 
-        if (!BrokerConfigJson.Exists)
-            throw new FileNotFoundException($"[PLATFORM] - Missing {BrokerConfigJson.Name} at {BrokerConfigJson.DirectoryName}");
+        if (!BrokerConfigJsonFile.Exists)
+            throw new FileNotFoundException($"[PLATFORM] - Missing {BrokerConfigJsonFile.Name} at {BrokerConfigJsonFile.DirectoryName}");
 
         CacheDir.Create();
         DataDir.Create();

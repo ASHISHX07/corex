@@ -8,9 +8,9 @@ internal partial class SessionJsonSerializerContext : JsonSerializerContext
 
 internal struct Session
 {
-    string Broker { get; set; }
-    string Token { get; set; }
-    string Date { get; set; }
-    string SavedAt { get; set; }
-    int ApiCalls { get; set; }
+    public string Broker { get; set; }
+    public string Token { get; set; }
+    public string Date { get; set; }
+    public string StartedAt { get; set; }
+    public string StoppedAt { get; set; }
 }

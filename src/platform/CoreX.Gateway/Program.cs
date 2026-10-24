@@ -5,13 +5,14 @@
 
 internal class CoreXPlatfrom
 {
-    internal static async Task<int> Main()
+    internal static async Task Main()
     {
     
         Console.WriteLine("CoreX Starting...");
 
         Fs.Init();
-        return 0;
+        
+        await Logger.Close();
     }
 }
 

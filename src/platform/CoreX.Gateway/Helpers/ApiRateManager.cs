@@ -1,14 +1,38 @@
 namespace CoreX.Gateway.Helpers;
 
+[JsonSourceGenerationOptions(WriteIndented = true, IndentSize = 4)]
+[JsonSerializable(typeof(ApiManager))]
+internal partial class ApiManagerSerializerContext : JsonSerializerContext
+{
+}
+
 internal class ApiManager
 {
     // Backing fields for Interlocked to use
     private int _dataPolls = default;
     private int _orderPolls = default;
 
-    public BrokerId broker { get; set; }
     public int DataPolls => _dataPolls;
     public int OrderPolls => _orderPolls;
+
+    // [JsonConstructor]
+    public ApiManager()
+    {
+
+    }
+
+    public int DataPoll
+    {
+        get
+        {
+            return _dataPolls;
+        }
+
+        set
+        {
+            
+        }
+    }
 
     // Interlocked guarantees thread-safety across multiple threads
     public void DApiCall() => Interlocked.Increment(ref _dataPolls);
