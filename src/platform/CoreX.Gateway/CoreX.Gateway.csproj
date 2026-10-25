@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="broker.config.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="..\..\..\shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

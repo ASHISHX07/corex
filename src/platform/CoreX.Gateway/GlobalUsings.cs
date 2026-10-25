@@ -44,7 +44,6 @@ global using CoreX.Gateway.Timers;
 global using CoreX.Gateway.Memory;
 
 // Third-Party
-global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Http;
-global using Newtonsoft.Json.Linq;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.DependencyInjection;

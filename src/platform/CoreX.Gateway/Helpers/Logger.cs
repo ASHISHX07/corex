@@ -2,10 +2,8 @@ namespace CoreX.Gateway.Helpers;
 
 internal static class Logger
 {
-    #pragma warning disable IDE0071
-    private static readonly string _systemLogPath = Path.Combine(Fs.LogsPath, @"system", $"{Date.GetDate().ToString("dd-MM-yyyy")}.log");
-    private static readonly string _networkLogPath = Path.Combine(Fs.LogsPath, @"network", $"{Date.GetDate().ToString("dd-MM-yyyy")}.log");
-    #pragma warning restore IDE0071
+    private static readonly string _systemLogPath = Path.Combine(Fs.SystemLogsPath, $"{Date.GetDate():dd-MM-yyyy}.log");
+    private static readonly string _networkLogPath = Path.Combine(Fs.NetworkLogsPath, $"{Date.GetDate():dd-MM-yyyy}.log");
 
     private static FileStreamOptions _options = new()
     {

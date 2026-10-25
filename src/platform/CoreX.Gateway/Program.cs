@@ -1,21 +1,18 @@
 ﻿//using FyersCSharpSDK;
 //using System.Security.AccessControl;
 
-//namespace CoreX.Gateway;
+namespace CoreX.Gateway;
 
 internal class CoreXPlatfrom
 {
     internal static async Task Main()
     {
-    
-        Console.WriteLine("CoreX Starting...");
-
         Fs.Init();
         
         await Logger.Close();
+        await PerformanceProfiler.Close();
     }
 }
-
 
 
 // using System.Diagnostics;

@@ -6,7 +6,7 @@ internal partial class ApiManagerSerializerContext : JsonSerializerContext
 {
 }
 
-internal class ApiManager
+internal sealed class ApiManager
 {
     // Backing fields for Interlocked to use
     private int _dataPolls = default;
@@ -18,20 +18,7 @@ internal class ApiManager
     // [JsonConstructor]
     public ApiManager()
     {
-
-    }
-
-    public int DataPoll
-    {
-        get
-        {
-            return _dataPolls;
-        }
-
-        set
-        {
-            
-        }
+        
     }
 
     // Interlocked guarantees thread-safety across multiple threads
