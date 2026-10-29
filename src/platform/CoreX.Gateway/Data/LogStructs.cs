@@ -11,6 +11,6 @@ internal struct Session
     public string Broker { get; set; }
     public string Token { get; set; }
     public string Date { get; set; }
-    public string StartedAt { get; set; }
-    public string StoppedAt { get; set; }
+    public string LastRun { get; set; }
+    public string RunDuration { get; set; }
 }

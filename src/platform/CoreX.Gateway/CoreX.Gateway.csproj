@@ -17,6 +17,7 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);PERF_PROFILE</DefineConstants>
 	  <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
@@ -30,7 +31,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="broker.config.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content
+      Include="..\..\..\config\appsettings.json"
+      Link="config\%(Filename)%(Extension)"
+      CopyToOutputDirectory="PreserveNewest"
+      CopyToPublicDirectory="PreserveNewest"
+    />
+
+    <Content
+      Include="..\..\..\config\broker.config.json"
+      Link="config\%(Filename)%(Extension)"
+      CopyToOutputDirectory="PreserveNewest"
+      CopyToPublicDirectory="PreserveNewest"
+    />
+
     <Compile Include="..\..\..\shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

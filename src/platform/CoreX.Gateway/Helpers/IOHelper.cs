@@ -26,6 +26,7 @@ internal static class Fs
     public static readonly string RootPath                  = @"../../../";
     public static readonly string PlatformPath              = @"./";
     public static readonly string CorePath                  = @"../core";
+    public static readonly string ConfigPath                = Path.Combine(RootPath, @"config");
     public static readonly string AppConfigPath             = Path.Combine(RootPath, @"config", @"appsettings.json");
     public static readonly string CredentialPath            = Path.Combine(RootPath, @"config", @"user-credentials.json");
     public static readonly string BrokerConfigPath          = Path.Combine(RootPath, @"config", @"broker.config.json");
