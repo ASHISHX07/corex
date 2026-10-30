@@ -23,18 +23,18 @@ internal static class Fs
     public static readonly DirectoryInfo ProfilerLogsDir    = new(ProfilerLogsPath);
 
     // Project Paths
-    public static readonly string RootPath                  = @"../../../";
-    public static readonly string PlatformPath              = @"./";
-    public static readonly string CorePath                  = @"../core";
+    public static readonly string RootPath                  = @"..\..\..\";
+    public static readonly string PlatformPath              = @".\";
+    public static readonly string CorePath                  = @"..\core";
     public static readonly string ConfigPath                = Path.Combine(RootPath, @"config");
-    public static readonly string AppConfigPath             = Path.Combine(RootPath, @"config", @"appsettings.json");
     public static readonly string CredentialPath            = Path.Combine(RootPath, @"config", @"user-credentials.json");
+    public static readonly string AppConfigPath             = Path.Combine(RootPath, @"config", @"appsettings.json");
     public static readonly string BrokerConfigPath          = Path.Combine(RootPath, @"config", @"broker.config.json");
     public static readonly string SharedDirPath             = Path.Combine(RootPath, @"shared");
 
     // Files
+    private static readonly FileInfo CredentialsJsonFile    = new(CredentialPath);
     public static FileInfo AppConfigJsonFile                = new(AppConfigPath);
-    public static FileInfo CredentialsJsonFile              = new(CredentialPath);
     public static FileInfo BrokerConfigJsonFile             = new(BrokerConfigPath);
 
     public static void Init()

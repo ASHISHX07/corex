@@ -1,6 +1,7 @@
 {
+    "broker": "upstox",
     "endpoints": {
         "baseUri": "https://api.upstox.com",
-        "tokenExchangeEndpoint": "v3/login/authorization/token"
+        "tokenExchangeEndpoint": "/v3/login/authorization/token"
     }
 }

@@ -74,7 +74,7 @@ internal static class PerformanceProfiler
         ProfilerLogWriter.WriteLineAsync($"[{component}]        - {ticks} {ticker}");
     }
 
-    public static async Task Close()
+    public static async Task CloseAsync()
     {
         await ProfilerLogWriter.DisposeAsync();
     }

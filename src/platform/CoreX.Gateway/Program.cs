@@ -2,28 +2,28 @@
 
 internal class CoreXPlatfrom
 {
-
     internal static async Task Main(string[] args)
     {
+        Fs.Init();
+
+        var environment = Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(x => x.Key == "CoreXEnvironment")?.Value
+            ?? throw new InvalidOperationException("[PLATFORM] - CoreXEnvironment is not configured");
+
         HostApplicationBuilder builder = Host.CreateApplicationBuilder(
             new HostApplicationBuilderSettings
             {
-                ApplicationName = "CoreX",
-                EnvironmentName = "Development",
                 Args = args,
-                ContentRootPath = AppContext.BaseDirectory
+                EnvironmentName = environment,
+                ApplicationName = "CoreX-Gateway"
             }
         );
 
-        // builder.Configuration.AddJsonFile(Fs.CredentialPath);
-        Console.WriteLine(builder.Configuration["brokerAppSecret"]);
-        IHost host = builder.Build();
+        builder.Configuration.AddJsonFile(Path.GetFullPath(Fs.CredentialPath), optional: false, reloadOnChange: true);
+        builder.Configuration.AddJsonFile(Path.GetFullPath(Fs.BrokerConfigPath), optional: false, reloadOnChange: true);
 
-        await host.RunAsync();
+        CoreXDi.RegisterServices(builder.Services, builder.Configuration);
 
-        Fs.Init();
-        
-        await Logger.Close();
-        await PerformanceProfiler.Close();
+        await Logger.CloseAsync();
+        await PerformanceProfiler.CloseAsync();
     }
 }

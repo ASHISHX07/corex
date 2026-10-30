@@ -29,7 +29,7 @@ internal static class Logger
     public static async Task WriteNetworkLogAsync(string component, string content) =>
         await _networkLogWriterStream.WriteLineAsync($"{Time.GetTime().GetLocalNow()} - [{component}]{Environment.NewLine}{content}");
 
-    public static async Task Close()
+    public static async Task CloseAsync()
     {
         await _systemLogWriterStream.DisposeAsync();
         await _networkLogWriterStream.DisposeAsync();

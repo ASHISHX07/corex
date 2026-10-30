@@ -2,9 +2,9 @@ namespace CoreX.Gateway.Contracts;
 
 
 
-internal interface IBrokerAuth
+internal interface IBrokerAuthClient
 {
     bool IsAutheniticated();
-    Task GetAuthCode(CancellationToken? cancellationToken);
-    Task GetToken(CancellationToken? cancellationToken);
+    Task<string> GetAuthCodeAsync(CancellationToken? cancellationToken);
+    Task<string> GetTokenAsync(CancellationToken? cancellationToken);
 }

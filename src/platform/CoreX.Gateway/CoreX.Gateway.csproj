@@ -7,11 +7,15 @@
   </Target>
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
+    <Configuration>Debug</Configuration>
+    <CoreXEnvironment Condition="'$(Configuration)' == 'Debug'">Development</CoreXEnvironment>
+    <CoreXEnvironment Condition="'$(Configuration)' == 'Release'">Production</CoreXEnvironment>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,6 +25,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata
+      Include="CoreXEnvironment"
+      Value="$(CoreXEnvironment)"
+    />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="fyers-api-v3" Version="1.5.0" />
