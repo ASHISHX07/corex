@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+#include <memory>
+
 namespace CoreX
 {
 	class Math
@@ -16,5 +19,6 @@ namespace CoreX
         static double normal_cdf(double x);
         static double normal_pdf(double x);
         
+        static std::unique_ptr<std::vector<std::vector<double>>> getNSizedMatrix(int n);
     };
 }
