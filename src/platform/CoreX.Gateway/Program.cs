@@ -19,7 +19,6 @@ internal class CoreXPlatfrom
         );
 
         builder.Configuration.AddJsonFile(Path.GetFullPath(Fs.CredentialPath), optional: false, reloadOnChange: true);
-        builder.Configuration.AddJsonFile(Path.GetFullPath(Fs.BrokerConfigPath), optional: false, reloadOnChange: true);
 
         CoreXDi.RegisterServices(builder.Services, builder.Configuration);
 

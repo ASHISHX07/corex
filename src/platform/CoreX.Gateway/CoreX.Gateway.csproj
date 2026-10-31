@@ -49,13 +49,6 @@
       CopyToPublicDirectory="PreserveNewest"
     />
 
-    <Content
-      Include="..\..\..\config\broker.config.json"
-      Link="config\%(Filename)%(Extension)"
-      CopyToOutputDirectory="PreserveNewest"
-      CopyToPublicDirectory="PreserveNewest"
-    />
-
     <Compile Include="..\..\..\shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
