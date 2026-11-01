@@ -4,10 +4,20 @@ internal static class CoreXDi
 {
     internal static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
-        string CorexServerBaseUri = configuration["corexServerBaseUri:corexAuthEndpoint"]
-            ?? throw new InvalidOperationException("[PLATFORM] - Missing broker baseUri in broker.config.json");
+        string broker = configuration["Broker"]
+            ?? throw new InvalidOperationException("[PLATFORM] - Broker configuration (name) is missing");
 
-        services.AddOptions<CredentialsOption>().Bind(configuration.GetSection("Credentials"));
-        
+        services
+            .AddOptions<CoreXOptions>()
+            .Bind(configuration.GetSection("CoreX"));
+
+        services
+            .AddOptions<BrokerOptions>()
+            .Bind(configuration.GetSection("Broker"));
+
+        services
+            .AddTransient<IBrokerAuthenticator>(
+                
+            );
     }
 }

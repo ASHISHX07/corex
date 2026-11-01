@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <vector>
 #include <memory>
 #include "../../include/corex/math.hpp"

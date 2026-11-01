@@ -1,15 +1,36 @@
 namespace CoreX.Gateway.Brokers;
 
-internal sealed class CredentialsOption
+[JsonSerializable(typeof(Credentials))]
+internal partial class CredentialsJsonContext : JsonSerializerContext
 {
-    public string CoreXClientKey { get; set; } = "";
-    public string BrokerAppId { get; set; } = "";
-    public string BrokerAppSecret { get; set; } = "";
 }
 
-public class Credentials(string corexClientKey, string brokerAppId, string brokerAppSecret)
+internal sealed record Credentials(
+    string CoreXClientKey,
+    string BrokerAppId,
+    string BrokerAppSecret
+);
+
+// public sealed class CredentialsOption
+// {
+//     public string CoreXClientKey { get; set; } = "";
+//     public string BrokerAppId { get; set; } = "";
+//     public string BrokerAppSecret { get; set; } = "";
+// }
+
+// public class Credentials(string corexClientKey, string brokerAppId, string brokerAppSecret)
+// {
+//     protected string CoreXClientKey { get; } = corexClientKey;
+//     protected string BrokerAppId { get; } = brokerAppId;
+//     protected string BrokerAppSecret { get; } = brokerAppSecret;
+// }
+
+internal sealed class CoreXOptions
 {
-    protected string CoreXClientKey { get; } = corexClientKey;
-    protected string BrokerAppId { get; } = brokerAppId;
-    protected string BrokerAppSecret { get; } = brokerAppSecret;
+    
+}
+
+internal sealed class BrokerOptions
+{
+    
 }
