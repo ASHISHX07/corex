@@ -11,8 +11,3 @@ internal sealed record Credentials(
     string BrokerAppId,
     string BrokerAppSecret
 );
-
-// Credentials? credentials = await JsonHandler.ReadJsonAsync<Credentials>(
-//     Fs.CredentialPath,
-//     CoreXJsonContext.Default
-// );

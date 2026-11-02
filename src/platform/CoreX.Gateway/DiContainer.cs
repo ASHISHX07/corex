@@ -4,24 +4,30 @@ internal static class CoreXDi
 {
     internal static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
+        string BrokerName = configuration["ActiveBroker"] ?? 
+            throw new InvalidOperationException("[PLATFORM] - Failed to get Broker name.");
+
         services
             .AddOptions<CoreXOptions>()
-            .Bind(configuration.GetSection("CoreX"));
+            .Bind(configuration.GetSection("CoreXAuthServer"));
 
         services
             .AddOptions<BrokerOptions>()
-            .Bind(configuration.GetSection("Broker"));
+            .Bind(configuration.GetSection($"Brokers:{BrokerName}"));
 
-        string BrokerName = configuration["Broker:Name"]?.ToUpper()?.Trim() ?? 
-            throw new InvalidOperationException("[PLATFORM] - Failed to get Broker name.");
+
+        services.AddHttpClient("UpstoxAuthClient", client =>
+        {
+            // client.BaseAddress = new Uri();
+        });
 
         services.AddTransient<IBrokerAuthenticator>(sp =>
         {
-            if (BrokerName == "UPSTOX")
+            if (BrokerName.ToUpper().Trim() == "UPSTOX")
             {
                 Credentials credentials = JsonHandler.ReadJson<Credentials>(Fs.CredentialPath, CredentialsJsonContext.Default) ??
                     throw new InvalidOperationException($"[PLATFORM] - Missing credentials for {BrokerName}");
-                    
+
                 return new UpstoxAuthenticator(credentials);
             }
 
