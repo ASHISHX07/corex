@@ -13,7 +13,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     
-    <Configuration>Debug</Configuration>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <CoreXEnvironment Condition="'$(Configuration)' == 'Debug'">Development</CoreXEnvironment>
     <CoreXEnvironment Condition="'$(Configuration)' == 'Release'">Production</CoreXEnvironment>
   </PropertyGroup>
@@ -27,10 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyMetadata
-      Include="CoreXEnvironment"
-      Value="$(CoreXEnvironment)"
-    />
+    <AssemblyMetadata Include="CoreXEnvironment" Value="$(CoreXEnvironment)"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +41,7 @@
   <ItemGroup>
     <Content
       Include="..\..\..\config\appsettings.json"
-      Link="config\%(Filename)%(Extension)"
+      Link="%(Filename)%(Extension)"
       CopyToOutputDirectory="PreserveNewest"
       CopyToPublicDirectory="PreserveNewest"
     />

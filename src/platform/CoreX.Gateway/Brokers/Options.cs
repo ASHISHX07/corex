@@ -5,11 +5,11 @@ internal partial class CredentialsJsonContext : JsonSerializerContext
 {
 }
 
-internal sealed record Credentials(
-    string CoreXClientKey,
-    string BrokerAppId,
-    string BrokerAppSecret
-);
+// internal sealed record Credentials(
+//     string CoreXClientKey,
+//     string BrokerAppId,
+//     string BrokerAppSecret
+// );
 
 // public sealed class CredentialsOption
 // {

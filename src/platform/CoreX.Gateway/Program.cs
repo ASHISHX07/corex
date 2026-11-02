@@ -14,13 +14,14 @@ internal class CoreXPlatfrom
             {
                 Args = args,
                 EnvironmentName = environment,
-                ApplicationName = "CoreX-Gateway"
+                ApplicationName = "CoreX-Gateway",
+                ContentRootPath = AppContext.BaseDirectory
             }
         );
-
-        builder.Configuration.AddJsonFile(Path.GetFullPath(Fs.CredentialPath), optional: false, reloadOnChange: true);
-
+        
         CoreXDi.RegisterServices(builder.Services, builder.Configuration);
+
+        using IHost host = builder.Build();
 
         await Logger.CloseAsync();
         await PerformanceProfiler.CloseAsync();

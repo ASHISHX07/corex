@@ -1,7 +1,7 @@
 namespace CoreX.Gateway.Data;
 
-[JsonSourceGenerationOptions(WriteIndented = true, IndentSize = 4)]
 [JsonSerializable(typeof(Session))]
+[JsonSourceGenerationOptions(WriteIndented = true, IndentSize = 4)]
 internal partial class SessionJsonSerializerContext : JsonSerializerContext
 {
 }
