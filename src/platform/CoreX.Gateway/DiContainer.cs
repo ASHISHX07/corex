@@ -15,7 +15,7 @@ internal static class CoreXDi
         // Public configuration
         services
             .AddOptions<CoreXServerOptions>()
-            .Bind(configuration.GetSection("CoreXAuthServer"))
+            .Bind(configuration.GetSection("CoreXServer"))
             .Validate(options => 
                 Uri.TryCreate(options.BaseUri, UriKind.Absolute, out var CoreXServerBaseUri) &&
                 CoreXServerBaseUri.Scheme == Uri.UriSchemeHttp,

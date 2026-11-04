@@ -10,6 +10,7 @@ namespace CoreX.Gateway.Helpers;
 internal static class CorexCryptography
 {
     private static readonly byte[] HkdfInfo = "corex-token-v2"u8.ToArray();
+    private const string Algorithm = "ECDH-P256+HKDF-SHA256+AES-256-GCM";
 
     internal static KeyPair GenerateKeyPair() => new();
 
@@ -30,29 +31,73 @@ internal static class CorexCryptography
         /// <summary>Returns the plaintext JSON bytes: { accessToken, tokenType, expiresAt, profile }.</summary>
         internal byte[] Decrypt(string sessionId, EncryptedTokenEnvelope envelope)
         {
-            if (envelope.Version != 2) throw new CryptographicException("Unsupported envelope version.");
+            if (string.IsNullOrWhiteSpace(sessionId))
+                throw new ArgumentException("Invalid session ID.", nameof(sessionId));
 
-            byte[] serverPoint = FromBase64Url(envelope.EphemeralPublicKey);   // server's one-time public key (65 bytes)
-            byte[] data = FromBase64Url(envelope.CipherText);                  // encrypted JSON + 16-byte integrity tag
-            if (serverPoint.Length != 65 || data.Length < 16) throw new CryptographicException("Malformed envelope.");
+            if (envelope.Version != 2 || envelope.Algorithm != Algorithm)
+                throw new CryptographicException("Unsupported encryption envelope.");
 
-            // 1. Shared secret: my private key + server's one-time public key (the server derived the same one).
+            byte[] serverPoint = FromBase64Url(envelope.EphemeralPublicKey);
+            byte[] nonce = FromBase64Url(envelope.Iv);
+            byte[] data = FromBase64Url(envelope.CipherText);
+
+            if (serverPoint.Length != 65 ||
+                serverPoint[0] != 0x04 ||
+                nonce.Length != 12 ||
+                data.Length < 16)
+            {
+                throw new CryptographicException("Malformed encryption envelope.");
+            }
+
             using var server = ECDiffieHellman.Create(new ECParameters
             {
                 Curve = ECCurve.NamedCurves.nistP256,
-                Q = new ECPoint { X = serverPoint[1..33], Y = serverPoint[33..65] }
+                Q = new ECPoint
+                {
+                    X = serverPoint[1..33],
+                    Y = serverPoint[33..65]
+                }
             });
-            byte[] secret = _key.DeriveRawSecretAgreement(server.PublicKey);
 
-            // 2. Turn the secret into an AES key. The session id is mixed in, so the key is unique per login.
             byte[] session = Encoding.UTF8.GetBytes(sessionId);
-            byte[] aesKey = HKDF.DeriveKey(HashAlgorithmName.SHA256, secret, 32, salt: session, info: HkdfInfo);
+            byte[] secret = _key.DeriveRawSecretAgreement(server.PublicKey);
+            byte[]? aesKey = null;
 
-            // 3. Decrypt and verify. Any tampering, or a wrong session id, throws CryptographicException.
-            byte[] plain = new byte[data.Length - 16];
-            using var aes = new AesGcm(aesKey, 16);
-            aes.Decrypt(FromBase64Url(envelope.Iv), data[..^16], data[^16..], plain, session);
-            return plain;
+            byte[] plaintext = new byte[data.Length - 16];
+
+            try
+            {
+                aesKey = HKDF.DeriveKey(
+                    HashAlgorithmName.SHA256,
+                    secret,
+                    32,
+                    salt: session,
+                    info: HkdfInfo);
+
+                using var aes = new AesGcm(aesKey, 16);
+
+                aes.Decrypt(
+                    nonce,
+                    data[..^16],
+                    data[^16..],
+                    plaintext,
+                    session);
+
+                return plaintext;
+            }
+            catch
+            {
+                CryptographicOperations.ZeroMemory(plaintext);
+                throw;
+            }
+            finally
+            {
+                CryptographicOperations.ZeroMemory(secret);
+                CryptographicOperations.ZeroMemory(session);
+
+                if (aesKey is not null)
+                    CryptographicOperations.ZeroMemory(aesKey);
+            }
         }
 
         public void Dispose() => _key.Dispose();
