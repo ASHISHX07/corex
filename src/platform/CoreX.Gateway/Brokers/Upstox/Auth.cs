@@ -20,16 +20,16 @@ internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXS
 
         _httpclient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CoreXClientKey);
 
-        var SessionCreationPayload = new
-        {
-            broker = "upstox",
-            appId = BrokerAppId,
-            appSecret = BrokerAppSecret,
-            clientPublicKey = publicKey.PublicKey
-        };
+        //var SessionCreationPayload = new
+        //{
+        //    broker = "upstox",
+        //    appId = BrokerAppId,
+        //    appSecret = BrokerAppSecret,
+        //    clientPublicKey = publicKey.PublicKey
+        //};
         
         //HttpResponseMessage responseMessage = await _httpclient.PostAsJsonAsync<SessionCreationPayload>()
-        //throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
     // Create Session
