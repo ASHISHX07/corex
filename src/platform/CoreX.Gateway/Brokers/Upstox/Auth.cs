@@ -1,18 +1,17 @@
 ﻿namespace CoreX.Gateway.Brokers;
 
-internal sealed class UpstoxAuthenticator : IBrokerAuthenticator
+internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXServerOptions> options) : IBrokerAuthenticator
 {
-    private readonly Credentials _credentials;
-    // private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpclient = httpClient;
+    private readonly CoreXServerOptions _options = options.Value;
 
-    internal UpstoxAuthenticator(Credentials credentials)
+    private readonly Credentials? credentials = JsonHandler.ReadJson<Credentials>(Fs.CredentialPath, CredentialsJsonSerializerContext.Default);
+
+    public async Task<string> AuthenticateAsync(CancellationToken cancellationToken = default)
     {
-        _credentials = credentials;
-        // _httpClient = httpClient;
-    }
+        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_httpclient.BaseAddress!, _options.AuthSessionCreation));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "");
 
-    // internal async Task<string> GetAuthCodeAsync(CancellationToken? cancellationToken)
-    // {
-        
-    // }
+        throw new NotImplementedException();
+    }
 }

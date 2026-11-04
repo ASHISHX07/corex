@@ -1,37 +1,53 @@
+using System.Buffers.Text;
+
 namespace CoreX.Gateway;
 
 internal static class CoreXDi
 {
     internal static void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
-        string BrokerName = configuration["ActiveBroker"] ?? 
+        string BrokerName = configuration["ActiveBroker"]?.Trim() ?? 
             throw new InvalidOperationException("[PLATFORM] - Failed to get Broker name.");
 
+        if (string.IsNullOrWhiteSpace(BrokerName))
+            throw new InvalidOperationException("[PLATFORM] - Broker name cannot be empty.");
+
+        // Public configuration
         services
-            .AddOptions<CoreXOptions>()
-            .Bind(configuration.GetSection("CoreXAuthServer"));
+            .AddOptions<CoreXServerOptions>()
+            .Bind(configuration.GetSection("CoreXAuthServer"))
+            .Validate(options => 
+                Uri.TryCreate(options.BaseUri, UriKind.Absolute, out var CoreXServerBaseUri) &&
+                CoreXServerBaseUri.Scheme == Uri.UriSchemeHttp,
+                "Invalid CoreX server base uri")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.AuthSessionCreation), "AuthSessionCreation cannot be empty.")
+            .Validate(options => !string.IsNullOrWhiteSpace(options.GetAuthSessionResult), "GetAuthSessionResult cannot be empty.")
+            .Validate(options => options.PollIntervalMs > 0, "PollIntervalMs must be greater than zero.")
+            .Validate(options => options.TimeOutSeconds > 0, "TimeOutSeconds must be greater than zero.")
+            .ValidateOnStart();
 
         services
             .AddOptions<BrokerOptions>()
             .Bind(configuration.GetSection($"Brokers:{BrokerName}"));
 
-
-        services.AddHttpClient("UpstoxAuthClient", client =>
+        switch (BrokerName.ToUpperInvariant())
         {
-            // client.BaseAddress = new Uri();
-        });
+            case "UPSTOX":
+                services.AddHttpClient<IBrokerAuthenticator, UpstoxAuthenticator>((sp, client) =>
+                {
+                    var options = sp.GetRequiredService<IOptions<CoreXServerOptions>>().Value;
 
-        services.AddTransient<IBrokerAuthenticator>(sp =>
-        {
-            if (BrokerName.ToUpper().Trim() == "UPSTOX")
-            {
-                Credentials credentials = JsonHandler.ReadJson<Credentials>(Fs.CredentialPath, CredentialsJsonContext.Default) ??
-                    throw new InvalidOperationException($"[PLATFORM] - Missing credentials for {BrokerName}");
+                    if (!Uri.TryCreate(options.BaseUri, UriKind.Absolute, out var baseUri) || baseUri.Scheme != Uri.UriSchemeHttps)
+                        throw new InvalidOperationException("[PLATFORM] - Invalid CoreX Server Base URI");
+                    
+                    client.BaseAddress = baseUri;
+                    client.Timeout = TimeSpan.FromSeconds(options.TimeOutSeconds);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                });
+                break;
 
-                return new UpstoxAuthenticator(credentials);
-            }
-
-            throw new NotSupportedException("[PLATFORM] - Invalid Broker.");
-        });
+            default:
+                throw new NotSupportedException($"[PLATFORM] - Broker '{BrokerName}' is not supported.");
+        }
     }
 }
