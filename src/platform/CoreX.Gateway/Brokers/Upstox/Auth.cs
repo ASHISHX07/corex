@@ -1,76 +1,111 @@
 ﻿namespace CoreX.Gateway.Brokers;
 
-internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXServerOptions> options) : IBrokerAuthenticator
+internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXServerOptions> serverOptions) : IBrokerAuthenticator
 {
+    private readonly string BrokerName = "upstox";
     private readonly HttpClient _httpclient = httpClient;
-    private readonly CoreXServerOptions _options = options.Value;
+    private readonly CoreXServerOptions _serverOptions = serverOptions.Value;
+    private readonly Credentials credentials = JsonHandler.ReadJson(Fs.CredentialPath, CoreXServerPayloadJsonContext.Default.Credentials) ??
+            throw new NotSupportedException("[PLATFORM] - Failed to load credentials.");
+    
+    private string SessionId = string.Empty;
 
-    private readonly Credentials? credentials = JsonHandler.ReadJson<Credentials>(Fs.CredentialPath, CredentialsJsonSerializerContext.Default);
-
-    public async Task<string> AuthenticateAsync(CancellationToken cancellationToken = default)
+    public async Task AuthenticateAsync(CancellationToken cancellationToken = default)
     {
-        string CoreXClientKey = credentials?.CoreXClientKey ??
-            throw new InvalidOperationException("[PLATFORM] - Missing CoreX client key");
-        string BrokerAppId    = credentials?.BrokerAppId ??
-            throw new InvalidOperationException("[PLATFORM] - Missing broker app id");
-        string BrokerAppSecret = credentials?.BrokerAppSecret ??
-            throw new InvalidOperationException("[PLATFORM] - Missing broker app secret");
+        _httpclient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", credentials.CoreXClientKey);
 
-        using var publicKey = CorexCryptography.GenerateKeyPair();
+        var payload = new BrokerAuthPayload(
+            Broker: BrokerName,
+            Credentials: new BrokerAuthPayload.BrokerCredentials(
+                AppId: credentials.BrokerAppId,
+                AppSecret: credentials.BrokerAppSecret
+            )
+        );
 
-        _httpclient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CoreXClientKey);
+        Console.WriteLine("[PLATFORM] - Upstox client authenticating...");
 
-        //var SessionCreationPayload = new
-        //{
-        //    broker = "upstox",
-        //    appId = BrokerAppId,
-        //    appSecret = BrokerAppSecret,
-        //    clientPublicKey = publicKey.PublicKey
-        //};
-        
-        //HttpResponseMessage responseMessage = await _httpclient.PostAsJsonAsync<SessionCreationPayload>()
-        throw new NotImplementedException();
+        using var response = await _httpclient.PostAsJsonAsync(
+            _serverOptions.Endpoints.CreateAuthSession,
+            payload,
+            CoreXServerPayloadJsonContext.Default.BrokerAuthPayload,
+            cancellationToken
+        );
+
+        if (response.IsSuccessStatusCode)
+        {
+            var sessionResponse = await response.Content.ReadFromJsonAsync(CoreXServerPayloadJsonContext.Default.BrokerAuthSessionResponse, cancellationToken) ??
+                throw new NoNullAllowedException("[PLATFORM] - possibly null value in session response");
+
+            SessionId = sessionResponse.SessionId;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = sessionResponse?.AuthorizationUrl,
+                    UseShellExecute = true
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                Process.Start("open", sessionResponse.AuthorizationUrl);
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                Process.Start("xdg-open", sessionResponse.AuthorizationUrl);
+            else throw new PlatformNotSupportedException("[PLATFORM] - Unsupported platform\n\tSupported Platforms - Windows, MacOS, Linux");
+
+            Console.WriteLine("[PLATFORM] - Waiting for server response...");
+        }
+        else
+        {
+            var sessionResponse = await response.Content.ReadFromJsonAsync(CoreXServerPayloadJsonContext.Default.CoreXServerError, cancellationToken) ??
+                throw new NoNullAllowedException("[PLATFORM] - possibly null value in session response");
+
+            throw new HttpRequestException($"[PLATFORM] - CoreX server error: {sessionResponse.Error}\n\t{sessionResponse.Message}");
+        }
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_serverOptions.TimeoutSeconds));
+        try
+        {
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+            using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(_serverOptions.PollIntervalMs));
+
+            string SessionRetrievalEndpoint = _serverOptions.Endpoints.GetAuthSessionResult.Replace("<sessionId>", SessionId);
+
+            while (await timer.WaitForNextTickAsync(linkedCts.Token))
+            {
+                using var message = await _httpclient.PostAsync(SessionRetrievalEndpoint, null, linkedCts.Token);
+
+                if (message.StatusCode == HttpStatusCode.Accepted)
+                    continue;
+
+                if (!message.IsSuccessStatusCode)
+                {
+                    var error = await message.Content.ReadFromJsonAsync(CoreXServerPayloadJsonContext.Default.CoreXServerError, linkedCts.Token);
+                    throw new HttpRequestException($"CoreX server error: {error?.Error}\n{error?.Message}", null, message.StatusCode);
+                }
+
+                var successResponse = await message.Content.ReadFromJsonAsync(CoreXServerPayloadJsonContext.Default.BrokerAuthSuccessResponse, linkedCts.Token) ??
+                    throw new JsonException("[PLATFORM] - Invalid authentication response");
+
+                var token = successResponse.Token.AccessToken;
+
+                if (string.IsNullOrWhiteSpace(token))
+                    throw new JsonException("[PLATFORM] - Authentication response contains no access token");
+
+                Session session = new()
+                {
+                    Broker = BrokerName,
+                    Token = token,
+                    SavedAt = Time.GetTime().GetLocalNow().ToString("dd-MM-yyyy h:mm:ss tt")
+                };
+
+                await CacheHandler.WriteSessionAsync(session, linkedCts.Token);
+
+                return;
+            }
+        }
+        catch (OperationCanceledException) when (cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            throw new TimeoutException("[AUTHENTICATION] - Authentication timed out");
+        }
     }
-
-    // Create Session
-
-    //private static async Task<ApiErrorResponse?> ReadErrorAsync(HttpResponseMessage response, CancellationToken token = default)
-    //{
-    //    try
-    //    {
-    //        //return await response.Content.ReadFromJsonAsync<ApiErrorResponse>(cancellationToken: token);
-    //    }
-    //    catch (JsonException)
-    //    {
-    //        return null;
-    //    }
-    //}
-
-    private sealed record CreateSessionRequest(
-        [property: JsonPropertyName("broker")] string Broker,
-        [property: JsonPropertyName("appId")] string AppId,
-        [property: JsonPropertyName("appSecret")] string AppSecret,
-        [property: JsonPropertyName("clientPublicKey")] string ClientPublicKey
-    );
-
-    private sealed record SessionResponse(
-        [property: JsonPropertyName("sessionId")] string SessionId,
-        [property: JsonPropertyName("authorizationUrl")] string AuthorizationUrl,
-        [property: JsonPropertyName("expiresAt")] DateTimeOffset ExpiresAt
-    );
-
-    private sealed record PollResponse(
-        [property: JsonPropertyName("status")] string? status,
-        [property: JsonPropertyName("error")] string? Error,
-        [property: JsonPropertyName("encrypted")] EncryptedTokenEnvelope? Encrypted
-    );
-
-    private sealed record ApiErrorResponse(
-        [property: JsonPropertyName("error")] string? Error
-    );
-
-    private sealed record SessionContext(
-        string CoreXClientKey,
-        SessionResponse Response
-    );
 }

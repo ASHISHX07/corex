@@ -2,11 +2,8 @@ namespace CoreX.Gateway.Helpers;
 
 internal static class JsonHandler
 {
-    public static void WriteJson<T>(string path, T obj, JsonSerializerContext context)
+    public static void WriteJson<T>(string path, T obj, JsonTypeInfo<T> typeInfo)
     {
-        if (context.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
-            throw new NotSupportedException($"[PLATFORM] - No generated JSON metadata found for {typeof(T).Name}.");
-
         using var WriteStream = new FileStream(
             path,
             FileMode.Create,
@@ -19,11 +16,8 @@ internal static class JsonHandler
         JsonSerializer.Serialize(WriteStream, obj, typeInfo);
     }
 
-    public static async Task WriteJsonAsync<T>(string path, T obj, JsonSerializerContext context)
+    public static async Task WriteJsonAsync<T>(string path, T obj, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default)
     {
-        if (context.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
-            throw new NotSupportedException($"[PLATFORM] - No generated JSON metadata found for {typeof(T).Name}.");
-
         await using var WriteStream = new FileStream(
             path,
             FileMode.Create,
@@ -33,14 +27,11 @@ internal static class JsonHandler
             useAsync: true
         );
 
-        await JsonSerializer.SerializeAsync(WriteStream, obj, typeInfo);
+        await JsonSerializer.SerializeAsync(WriteStream, obj, typeInfo, cancellationToken);
     }
 
-    public static T? ReadJson<T>(string path, JsonSerializerContext context)
+    public static T? ReadJson<T>(string path, JsonTypeInfo<T> typeInfo)
     {
-        if (context.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
-            throw new NotSupportedException($"[PLATFORM] - No generated JSON metadata found for {typeof(T).Name}.");
-
         using var ReadStream = new FileStream(
             path,
             FileMode.Open,
@@ -53,11 +44,8 @@ internal static class JsonHandler
         return JsonSerializer.Deserialize(ReadStream, typeInfo);
     }
 
-    public static async Task<T?> ReadJsonAsync<T>(string path, JsonSerializerContext context)
+    public static async Task<T?> ReadJsonAsync<T>(string path, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default)
     {
-        if (context.GetTypeInfo(typeof(T)) is not JsonTypeInfo<T> typeInfo)
-            throw new NotSupportedException($"[PLATFORM] - No generated JSON metadata found for {typeof(T).Name}.");
-
         await using var ReadStream = new FileStream(
             path,
             FileMode.Open,
@@ -67,6 +55,6 @@ internal static class JsonHandler
             useAsync: true
         );
 
-        return await JsonSerializer.DeserializeAsync(ReadStream, typeInfo);
+        return await JsonSerializer.DeserializeAsync(ReadStream, typeInfo, cancellationToken);
     }
 }

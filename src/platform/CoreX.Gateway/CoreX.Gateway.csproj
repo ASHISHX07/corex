@@ -7,8 +7,9 @@
   </Target>
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <ApplicationIcon>./CX-LIGHT-TRSP-01.ico</ApplicationIcon>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -27,24 +28,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyMetadata Include="CoreXEnvironment" Value="$(CoreXEnvironment)"/>
+    <AssemblyMetadata Include="CoreXEnvironment" Value="$(CoreXEnvironment)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fyers-api-v3" Version="1.5.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.13" />
+    <PackageReference Include="fyers-api-v3" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
     <PackageReference Include="upstox-dotnet-sdk" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content
-      Include="..\..\..\config\appsettings.json"
-      Link="%(Filename)%(Extension)"
-      CopyToOutputDirectory="PreserveNewest"
-      CopyToPublicDirectory="PreserveNewest"
-    />
+    <Content Include="..\..\..\config\appsettings.json" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublicDirectory="PreserveNewest" />
 
     <Compile Include="..\..\..\shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>

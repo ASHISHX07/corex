@@ -3,6 +3,7 @@ global using System;
 global using System.IO;
 global using System.IO.Compression;
 global using System.IO.Pipelines;
+global using System.Data;
 global using System.Net;
 global using System.Net.Http;
 global using System.Net.Sockets;
@@ -24,6 +25,7 @@ global using System.Runtime.InteropServices;
 global using System.Runtime.CompilerServices;
 global using System.Collections.Generic;
 global using System.Collections.Concurrent;
+global using System.Linq;
 global using HyperSyncLib;
 
 // Memory
