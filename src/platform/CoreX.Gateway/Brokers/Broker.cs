@@ -1,6 +1,14 @@
 namespace CoreX.Gateway.Brokers;
 
+internal enum Index
+{
+    Nifty,
+    Banknifty,
+    Sensex,
+    Bankex
+}
+
 //internal interface IBroker
 //{
-//    public Task AuthenticateAsync();
+//    Task LoginAsync(CancellationToken cancellationToken = default);
 //}

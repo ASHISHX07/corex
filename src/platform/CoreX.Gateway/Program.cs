@@ -4,17 +4,6 @@ internal class CoreXPlatfrom
 {
     internal static async Task Main(string[] args)
     {
-        using var cts = new CancellationTokenSource();
-
-        ConsoleCancelEventHandler cancelHandler = (_, e) =>
-        {
-            e.Cancel = true; // Prevent immediate process termination
-            Console.WriteLine("\n[PLATFORM] - Closing...");
-            cts.Cancel();
-        };
-
-        Console.CancelKeyPress += cancelHandler;
-
         Fs.Init();
 
         var environment = Assembly.GetEntryAssembly()?.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(x => x.Key == "CoreXEnvironment")?.Value
@@ -30,21 +19,33 @@ internal class CoreXPlatfrom
             }
         );
         
+        builder.Logging.Services.AddSingleton<ILoggerProvider, GatewayFileLoggerProvider>();
         CoreXDi.RegisterServices(builder.Services, builder.Configuration);
 
         using IHost host = builder.Build();
 
-        await host.StartAsync();
+        var stoppingToken = host.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
 
-        //await host.Services.GetRequiredService<IBrokerAuthenticator>().AuthenticateAsync();
-        //var (success, profile) = await host.Services.GetRequiredService<IBroker>().TryGetProfileInfoAsync();
-
-        await host.Services.GetRequiredService<IBroker>().LoginAsync(cts.Token);
-
-        Console.CancelKeyPress -= cancelHandler;
-
-        await host.StopAsync();
-        await Logger.CloseAsync();
-        await PerformanceProfiler.CloseAsync();
+        try
+        {
+            await host.StartAsync(stoppingToken);
+            var broker = host.Services.GetRequiredService<IBroker>();
+            await broker.LoginAsync(stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // A host shutdown cancels the active HTTP request or timer wait.
+        }
+        finally
+        {
+            try
+            {
+                await host.StopAsync();
+            }
+            finally
+            {
+                await PerformanceProfiler.CloseAsync();
+            }
+        }
     }
 }

@@ -86,10 +86,14 @@ internal sealed record CoreXServerError(
 internal sealed record BrokerOptions
 {
     public string BaseUri { get; set; } = string.Empty;
+    public string[] IndexInstrumentKeys { get; set; } = [];
     public BrokerEndpoints Endpoints { get; set; } = new();
+    public int ApiPollIntervalMs { get; set; }
 
     internal sealed class BrokerEndpoints
     {
         public string UserProfile { get; set; } = string.Empty;
+        public string OptionContracts { get; set; } = string.Empty;
+        public string GetQuotes { get; set; } = string.Empty;
     }
 }

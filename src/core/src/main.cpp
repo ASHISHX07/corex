@@ -1,8 +1,6 @@
 #include <iostream>
 
-int main()
-{
-	std::cout << "Hello from CoreX-Core";
-
-	return 0;
+int main() {
+    std::cout << __cplusplus << '\n';
+    return 0;
 }

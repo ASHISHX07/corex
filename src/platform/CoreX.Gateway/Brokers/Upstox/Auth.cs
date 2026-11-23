@@ -1,6 +1,9 @@
 ﻿namespace CoreX.Gateway.Brokers;
 
-internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXServerOptions> serverOptions) : IBrokerAuthenticator
+internal sealed class UpstoxAuthenticator(
+    HttpClient httpClient,
+    IOptions<CoreXServerOptions> serverOptions,
+    ILogger<Upstox> logger) : IBrokerAuthenticator
 {
     private readonly string BrokerName = "upstox";
     private readonly HttpClient _httpclient = httpClient;
@@ -22,8 +25,7 @@ internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXS
             )
         );
 
-        Console.WriteLine("[PLATFORM] - Upstox client authenticating...");
-
+        logger.LogInformation("[PLATFORM] - Upstox client authenticating...");
         using var response = await _httpclient.PostAsJsonAsync(
             _serverOptions.Endpoints.CreateAuthSession,
             payload,
@@ -52,7 +54,7 @@ internal sealed class UpstoxAuthenticator(HttpClient httpClient, IOptions<CoreXS
                 Process.Start("xdg-open", sessionResponse.AuthorizationUrl);
             else throw new PlatformNotSupportedException("[PLATFORM] - Unsupported platform\n\tSupported Platforms - Windows, MacOS, Linux");
 
-            Console.WriteLine("[PLATFORM] - Waiting for server response...");
+            logger.LogInformation("[PLATFORM] - Waiting for server response...");
         }
         else
         {

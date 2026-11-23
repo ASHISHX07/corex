@@ -1,7 +1,6 @@
 // System/Platform
 global using System;
 global using System.IO;
-global using System.IO.Compression;
 global using System.IO.Pipelines;
 global using System.Data;
 global using System.Net;
@@ -15,6 +14,7 @@ global using System.Text.Json;
 global using System.Text.Json.Schema;
 global using System.Text.Json.Serialization;
 global using System.Text.Json.Serialization.Metadata;
+global using System.Text.RegularExpressions;
 global using System.Reflection;
 global using System.Globalization;
 global using System.Threading;
@@ -49,7 +49,7 @@ global using CoreX.Gateway.Memory;
 global using CoreX.Gateway.Brokers;
 
 // Third-Party
-global using Microsoft.Extensions.Http;
+global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;

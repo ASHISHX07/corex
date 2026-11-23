@@ -45,4 +45,8 @@
     <Compile Include="..\..\..\shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Brokers\Upstox\Utils\" />
+  </ItemGroup>
+
 </Project>
