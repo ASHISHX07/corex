@@ -32,11 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fyers-api-v3" Version="1.6.0" />
+    <PackageReference Include="fyers-api-v3" Version="1.7.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.36.2" />
+    <PackageReference Include="upstox-dotnet-sdk" Version="2.7.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
-    <PackageReference Include="upstox-dotnet-sdk" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>

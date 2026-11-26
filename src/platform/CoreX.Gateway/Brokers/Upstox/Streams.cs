@@ -1,6 +1,4 @@
-﻿namespace CoreX.Gateway.Brokers;
-
-internal class UpstoxMarketDataStreams(
+﻿internal class UpstoxDataStreams(
     HttpClient httpClient,
     BrokerOptions brokerConfig
     //ILogger<Upstox> logger
@@ -14,7 +12,7 @@ internal class UpstoxMarketDataStreams(
         string keys = string.Join(",", instruments.Select(Uri.EscapeDataString));
         string query = $"instrument_key={keys}";
 
-        UriBuilder uriBuilder = new(httpClient.BaseAddress!)
+        UriBuilder uriBuilder = new(brokerConfig.BaseUri)
         {
             Path = brokerConfig.Endpoints.GetQuotes,
             Query = query
@@ -24,7 +22,6 @@ internal class UpstoxMarketDataStreams(
         response.EnsureSuccessStatusCode();
 
         var Quote = await response.Content.ReadFromJsonAsync(UpstoxResponseJsonContext.Default.UpstoxMarketQuoteResponse, cancellationToken);
-        Console.WriteLine(Quote?.InstrumentData.Values);
     }
 
     public async Task QuoteStreamAsync(string[] instruments, CancellationToken cancellationToken)
@@ -36,5 +33,38 @@ internal class UpstoxMarketDataStreams(
             await GetQuoteAsync(instruments, cancellationToken);
         }
         while (await timer.WaitForNextTickAsync(cancellationToken));
+    }
+
+    public async Task OptionChainPollStream(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task OptionChainWsStream(CancellationToken cancellationToken)
+    {
+
+    }
+}
+
+internal class UpstoxWSFeedv3(BrokerOptions brokerConfig)
+{
+    private readonly UriBuilder _wsDataFeedEndpointUri = new(brokerConfig.BaseUri)
+    {
+        Path = brokerConfig.Endpoints.WsFeedEndpoint
+    };
+
+    private readonly UriBuilder _wsPortfolioFeedUri = new(brokerConfig.BaseUri)
+    {
+        Path = brokerConfig.Endpoints.PortfolioFeedEndpoint
+    };
+
+    internal async Task WsDataFeedAsync()
+    {
+        using ClientWebSocket socket = new();
+    }
+
+    internal async Task WsPortfolioFeedAsync()
+    {
+        using ClientWebSocket socket = new();
     }
 }

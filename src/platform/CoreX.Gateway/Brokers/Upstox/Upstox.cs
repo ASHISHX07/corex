@@ -7,10 +7,10 @@ internal class Upstox(
     ILogger<Upstox> logger) : IBroker
 {
     private readonly BrokerOptions _brokerOptions = brokerConfig.Value;
+    private static string _upstoxCachePath = Path.Combine(Fs.CachePath, "upstox");
     private readonly HttpClient _httpclient = httpClient;
     private Session? _session;
     private UpstoxProfileInfo? _profileInfo;
-    private static string _upstoxCachePath = Path.Combine(Fs.CachePath, "upstox");
 
     // ---------- ACCOUNT RELATED --------------------------------------------------
     public async Task LoginAsync(CancellationToken cancellationToken = default)
@@ -46,9 +46,9 @@ internal class Upstox(
         }
 
         await GetOptionInstrumentsAsync(cancellationToken);
-        var stream = new UpstoxMarketDataStreams(_httpclient, _brokerOptions);
+        var stream = new UpstoxDataStreams(_httpclient, _brokerOptions);
 
-        await stream.QuoteStreamAsync(["NSE_EQ|INE848E01016"], cancellationToken);
+        await stream.QuoteStreamAsync(["NSE_FO|76396"], cancellationToken);
     }
 
     public async Task<(HttpStatusCode? StatusCode, UpstoxProfileInfo? Profile)> TryGetProfileInfoAsync(CancellationToken cancellationToken = default)
