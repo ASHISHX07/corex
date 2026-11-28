@@ -97,6 +97,8 @@ internal sealed record BrokerOptions
         public string GetQuotes { get; set; } = string.Empty;
         public string GetOptionChain { get; set; } = string.Empty;
         public string WsFeedEndpoint { get; set; } = string.Empty;
+        public string WsFeedAuthEndpoint { get; set; } = string.Empty;
         public string PortfolioFeedEndpoint { get; set; } = string.Empty;
+        public string WsPortfolioFeedAuthEndpoint { get; set; } = string.Empty;
     }
 }

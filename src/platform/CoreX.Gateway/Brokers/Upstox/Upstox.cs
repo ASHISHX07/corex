@@ -44,11 +44,6 @@ internal class Upstox(
         {
             logger.LogInformation("[PLATFORM] - Logged in as {Username}", _profileInfo.Data.Username);
         }
-
-        await GetOptionInstrumentsAsync(cancellationToken);
-        var stream = new UpstoxDataStreams(_httpclient, _brokerOptions);
-
-        await stream.QuoteStreamAsync(["NSE_FO|76396"], cancellationToken);
     }
 
     public async Task<(HttpStatusCode? StatusCode, UpstoxProfileInfo? Profile)> TryGetProfileInfoAsync(CancellationToken cancellationToken = default)
@@ -98,13 +93,14 @@ internal class Upstox(
         return (response.StatusCode, profile);
     }
 
-    public async Task<List<UpstoxOptionContracts>> GetOptionInstrumentsAsync(CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, UpstoxOptionContracts>> GetOptionInstrumentsAsync(CancellationToken cancellationToken = default)
     {
-        List<UpstoxOptionContracts> indexInstruments = new();
+        Dictionary<string, UpstoxOptionContracts> indexInstruments = new();
 
         foreach (string index in _brokerOptions.IndexInstrumentKeys.Distinct(StringComparer.Ordinal))
         {
             string cacheName = index.Replace("|", "-").Replace(" ", "");
+            string indexName = 
             string path = Path.Combine(_upstoxCachePath, $"{cacheName}.option-contracts.json");
             var upstoxInstruments = await JsonHandler.ReadJsonAsync(path, UpstoxResponseJsonContext.Default.UpstoxOptionContracts, cancellationToken);
 
@@ -125,16 +121,27 @@ internal class Upstox(
 
                 var instruments = await response.Content.ReadFromJsonAsync(UpstoxResponseJsonContext.Default.UpstoxOptionContracts, cancellationToken);
                 await JsonHandler.WriteJsonAsync(path, instruments, UpstoxResponseJsonContext.Default.UpstoxOptionContracts, cancellationToken);
-                indexInstruments.Add(instruments!);
+                // indexInstruments.Add(instruments!);
+                indexInstruments.Add(index, )
             }
             else
             {
-                indexInstruments.Add(upstoxInstruments);
+                indexInstruments.Add(
+
+                // indexInstruments.Add(upstoxInstruments);
             }
         }
 
         return indexInstruments;
     }
 
+    public async Task Stream(CancellationToken cancellationToken = default)
+    {
+        await GetOptionInstrumentsAsync(cancellationToken);
+        var stream = new UpstoxDataStreams(_httpclient, _brokerOptions);
 
+        await stream.QuoteStreamAsync(["NSE_FO|76396"], cancellationToken);
+
+
+    }
 }

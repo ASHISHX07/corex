@@ -4,6 +4,8 @@
     //ILogger<Upstox> logger
     ) : IMarketDataStreams
 {
+    private UpstoxWSFeedV3 UpstoxWsClient = new(httpClient, brokerConfig);
+
     public async Task GetQuoteAsync(string[] instruments, CancellationToken cancellationToken = default)
     {
         if (instruments.Length is < 1 or > 500)
@@ -42,29 +44,46 @@
 
     public async Task OptionChainWsStream(CancellationToken cancellationToken)
     {
-
+        throw new NotImplementedException();
     }
 }
 
-internal class UpstoxWSFeedv3(BrokerOptions brokerConfig)
+internal class UpstoxWSFeedV3(HttpClient httpClient, BrokerOptions brokerConfig)
 {
-    private readonly UriBuilder _wsDataFeedEndpointUri = new(brokerConfig.BaseUri)
+    
+    internal async Task GetWSDataFeedClientAsync(CancellationToken cancellationToken = default)
     {
-        Path = brokerConfig.Endpoints.WsFeedEndpoint
-    };
+        var response = await httpClient.GetByteArrayAsync(brokerConfig.Endpoints.WsFeedAuthEndpoint, cancellationToken);
+        string? WsDataFeedUri = ExtractRedirectUri(response);
 
-    private readonly UriBuilder _wsPortfolioFeedUri = new(brokerConfig.BaseUri)
-    {
-        Path = brokerConfig.Endpoints.PortfolioFeedEndpoint
-    };
+        if (string.IsNullOrEmpty(WsDataFeedUri))
+        {
+            throw new InvalidOperationException("[PLATFORM] - Failed to get Websocket authorized redirect Uri");
+        }
 
-    internal async Task WsDataFeedAsync()
+        using ClientWebSocket socket = new();
+        await socket.ConnectAsync(new Uri(WsDataFeedUri), cancellationToken);
+    }
+
+    internal async Task GetWsPortfolioFeedAsync(CancellationToken cancellationToken = default)
     {
+        var response = await httpClient.GetByteArrayAsync(brokerConfig.Endpoints.WsPortfolioFeedAuthEndpoint, cancellationToken);
+        string? WsPortfolioFeedUri = ExtractRedirectUri(response);
+
         using ClientWebSocket socket = new();
     }
 
-    internal async Task WsPortfolioFeedAsync()
+    private string? ExtractRedirectUri(ReadOnlySpan<byte> utf8Json)
     {
-        using ClientWebSocket socket = new();
+        var reader = new Utf8JsonReader(utf8Json);
+        while(reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.PropertyName &&
+                reader.ValueTextEquals("authorized_redirect_uri"u8))
+            {
+                if (reader.Read() && reader.TokenType == JsonTokenType.String) return reader.GetString();
+            }
+        }
+        return null;
     }
 }
